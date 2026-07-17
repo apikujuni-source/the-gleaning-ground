@@ -1,0 +1,43 @@
+name: Import dated devotionals
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/import-devotionals.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Unpack devotional archive
+        shell: bash
+        run: |
+          cat \
+            .import/devotionals/part00 \
+            .import/devotionals/part01-00 \
+            .import/devotionals/part01-01 \
+            .import/devotionals/part01-02 \
+            .import/devotionals/part01-03 \
+            .import/devotionals/part01-04 \
+            | base64 --decode > /tmp/devotionals.tar.gz
+          tar -xzf /tmp/devotionals.tar.gz
+
+      - name: Commit imported devotionals
+        shell: bash
+        run: |
+          rm -rf .import/devotionals
+          rm -f .github/workflows/import-devotionals.yml
+          git config user.name "Gleaning Ground Importer"
+          git config user.email "actions@users.noreply.github.com"
+          git add content/devotionals .import .github/workflows
+          git commit -m "Import 87 dated devotionals from old website"
+          git push origin main
