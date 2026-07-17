@@ -3,9 +3,9 @@ backend:
   repo: apikujuni-source/the-gleaning-ground
   branch: main
 
-site_url: https://www.thegleaningground.com
-display_url: https://www.thegleaningground.com
-logo_url: https://www.thegleaningground.com/assets/mark.svg
+site_url: https://gleaningground.com
+display_url: https://gleaningground.com
+logo_url: https://gleaningground.com/assets/mark.svg
 
 media_folder: content/uploads
 public_folder: /assets/uploads
