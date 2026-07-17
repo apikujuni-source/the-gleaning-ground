@@ -18,6 +18,14 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Keep the Divine Blueprint subdomain visible while serving its dedicated
+# landing experience from the main Gleaning Ground deployment.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/"
+  to = "/divine-blueprint/"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/admin"
   to = "/admin/"
