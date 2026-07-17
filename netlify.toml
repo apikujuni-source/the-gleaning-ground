@@ -18,6 +18,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Send legacy Divine Blueprint pages on the main domain to the standalone site.
+[[redirects]]
+  from = "https://gleaningground.com/divine-blueprint/"
+  to = "https://divineblueprint.gleaningground.com/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://gleaningground.com/divine-blueprint/*"
+  to = "https://divineblueprint.gleaningground.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://gleaningground.com/books/the-divine-blueprint/*"
+  to = "https://divineblueprint.gleaningground.com/"
+  status = 301
+  force = true
+
 # Serve the complete standalone Divine Blueprint website from its subdomain.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/"
