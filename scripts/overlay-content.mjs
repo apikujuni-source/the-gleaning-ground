@@ -51,7 +51,9 @@ const replacements = [
   ["thegleaningground.com", "gleaningground.com"],
   ["hello@thegleaningground.com", "hello@gleaningground.com"],
   ["<strong>The Gleaning</strong><em>Ground</em>", "<strong>Gleaning</strong><em>Ground</em>"],
-  ["The Gleaning Ground", "Gleaning Ground"]
+  ["The Gleaning Ground", "Gleaning Ground"],
+  ["href=\"/books/the-divine-blueprint/\"", "href=\"/divine-blueprint/\""],
+  ["href=\"{{ book.url }}\"", "href=\"{{ book.data.destination or book.url }}\""]
 ];
 
 async function rewriteBranding(directory) {
@@ -85,6 +87,7 @@ await rewriteBranding("src");
 const redirectsPath = "src/_redirects";
 const requiredRedirects = [
   "/books/the-grad-life-blueprint/*  /books/  301",
+  "/books/the-divine-blueprint/*  /divine-blueprint/  301",
   "https://thegleaningground.com/*  https://gleaningground.com/:splat  301!",
   "https://www.thegleaningground.com/*  https://gleaningground.com/:splat  301!",
   "https://www.gleaningground.com/*  https://gleaningground.com/:splat  301!"
