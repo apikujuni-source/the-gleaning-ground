@@ -7,7 +7,7 @@ format: Book
 status: Forthcoming
 category: Spiritual Formation
 topics: [Sonship, Maturity, Discipleship]
-destination: /divine-blueprint/
+destination: https://divineblueprint.gleaningground.com/
 collectionName: books
 collectionLabel: Books
 permalink: /books/the-divine-blueprint/index.html
@@ -25,4 +25,4 @@ The project is being developed as a complete discipleship ecosystem:
 - A premium Companion journal
 - Leader and church resources
 
-<a class="button button-primary" href="/divine-blueprint/">Explore the full journey</a>
+<a class="button button-primary" href="https://divineblueprint.gleaningground.com/">Explore the full journey</a>
