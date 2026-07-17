@@ -44,6 +44,8 @@ const textExtensions = new Set([
   ".txt", ".xml", ".yaml", ".yml"
 ]);
 
+const divineBlueprintUrl = "https://divineblueprint.gleaningground.com/";
+
 const replacements = [
   ["https://www.thegleaningground.com", "https://gleaningground.com"],
   ["https://thegleaningground.com", "https://gleaningground.com"],
@@ -52,7 +54,8 @@ const replacements = [
   ["hello@thegleaningground.com", "hello@gleaningground.com"],
   ["<strong>The Gleaning</strong><em>Ground</em>", "<strong>Gleaning</strong><em>Ground</em>"],
   ["The Gleaning Ground", "Gleaning Ground"],
-  ["href=\"/books/the-divine-blueprint/\"", "href=\"/divine-blueprint/\""],
+  ["href=\"/books/the-divine-blueprint/\"", `href=\"${divineBlueprintUrl}\"`],
+  ["href=\"/divine-blueprint/\"", `href=\"${divineBlueprintUrl}\"`],
   ["href=\"{{ book.url }}\"", "href=\"{{ book.data.destination or book.url }}\""]
 ];
 
@@ -87,7 +90,7 @@ await rewriteBranding("src");
 const redirectsPath = "src/_redirects";
 const requiredRedirects = [
   "/books/the-grad-life-blueprint/*  /books/  301",
-  "/books/the-divine-blueprint/*  /divine-blueprint/  301",
+  `/books/the-divine-blueprint/*  ${divineBlueprintUrl}  301!`,
   "https://thegleaningground.com/*  https://gleaningground.com/:splat  301!",
   "https://www.thegleaningground.com/*  https://gleaningground.com/:splat  301!",
   "https://www.gleaningground.com/*  https://gleaningground.com/:splat  301!"
