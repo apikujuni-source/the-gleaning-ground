@@ -66,6 +66,7 @@ collections:
       - {label: Category, name: category, widget: string}
       - {label: Topics, name: topics, widget: list}
       - {label: Purchase URL, name: purchaseUrl, widget: string, required: false}
+      - {label: Destination URL, name: destination, widget: string, required: false, hint: "Optional page used by book cards, such as /divine-blueprint/"}
       - {label: Collection Name, name: collectionName, widget: hidden, default: books}
       - {label: Collection Label, name: collectionLabel, widget: hidden, default: Books}
       - {label: Permalink, name: permalink, widget: string, hint: "/books/book-slug/index.html"}
