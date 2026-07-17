@@ -1,0 +1,106 @@
+backend:
+  name: github
+  repo: apikujuni-source/the-gleaning-ground
+  branch: main
+
+site_url: https://www.thegleaningground.com
+display_url: https://www.thegleaningground.com
+logo_url: https://www.thegleaningground.com/assets/mark.svg
+
+media_folder: content/uploads
+public_folder: /assets/uploads
+publish_mode: editorial_workflow
+local_backend: true
+
+collections:
+  - name: devotionals
+    label: Devotionals
+    label_singular: Devotional
+    folder: content/devotionals
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "devotionals/{{slug}}"
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: layouts/post.njk}
+      - {label: Title, name: title, widget: string}
+      - {label: Description, name: description, widget: text}
+      - {label: Publish Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false}
+      - {label: Category, name: category, widget: select, options: [Guidance, Formation, Stewardship, Faith, Prayer, Identity, Purpose]}
+      - {label: Key Scripture, name: keyScripture, widget: text, required: false}
+      - {label: Collection Name, name: collectionName, widget: hidden, default: devotionals}
+      - {label: Collection Label, name: collectionLabel, widget: hidden, default: Devotionals}
+      - {label: Permalink, name: permalink, widget: string, hint: "/devotionals/your-slug/index.html"}
+      - {label: Body, name: body, widget: markdown}
+  - name: teachings
+    label: Teachings
+    folder: content/teachings
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: layouts/post.njk}
+      - {label: Title, name: title, widget: string}
+      - {label: Description, name: description, widget: text}
+      - {label: Publish Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false}
+      - {label: Format, name: format, widget: select, options: [Teaching Outline, Bible Study, Video Teaching, Podcast, Article]}
+      - {label: Series, name: series, widget: string}
+      - {label: Duration, name: duration, widget: string, required: false}
+      - {label: Status, name: status, widget: select, options: [Outline available, Study available, Coming soon, Published]}
+      - {label: Category, name: category, widget: string}
+      - {label: Key Scripture, name: keyScripture, widget: text, required: false}
+      - {label: Collection Name, name: collectionName, widget: hidden, default: teachings}
+      - {label: Collection Label, name: collectionLabel, widget: hidden, default: Teachings}
+      - {label: Permalink, name: permalink, widget: string, hint: "/teachings/your-slug/index.html"}
+      - {label: Body, name: body, widget: markdown}
+  - name: books
+    label: Books
+    folder: content/books
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: layouts/post.njk}
+      - {label: Title, name: title, widget: string}
+      - {label: Subtitle, name: subtitle, widget: string, required: false}
+      - {label: Description, name: description, widget: text}
+      - {label: Format, name: format, widget: string}
+      - {label: Status, name: status, widget: select, options: [Available, Forthcoming, In development, Out of print]}
+      - {label: Category, name: category, widget: string}
+      - {label: Topics, name: topics, widget: list}
+      - {label: Purchase URL, name: purchaseUrl, widget: string, required: false}
+      - {label: Collection Name, name: collectionName, widget: hidden, default: books}
+      - {label: Collection Label, name: collectionLabel, widget: hidden, default: Books}
+      - {label: Permalink, name: permalink, widget: string, hint: "/books/book-slug/index.html"}
+      - {label: Body, name: body, widget: markdown}
+  - name: resources
+    label: Resources
+    folder: content/resources
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: layouts/post.njk}
+      - {label: Title, name: title, widget: string}
+      - {label: Description, name: description, widget: text}
+      - {label: Publish Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false}
+      - {label: Type, name: type, widget: select, options: [Bible Study, Reflection Guide, Leader Guide, Worksheet, Devotional, Curriculum]}
+      - {label: Audience, name: audience, widget: string}
+      - {label: Status, name: status, widget: select, options: [Free download, Free online guide, Preview available, In development, Available for purchase]}
+      - {label: Category, name: category, widget: string}
+      - {label: Download URL, name: downloadUrl, widget: string, required: false}
+      - {label: Collection Name, name: collectionName, widget: hidden, default: resources}
+      - {label: Collection Label, name: collectionLabel, widget: hidden, default: Resources}
+      - {label: Permalink, name: permalink, widget: string, hint: "/resources/resource-slug/index.html"}
+      - {label: Body, name: body, widget: markdown}
+  - name: settings
+    label: Site Settings
+    files:
+      - label: General Settings
+        name: site
+        file: content/site.json
+        format: json
+        fields:
+          - {label: Site Name, name: name, widget: string}
+          - {label: Site URL, name: url, widget: string}
+          - {label: Description, name: description, widget: text}
+          - {label: Tagline, name: tagline, widget: string}
+          - {label: Ministry Line, name: ministryLine, widget: text}
+          - {label: Author, name: author, widget: string}
+          - {label: Email, name: email, widget: string}

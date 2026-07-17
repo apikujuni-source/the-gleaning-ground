@@ -4,8 +4,9 @@
   "private": true,
   "description": "The Gleaning Ground ministry website for Netlify with Decap CMS.",
   "scripts": {
-    "dev": "tar -xzf .source/tgg-source.tar.gz && eleventy --serve",
-    "build": "tar -xzf .source/tgg-source.tar.gz && eleventy",
+    "prepare-site": "tar -xzf .source/tgg-source.tar.gz && node scripts/overlay-content.mjs",
+    "dev": "npm run prepare-site && eleventy --serve",
+    "build": "npm run prepare-site && eleventy",
     "cms": "npx decap-server"
   },
   "dependencies": {
