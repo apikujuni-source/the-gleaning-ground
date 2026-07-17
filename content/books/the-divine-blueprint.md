@@ -7,6 +7,7 @@ format: Book
 status: Forthcoming
 category: Spiritual Formation
 topics: [Sonship, Maturity, Discipleship]
+destination: /divine-blueprint/
 collectionName: books
 collectionLabel: Books
 permalink: /books/the-divine-blueprint/index.html
