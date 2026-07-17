@@ -1,0 +1,21 @@
+---
+layout: layouts/base.njk
+---
+<article class="post-page">
+  <header class="post-header">
+    <div class="shell narrow">
+      <a class="back-link" href="/{{ collectionName }}/">← Back to {{ collectionLabel }}</a>
+      <p class="eyebrow">{{ category or collectionLabel }}</p>
+      <h1>{{ title }}</h1>
+      {% if description %}<p class="page-lead">{{ description }}</p>{% endif %}
+      {% if date %}<time datetime="{{ date | htmlDateString }}">{{ date | readableDate }}</time>{% endif %}
+    </div>
+  </header>
+  <div class="shell post-layout">
+    <div class="post-content prose">{{ content | safe }}</div>
+    <aside class="post-aside">
+      {% if keyScripture %}<div class="aside-card"><p class="eyebrow">Key Scripture</p><blockquote>{{ keyScripture }}</blockquote></div>{% endif %}
+      <div class="aside-card"><h2>Continue the journey</h2><p>Receive new devotionals, studies, and ministry updates.</p><a class="button button-primary" href="#newsletter">Join the community</a></div>
+    </aside>
+  </div>
+</article>

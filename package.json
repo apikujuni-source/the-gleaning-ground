@@ -1,0 +1,16 @@
+{
+  "name": "the-gleaning-ground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Gleaning Ground ministry website for Netlify with Decap CMS.",
+  "scripts": {
+    "dev": "eleventy --serve",
+    "build": "eleventy",
+    "cms": "npx decap-server"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "3.1.6",
+    "luxon": "3.7.2"
+  },
+  "type": "module"
+}

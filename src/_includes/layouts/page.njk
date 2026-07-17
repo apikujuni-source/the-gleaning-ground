@@ -1,0 +1,11 @@
+---
+layout: layouts/base.njk
+---
+<section class="page-hero">
+  <div class="shell narrow">
+    {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
+    <h1>{{ title }}</h1>
+    {% if description %}<p class="page-lead">{{ description }}</p>{% endif %}
+  </div>
+</section>
+<section class="page-body"><div class="shell prose">{{ content | safe }}</div></section>

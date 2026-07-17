@@ -1,0 +1,10 @@
+[
+  {"label":"Home","url":"/"},
+  {"label":"About","url":"/about/"},
+  {"label":"Devotionals","url":"/devotionals/"},
+  {"label":"Teachings","url":"/teachings/"},
+  {"label":"Books","url":"/books/"},
+  {"label":"Children & Family","url":"/children-family/"},
+  {"label":"Resources","url":"/resources/"},
+  {"label":"The Divine Blueprint","url":"/divine-blueprint/"}
+]
