@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  POSTHOG_PROJECT_TOKEN = "phc_tdHrDUPYPtpqecRUdetv4epsUFDxzxvZxi8HAzjbwngk"
+  POSTHOG_HOST = "https://us.i.posthog.com"
 
 [[headers]]
   for = "/*"
