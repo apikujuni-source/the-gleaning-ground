@@ -1,0 +1,43 @@
+name: Build Companion Journal
+
+on:
+  pull_request:
+    paths:
+      - 'journal/**'
+      - '.github/workflows/build-companion-journal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install document dependencies
+        run: pip install python-docx==1.1.2 reportlab==4.2.5 pillow==11.0.0
+
+      - name: Build editable DOCX and print-ready PDF
+        run: python journal/build_companion.py
+
+      - name: Verify outputs
+        run: |
+          test -s journal/output/The-Divine-Blueprint-Companion-Journal-Editable.docx
+          test -s journal/output/The-Divine-Blueprint-Companion-Journal-Print-Ready.pdf
+          ls -lh journal/output
+
+      - name: Upload Companion Journal files
+        uses: actions/upload-artifact@v4
+        with:
+          name: divine-blueprint-companion-journal
+          path: journal/output/*
+          if-no-files-found: error
+          retention-days: 30
