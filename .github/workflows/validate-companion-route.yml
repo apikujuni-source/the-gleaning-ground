@@ -1,0 +1,43 @@
+name: Validate Companion route
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build website
+        run: npm run build
+
+      - name: Validate clean Companion page and downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="_site/divine-blueprint-site"
+          test -s "$ROOT/companion.html"
+          test -s "$ROOT/companion/index.html"
+          test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
+          test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
+          grep -q '<base href="/">' "$ROOT/companion/index.html"
+          grep -q 'Download Fillable PDF' "$ROOT/companion/index.html"
+          grep -q 'Download Print Edition' "$ROOT/companion/index.html"
+          grep -q 'href="/companion"' "$ROOT/index.html"
+          echo "Clean Companion route and both PDF downloads are present."
