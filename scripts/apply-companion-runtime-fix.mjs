@@ -20,4 +20,15 @@ for (const page of [
   }
 }
 
-console.log("Injected the Companion download runtime fix into both public Companion pages.");
+await writeFile(
+  join(siteRoot, "companion-fix-status.txt"),
+  [
+    "COMPANION_DOWNLOAD_FIX=ACTIVE",
+    "VERSION=2026-07-22-3",
+    "PUBLIC_ROUTE=/companion",
+    "BEHAVIOR=Get the Companion opens fillable and print-ready downloads"
+  ].join("\n") + "\n",
+  "utf8"
+);
+
+console.log("Injected the Companion download runtime fix and deployment fingerprint.");
