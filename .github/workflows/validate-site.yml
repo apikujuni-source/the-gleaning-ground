@@ -1,0 +1,62 @@
+name: Validate website build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build website
+        run: npm run build
+
+      - name: Validate Companion Journal integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="_site/divine-blueprint-site"
+          FILLABLE="$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
+          PRINT="$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
+
+          test -s "$FILLABLE"
+          test -s "$PRINT"
+          test "$(head -c 5 "$FILLABLE")" = "%PDF-"
+          test "$(head -c 5 "$PRINT")" = "%PDF-"
+          grep -q "Download Fillable PDF" "$ROOT/companion.html"
+          grep -q "Download Print Edition" "$ROOT/companion.html"
+          grep -q "Your writing is private" "$ROOT/companion.html"
+
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          const paths = [
+            '_site/divine-blueprint-site/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf',
+            '_site/divine-blueprint-site/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf'
+          ];
+          for (const path of paths) {
+            const pdf = await readFile(path, 'latin1');
+            const pages = (pdf.match(/\/Type \/Page\b/g) || []).length;
+            if (pages !== 98) throw new Error(`${path} has ${pages} pages; expected 98.`);
+          }
+          const fillable = await readFile(paths[0], 'latin1');
+          if (!fillable.includes('/AcroForm')) throw new Error('Fillable PDF is missing its AcroForm.');
+          const printable = await readFile(paths[1], 'latin1');
+          if (printable.includes('/AcroForm')) throw new Error('Print PDF should not contain an AcroForm.');
+          console.log('Companion PDFs validated: 98 pages each; fillable and print editions are distinct.');
+          NODE
