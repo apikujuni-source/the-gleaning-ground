@@ -37,6 +37,44 @@
   status = 301
   force = true
 
+# Never expose the internal publish folder in a public Divine Blueprint URL.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/divine-blueprint-site"
+  to = "https://divineblueprint.gleaningground.com/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/divine-blueprint-site/*"
+  to = "https://divineblueprint.gleaningground.com/:splat"
+  status = 301
+  force = true
+
+# Redirect legacy HTML filenames to clean public routes.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/journey.html"
+  to = "https://divineblueprint.gleaningground.com/journey"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/bible-studies.html"
+  to = "https://divineblueprint.gleaningground.com/bible-studies"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/teachings.html"
+  to = "https://divineblueprint.gleaningground.com/teachings"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/companion.html"
+  to = "https://divineblueprint.gleaningground.com/companion"
+  status = 301
+  force = true
+
 # Serve the standalone Divine Blueprint website from its subdomain.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/"
@@ -44,7 +82,43 @@
   status = 200
   force = true
 
-# Serve the public clean Companion URL from a real directory index.
+# Explicit navigation routes use real directory indexes generated during build.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/journey"
+  to = "/divine-blueprint-site/journey/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/journey/"
+  to = "/divine-blueprint-site/journey/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/bible-studies"
+  to = "/divine-blueprint-site/bible-studies/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/bible-studies/"
+  to = "/divine-blueprint-site/bible-studies/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/teachings"
+  to = "/divine-blueprint-site/teachings/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/teachings/"
+  to = "/divine-blueprint-site/teachings/index.html"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/companion"
   to = "/divine-blueprint-site/companion/index.html"
@@ -57,13 +131,8 @@
   status = 200
   force = true
 
-# Preserve the old filename as a permanent redirect to the public clean URL.
-[[redirects]]
-  from = "https://divineblueprint.gleaningground.com/companion.html"
-  to = "https://divineblueprint.gleaningground.com/companion"
-  status = 301
-  force = true
-
+# Remaining clean routes map into the standalone site. The build creates
+# directory index pages for all top-level Divine Blueprint HTML pages.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/*"
   to = "/divine-blueprint-site/:splat"
