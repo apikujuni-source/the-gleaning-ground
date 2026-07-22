@@ -37,24 +37,31 @@
   status = 301
   force = true
 
-# Serve the complete standalone Divine Blueprint website from its subdomain.
+# Serve the standalone Divine Blueprint website from its subdomain.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/"
   to = "/divine-blueprint-site/index.html"
   status = 200
   force = true
 
-# Explicit Companion routes must appear before the subdomain wildcard.
+# Serve the public clean Companion URL from a real directory index.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/companion"
-  to = "/divine-blueprint-site/companion.html"
+  to = "/divine-blueprint-site/companion/index.html"
   status = 200
   force = true
 
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/companion/"
-  to = "/divine-blueprint-site/companion.html"
+  to = "/divine-blueprint-site/companion/index.html"
   status = 200
+  force = true
+
+# Preserve the old filename as a permanent redirect to the public clean URL.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/companion.html"
+  to = "https://divineblueprint.gleaningground.com/companion"
+  status = 301
   force = true
 
 [[redirects]]
