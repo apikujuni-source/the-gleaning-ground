@@ -44,6 +44,19 @@
   status = 200
   force = true
 
+# Explicit Companion routes must appear before the subdomain wildcard.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/companion"
+  to = "/divine-blueprint-site/companion.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/companion/"
+  to = "/divine-blueprint-site/companion.html"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/*"
   to = "/divine-blueprint-site/:splat"
