@@ -27,17 +27,26 @@ jobs:
       - name: Build website
         run: npm run build
 
-      - name: Validate clean Companion page and downloads
+      - name: Validate Companion CTA and downloads
         shell: bash
         run: |
           set -euo pipefail
           ROOT="_site/divine-blueprint-site"
+          PAGE="$ROOT/companion/index.html"
           test -s "$ROOT/companion.html"
-          test -s "$ROOT/companion/index.html"
+          test -s "$PAGE"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
-          grep -q '<base href="/">' "$ROOT/companion/index.html"
-          grep -q 'Download Fillable PDF' "$ROOT/companion/index.html"
-          grep -q 'Download Print Edition' "$ROOT/companion/index.html"
+          grep -q '<base href="/">' "$PAGE"
+          grep -q 'Get the Companion</a>' "$PAGE"
+          grep -Eq 'href="#(companion-downloads|download-editions)"[^>]*>Get the Companion</a>' "$PAGE"
+          grep -q 'Download Fillable PDF' "$PAGE"
+          grep -Eq 'Download (Print-Ready PDF|Print Edition)' "$PAGE"
+          grep -q 'The-Divine-Blueprint-Companion-Fillable.pdf' "$PAGE"
+          grep -q 'The-Divine-Blueprint-Companion-Print-Ready.pdf' "$PAGE"
+          if grep -Eq '<[^>]*data-modal-open[^>]*>[^<]*Get the Companion' "$PAGE"; then
+            echo "Get the Companion is still connected to the store modal." >&2
+            exit 1
+          fi
           grep -q 'href="/companion"' "$ROOT/index.html"
-          echo "Clean Companion route and both PDF downloads are present."
+          echo "Companion CTA opens download choices and both PDF editions are present."
