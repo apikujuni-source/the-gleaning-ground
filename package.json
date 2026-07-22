@@ -7,7 +7,7 @@
     "prepare-site": "rm -rf src _site && cat .source/chunks/00 .source/chunks/01 .source/chunks/02 .source/chunks/03 .source/chunks/04a .source/chunks/04b | base64 -d | tar -xz --exclude='./package.json' --exclude='package.json' --exclude='./package-lock.json' --exclude='package-lock.json' --exclude='./netlify.toml' --exclude='netlify.toml' --exclude='./scripts' --exclude='scripts' --exclude='./content' --exclude='content' --exclude='./cms' --exclude='cms' && node scripts/overlay-content.mjs",
     "install-divine-blueprint": "mkdir -p _site/divine-blueprint-site && cat .source/divine-blueprint/chunks/00 .source/divine-blueprint/chunks/01 .source/divine-blueprint/chunks/02 .source/divine-blueprint/chunks/03 .source/divine-blueprint/chunks/04 .source/divine-blueprint/chunks/05 | base64 -d | tar -xz -C _site/divine-blueprint-site && node scripts/apply-divine-blueprint-cover.mjs && node scripts/integrate-companion-journal.mjs",
     "dev": "npm run prepare-site && eleventy --serve",
-    "build": "npm run prepare-site && eleventy && npm run install-divine-blueprint",
+    "build": "npm run prepare-site && eleventy && npm run install-divine-blueprint && node scripts/fix-domain-links.mjs",
     "cms": "npx decap-server"
   },
   "dependencies": {
