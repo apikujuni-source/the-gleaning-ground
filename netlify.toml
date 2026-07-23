@@ -78,6 +78,19 @@
   status = 301
   force = true
 
+# Send Divine Blueprint administrators to the shared CMS.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/admin"
+  to = "https://gleaningground.com/admin/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/admin/"
+  to = "https://gleaningground.com/admin/"
+  status = 302
+  force = true
+
 # Serve the standalone Divine Blueprint website from its subdomain.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/"
