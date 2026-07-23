@@ -9,6 +9,9 @@ const outputImage = join(siteRoot, "assets/divine-blueprint-cover.webp");
 const mockupChunksDir = ".source/divine-blueprint-home-mockup/chunks";
 const mockupChunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
 const mockupOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup-final.webp");
+const originalChunksDir = ".source/divine-blueprint-home-original/chunks";
+const originalChunkNames = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
+const originalOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup-47e42f5d.png");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
 
@@ -19,6 +22,10 @@ for (const name of chunkNames) {
 for (const name of mockupChunkNames) {
   const path = join(mockupChunksDir, name);
   if (!existsSync(path)) throw new Error(`Missing Divine Blueprint homepage mockup chunk: ${path}`);
+}
+for (const name of originalChunkNames) {
+  const path = join(originalChunksDir, name);
+  if (!existsSync(path)) throw new Error(`Missing original homepage PNG chunk: ${path}`);
 }
 if (!existsSync(indexPath) || !existsSync(stylesPath)) {
   throw new Error("Divine Blueprint website package was not extracted before applying the cover.");
@@ -53,6 +60,19 @@ if (
 }
 await writeFile(mockupOutputImage, mockupImage);
 
+const originalEncoded = (await Promise.all(
+  originalChunkNames.map((name) => readFile(join(originalChunksDir, name), "utf8"))
+)).join("").replace(/\s+/g, "");
+const originalImage = Buffer.from(originalEncoded, "base64");
+const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+if (
+  originalImage.length !== 3128539 ||
+  !originalImage.subarray(0, 8).equals(pngSignature)
+) {
+  throw new Error(`Original homepage PNG failed validation (${originalImage.length} bytes).`);
+}
+await writeFile(originalOutputImage, originalImage);
+
 const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book concept">
       <div class="light-orb"></div>
       <div class="book-mockup">
@@ -66,7 +86,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-final.webp" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
