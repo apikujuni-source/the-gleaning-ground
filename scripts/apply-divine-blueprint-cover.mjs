@@ -6,12 +6,19 @@ const siteRoot = "_site/divine-blueprint-site";
 const chunksDir = ".source/divine-blueprint-cover/chunks";
 const chunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
 const outputImage = join(siteRoot, "assets/divine-blueprint-cover.webp");
+const mockupChunksDir = ".source/divine-blueprint-home-mockup/chunks";
+const mockupChunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
+const mockupOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup.webp");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
 
 for (const name of chunkNames) {
   const path = join(chunksDir, name);
   if (!existsSync(path)) throw new Error(`Missing Divine Blueprint cover chunk: ${path}`);
+}
+for (const name of mockupChunkNames) {
+  const path = join(mockupChunksDir, name);
+  if (!existsSync(path)) throw new Error(`Missing Divine Blueprint homepage mockup chunk: ${path}`);
 }
 if (!existsSync(indexPath) || !existsSync(stylesPath)) {
   throw new Error("Divine Blueprint website package was not extracted before applying the cover.");
@@ -33,6 +40,19 @@ if (
 await mkdir(join(siteRoot, "assets"), { recursive: true });
 await writeFile(outputImage, image);
 
+const mockupEncoded = (await Promise.all(
+  mockupChunkNames.map((name) => readFile(join(mockupChunksDir, name), "utf8"))
+)).join("").replace(/\s+/g, "");
+const mockupImage = Buffer.from(mockupEncoded, "base64");
+if (
+  mockupImage.length < 10000 ||
+  mockupImage.subarray(0, 4).toString("ascii") !== "RIFF" ||
+  mockupImage.subarray(8, 12).toString("ascii") !== "WEBP"
+) {
+  throw new Error("Decoded Divine Blueprint homepage mockup is not a valid WebP image.");
+}
+await writeFile(mockupOutputImage, mockupImage);
+
 const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book concept">
       <div class="light-orb"></div>
       <div class="book-mockup">
@@ -46,7 +66,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-cover.webp?v=20260723-cover-v2" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup.webp?v=20260723-home-mockup-v1" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
