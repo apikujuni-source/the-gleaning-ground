@@ -1,6 +1,7 @@
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { createHash } from "node:crypto";
+import { basename, dirname, extname, join } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
 const chunksDir = ".source/divine-blueprint-cover/chunks";
@@ -80,7 +81,7 @@ let homepageSettings = {};
 if (existsSync(settingsPath)) {
   homepageSettings = JSON.parse(await readFile(settingsPath, "utf8"));
 }
-const homepageCover =
+let homepageCover =
   typeof homepageSettings.homepageBookCover === "string" && homepageSettings.homepageBookCover.trim()
     ? homepageSettings.homepageBookCover.trim()
     : fallbackHomepageCover;
@@ -96,12 +97,23 @@ if (!homepageCover.startsWith("/assets/")) {
 if (homepageCover.startsWith("/assets/uploads/")) {
   const relativeCover = homepageCover.replace(/^\/+/, "");
   const uploadedSource = join("_site", relativeCover);
-  const uploadedTarget = join(siteRoot, relativeCover);
   if (!existsSync(uploadedSource)) {
     throw new Error(`The CMS-selected Divine Blueprint cover was not found: ${uploadedSource}`);
   }
+
+  const uploadedBytes = await readFile(uploadedSource);
+  const contentHash = createHash("sha256").update(uploadedBytes).digest("hex").slice(0, 12);
+  const extension = extname(relativeCover);
+  const fileStem = basename(relativeCover, extension);
+  const hashedRelativeCover = join(
+    dirname(relativeCover),
+    `${fileStem}-${contentHash}${extension.toLowerCase()}`
+  ).replace(/\\/g, "/");
+  const uploadedTarget = join(siteRoot, hashedRelativeCover);
+
   await mkdir(dirname(uploadedTarget), { recursive: true });
   await cp(uploadedSource, uploadedTarget);
+  homepageCover = `/${hashedRelativeCover}`;
 }
 
 const escapeAttribute = (value) =>
