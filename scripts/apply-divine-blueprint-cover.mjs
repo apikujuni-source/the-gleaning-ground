@@ -8,7 +8,7 @@ const chunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
 const outputImage = join(siteRoot, "assets/divine-blueprint-cover.webp");
 const mockupChunksDir = ".source/divine-blueprint-home-mockup/chunks";
 const mockupChunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
-const mockupOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup.webp");
+const mockupOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup-final.webp");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
 
@@ -66,7 +66,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup.webp?v=20260723-home-mockup-v1" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-final.webp" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
