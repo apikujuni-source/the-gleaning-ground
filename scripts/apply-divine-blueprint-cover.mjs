@@ -86,15 +86,18 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover" width="1122" height="1402" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
 if (!index.includes("hero-book-cover-image")) {
   if (!index.includes(oldHero)) throw new Error("Could not find the existing Divine Blueprint book mockup.");
   index = index.replace(oldHero, newHero);
-  await writeFile(indexPath, index, "utf8");
 }
+if (!index.includes('rel="preload" as="image" href="assets/divine-blueprint-home-mockup-47e42f5d.png"')) {
+  index = index.replace("</head>", '  <link rel="preload" as="image" href="assets/divine-blueprint-home-mockup-47e42f5d.png" fetchpriority="high">\n</head>');
+}
+await writeFile(indexPath, index, "utf8");
 
 const coverCss = `
 
