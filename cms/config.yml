@@ -24,7 +24,7 @@ collections:
           - label: Homepage Book Cover
             name: homepageBookCover
             widget: image
-            hint: "Upload a PNG, JPG, or WebP mockup. Publishing automatically updates the Divine Blueprint homepage."
+            hint: "Upload a PNG, JPG, or WebP mockup. Publishing updates the homepage and automatically creates a cache-safe image URL."
           - label: Book Cover Alt Text
             name: homepageBookCoverAlt
             widget: string
