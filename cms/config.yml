@@ -13,6 +13,22 @@ publish_mode: editorial_workflow
 local_backend: true
 
 collections:
+  - name: divine_blueprint
+    label: The Divine Blueprint
+    files:
+      - label: Homepage Settings
+        name: homepage
+        file: content/divine-blueprint.json
+        format: json
+        fields:
+          - label: Homepage Book Cover
+            name: homepageBookCover
+            widget: image
+            hint: "Upload a PNG, JPG, or WebP mockup. Publishing automatically updates the Divine Blueprint homepage."
+          - label: Book Cover Alt Text
+            name: homepageBookCoverAlt
+            widget: string
+            hint: "Briefly describe the cover for visitors using screen readers."
   - name: devotionals
     label: Devotionals
     label_singular: Devotional
