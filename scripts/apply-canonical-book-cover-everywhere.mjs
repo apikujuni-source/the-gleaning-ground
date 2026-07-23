@@ -6,7 +6,7 @@ const siteRoot = "_site/divine-blueprint-site";
 const assetsRoot = join(siteRoot, "assets");
 const stylesPath = join(assetsRoot, "styles.css");
 const runtimePath = join(assetsRoot, "canonical-book-cover.js");
-const canonicalCover = "/assets/divine-blueprint-cover.webp";
+const canonicalCover = "/assets/divine-blueprint-cover.webp?v=20260723-cover-v2";
 const canonicalAlt = "The Divine Blueprint by Ayo-Paul Ikujuni book cover";
 
 if (!existsSync(join(assetsRoot, "divine-blueprint-cover.webp"))) {
