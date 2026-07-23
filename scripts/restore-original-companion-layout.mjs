@@ -5,11 +5,17 @@ const root = "_site/divine-blueprint-site";
 const stylesPath = join(root, "assets", "styles.css");
 const cleanDirectory = join(root, "companion");
 const pagePaths = [join(root, "companion.html"), join(cleanDirectory, "index.html")];
+const coverParts = [
+  ".source/divine-blueprint/companion-journal-cover/part00",
+  ".source/divine-blueprint/companion-journal-cover/part01",
+  ".source/divine-blueprint/companion-journal-cover/part02"
+];
+const coverAssetPath = join(root, "assets", "companion-journal-cover.webp");
 
-const coverUrl = "/assets/divine-blueprint-cover.webp?v=20260723-single-flat";
+const coverUrl = "/assets/companion-journal-cover.webp?v=20260722-journal-cover";
 const fillableUrl = "/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf";
 const printUrl = "/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf";
-const coverAlt = "The Divine Blueprint: The Making, Maturing, and Manifestation of God's Sons, by Ayo-Paul Ikujuni";
+const coverAlt = "The Divine Blueprint Companion Journal cover by Ayo-Paul Ikujuni";
 
 const page = `<!doctype html>
 <html lang="en">
@@ -46,8 +52,8 @@ const page = `<!doctype html>
       </ul>
       <a class="btn btn-primary" href="#download-editions">Get the Companion</a>
     </div>
-    <figure class="companion-flat-book" aria-label="The Divine Blueprint book cover">
-      <img class="companion-flat-book-image" src="${coverUrl}" alt="${coverAlt}" width="1024" height="1536" loading="eager" decoding="async">
+    <figure class="companion-flat-book" aria-label="The Divine Blueprint Companion Journal cover">
+      <img class="companion-flat-book-image" src="${coverUrl}" alt="${coverAlt}" width="512" height="768" loading="eager" decoding="async">
     </figure>
   </div>
 </section>
@@ -83,6 +89,10 @@ const page = `<!doctype html>
 </body>
 </html>`;
 
+await mkdir(join(root, "assets"), { recursive: true });
+const coverBase64 = (await Promise.all(coverParts.map(path => readFile(path, "utf8")))).join("").replace(/\s+/g, "");
+await writeFile(coverAssetPath, Buffer.from(coverBase64, "base64"));
+
 await mkdir(cleanDirectory, { recursive: true });
 for (const path of pagePaths) await writeFile(path, page, "utf8");
 
@@ -106,4 +116,4 @@ if (styles.includes(marker)) styles = styles.slice(0, styles.indexOf(marker)).re
 else styles += css;
 await writeFile(stylesPath, styles, "utf8");
 
-console.log("Wrote the Companion page from a fixed template with exactly one flat book cover.");
+console.log("Wrote the Companion page with the dedicated Companion Journal cover asset.");
