@@ -15,6 +15,8 @@ const originalChunkNames = ["00", "01", "02", "03", "04", "05", "06", "07", "08"
 const originalOutputImage = join(siteRoot, "assets/divine-blueprint-homepage-book-47e42f5d.png");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
+const mainHomepagePath = "_site/index.html";
+const mainStylesPath = "_site/assets/css/styles.css";
 const settingsPath = "content/divine-blueprint.json";
 const fallbackHomepageCover = "/assets/divine-blueprint-homepage-book-47e42f5d.png";
 const fallbackHomepageCoverAlt = "The Divine Blueprint by Ayo-Paul Ikujuni book cover";
@@ -76,6 +78,8 @@ if (
   throw new Error(`Original homepage PNG failed validation (${originalImage.length} bytes).`);
 }
 await writeFile(originalOutputImage, originalImage);
+await mkdir("_site/assets", { recursive: true });
+await writeFile("_site/assets/divine-blueprint-homepage-book-47e42f5d.png", originalImage);
 
 let homepageSettings = {};
 if (existsSync(settingsPath)) {
@@ -110,9 +114,12 @@ if (homepageCover.startsWith("/assets/uploads/")) {
     `${fileStem}-${contentHash}${extension.toLowerCase()}`
   ).replace(/\\/g, "/");
   const uploadedTarget = join(siteRoot, hashedRelativeCover);
+  const mainUploadedTarget = join("_site", hashedRelativeCover);
 
   await mkdir(dirname(uploadedTarget), { recursive: true });
+  await mkdir(dirname(mainUploadedTarget), { recursive: true });
   await cp(uploadedSource, uploadedTarget);
+  await cp(uploadedSource, mainUploadedTarget);
   homepageCover = `/${hashedRelativeCover}`;
 }
 
@@ -148,6 +155,24 @@ if (!index.includes(preloadTag)) {
 }
 await writeFile(indexPath, index, "utf8");
 
+if (existsSync(mainHomepagePath)) {
+  let mainHomepage = await readFile(mainHomepagePath, "utf8");
+  const featuredVisual = `<div class="blueprint-card blueprint-cover-card"><img src="${homepageCoverHtml}" alt="${homepageCoverAltHtml}" loading="eager" fetchpriority="high" decoding="async"></div>`;
+  const featuredPattern = /<div class="blueprint-card">[\s\S]*?<p>Manifestation<\/p><\/div>/;
+
+  if (featuredPattern.test(mainHomepage)) {
+    mainHomepage = mainHomepage.replace(featuredPattern, featuredVisual);
+  } else if (!mainHomepage.includes("blueprint-cover-card")) {
+    throw new Error("Could not find the main homepage Divine Blueprint visual.");
+  }
+
+  const mainPreloadTag = `  <link rel="preload" as="image" href="${homepageCoverHtml}" fetchpriority="high">`;
+  if (!mainHomepage.includes(mainPreloadTag)) {
+    mainHomepage = mainHomepage.replace("</head>", `${mainPreloadTag}\n</head>`);
+  }
+  await writeFile(mainHomepagePath, mainHomepage, "utf8");
+}
+
 const coverCss = `
 
 /* Uploaded Divine Blueprint cover */
@@ -161,6 +186,39 @@ let styles = await readFile(stylesPath, "utf8");
 if (!styles.includes(".hero-book-cover-image")) {
   styles += coverCss;
   await writeFile(stylesPath, styles, "utf8");
+}
+
+if (existsSync(mainStylesPath)) {
+  const mainMarker = "/* CMS Divine Blueprint homepage cover */";
+  let mainStyles = await readFile(mainStylesPath, "utf8");
+  if (!mainStyles.includes(mainMarker)) {
+    mainStyles += `
+
+${mainMarker}
+.blueprint-card.blueprint-cover-card{
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  overflow:visible;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.blueprint-cover-card img{
+  display:block;
+  width:min(430px,100%);
+  height:auto;
+  max-height:620px;
+  object-fit:contain;
+  filter:drop-shadow(20px 26px 30px rgba(5,24,43,.24));
+}
+@media (max-width:760px){
+  .blueprint-cover-card img{width:min(340px,92vw);max-height:540px}
+}
+`;
+    await writeFile(mainStylesPath, mainStyles, "utf8");
+  }
 }
 
 console.log(`Applied Divine Blueprint cover (${image.length} bytes).`);
