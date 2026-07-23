@@ -26,14 +26,15 @@ const styles = await readFile(join(root, "assets/styles.css"), "utf8");
 const requiredCompanionFragments = [
   '<base href="/">',
   'href="/assets/styles.css?v=20260723-cover-final"',
-  'class="section companion-original-section"',
-  'id="companion-original-title">More Than a<br>Journal</h1>',
+  'More Than a<br>Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
-  'src="/assets/divine-blueprint-cover.webp?v=20260723-flat-original"',
+  'src="/assets/divine-blueprint-cover.webp?v=20260723-single-flat"',
   'width="1024" height="1536"',
   'href="#download-editions">Get the Companion</a>',
   'Download Fillable PDF',
+  'Download Print Edition',
+  'The-Divine-Blueprint-Companion-Fillable.pdf',
   'The-Divine-Blueprint-Companion-Print-Ready.pdf',
   'href="/journey"',
   'href="/bible-studies"',
@@ -44,19 +45,19 @@ for (const fragment of requiredCompanionFragments) {
   if (!companion.includes(fragment)) throw new Error(`Companion page is missing: ${fragment}`);
 }
 
-const flatCoverCount = (companion.match(/class="companion-flat-book-image"/g) || []).length;
-if (flatCoverCount !== 1) {
-  throw new Error(`Companion page has ${flatCoverCount} flat book images; expected exactly one.`);
+const singleCoverCount = (companion.match(/class="companion-flat-book-image"/g) || []).length;
+if (singleCoverCount !== 1) {
+  throw new Error(`Companion page contains ${singleCoverCount} flat covers; expected exactly one.`);
 }
 
 const forbiddenCompanionClasses = [
   "companion-cover-visual",
   "companion-book-cover-visual",
-  "divine-blueprint-full-cover",
   "journal-visual",
   "open-journal",
   "closed-journal",
-  "journal-lines"
+  "journal-lines",
+  "divine-blueprint-full-cover"
 ];
 
 for (const className of forbiddenCompanionClasses) {
@@ -64,20 +65,17 @@ for (const className of forbiddenCompanionClasses) {
   if (pattern.test(companion)) throw new Error(`Legacy or duplicate Companion visual remains: ${className}`);
 }
 
-if (!styles.includes("RESTORED original Companion page with one flat cover")) {
-  throw new Error("The original Companion layout CSS is missing.");
+if (/canonical-book-cover\.js|divine-blueprint-cover-final\.js|companion-cover-display\.js/i.test(companion)) {
+  throw new Error("A cover-manipulation runtime script remains on the Companion page.");
 }
-if (!styles.includes(".companion-flat-book-image")) {
-  throw new Error("The flat book image styling is missing.");
+if (!styles.includes("SINGLE FLAT COVER Companion page")) {
+  throw new Error("Single flat-cover Companion CSS is missing.");
 }
-if (!styles.includes("object-fit:contain")) {
+if (!styles.includes("object-fit:contain!important")) {
   throw new Error("The flat cover is not protected from cropping.");
 }
 if (/<[^>]*data-modal-open[^>]*>[^<]*Get the Companion/i.test(companion)) {
   throw new Error("Get the Companion is still connected to the store modal.");
-}
-if (/canonical-book-cover|divine-blueprint-cover-final|companion-cover-display/i.test(companion)) {
-  throw new Error("A cover-manipulation runtime remains on the Companion page.");
 }
 
 const failures = [];
@@ -99,13 +97,13 @@ async function walk(directory) {
     }
 
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
-      const src = tag.match(/\bsrc=(['"])(.*?)\1/i)?.[2] || "";
+      const src = tag.match(/\bsrc=(["'])(.*?)\1/i)?.[2] || "";
       const identity = tag.toLowerCase();
       const isBookCover = identity.includes("divine blueprint book cover") ||
         identity.includes("hero-book-cover-image") ||
         identity.includes("canonical-book-cover-image") ||
         identity.includes("companion-flat-book-image");
-      if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp") && !src.startsWith("assets/divine-blueprint-cover.webp")) {
+      if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp")) {
         failures.push(`${path}: non-canonical book cover ${src}`);
       }
     }
@@ -114,4 +112,4 @@ async function walk(directory) {
 
 await walk(root);
 if (failures.length) throw new Error(failures.join("\n"));
-console.log("Validated original Companion design, exactly one flat cover, fresh stylesheet, downloads, and clean routes.");
+console.log("Validated simplified Companion page with one flat cover, working downloads, and clean routes.");
