@@ -14,7 +14,7 @@ topics:
 destination: https://divineblueprint.gleaningground.com/
 collectionName: books
 collectionLabel: Books
-permalink: /assets/divine-blueprint-homepage-book-47e42f5d.png
+permalink: "/books/the-divine-blueprint/index.html "
 ---
 *The Divine Blueprint* traces a spiritual journey from the first encounter with Christ—the Light of men—to maturity faithful manifestation.
 
