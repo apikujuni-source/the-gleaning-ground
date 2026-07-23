@@ -1,0 +1,505 @@
+{
+  "adminTitle": "Companion Journal",
+  "target": "divine",
+  "pagePath": "/companion",
+  "seo": {
+    "title": "The Companion Journal | The Divine Blueprint",
+    "description": "Download The Divine Blueprint Companion as a fillable digital journal or a print-ready personal journal."
+  },
+  "sections": [
+    {
+      "label": "More Than aJournal",
+      "textFields": [
+        {
+          "label": "Main heading — More Than aJournal",
+          "xpath": "/html/body/main/section[1]/div/div/h1",
+          "mode": "html",
+          "value": "More Than a<br>Journal"
+        },
+        {
+          "label": "Paragraph — The Companion helps readers move from reading to encounter, app…",
+          "xpath": "/html/body/main/section[1]/div/div/p",
+          "mode": "text",
+          "value": "The Companion helps readers move from reading to encounter, application, and transformation."
+        },
+        {
+          "label": "List item — Chapter objectives",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[1]",
+          "mode": "text",
+          "value": "Chapter objectives"
+        },
+        {
+          "label": "List item — Scripture immersion",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[2]",
+          "mode": "text",
+          "value": "Scripture immersion"
+        },
+        {
+          "label": "List item — Personal inventories",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[3]",
+          "mode": "text",
+          "value": "Personal inventories"
+        },
+        {
+          "label": "List item — Guided prayers",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[4]",
+          "mode": "text",
+          "value": "Guided prayers"
+        },
+        {
+          "label": "List item — Weekly obedience challenges",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[5]",
+          "mode": "text",
+          "value": "Weekly obedience challenges"
+        },
+        {
+          "label": "List item — Spiritual checkpoints",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[6]",
+          "mode": "text",
+          "value": "Spiritual checkpoints"
+        },
+        {
+          "label": "List item — Blueprint milestones",
+          "xpath": "/html/body/main/section[1]/div/div/ul/li[7]",
+          "mode": "text",
+          "value": "Blueprint milestones"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Get the Companion",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Get the Companion",
+          "url": "#download-editions"
+        }
+      ],
+      "imageFields": [
+        {
+          "label": "Image — The Divine Blueprint Companion Journal cover by Ayo-Paul Ikujuni",
+          "xpath": "/html/body/main/section[1]/div/figure/img",
+          "src": "/assets/companion-journal-cover.webp?v=20260722-journal-cover",
+          "alt": "The Divine Blueprint Companion Journal cover by Ayo-Paul Ikujuni"
+        }
+      ],
+      "attributeFields": []
+    },
+    {
+      "label": "Turn Every Chapter Into a Formation Experience",
+      "textFields": [
+        {
+          "label": "Heading — Turn Every Chapter Into a Formation Experience",
+          "xpath": "/html/body/main/section[2]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Turn Every Chapter Into a Formation Experience"
+        },
+        {
+          "label": "Paragraph — The Companion follows all nine chapters of The Divine Blueprint…",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p",
+          "mode": "html",
+          "value": "The Companion follows all nine chapters of <em>The Divine Blueprint</em> and creates space for Scripture meditation, personal inventory, guided reflection, spiritual practices, prayer, and measurable milestones."
+        },
+        {
+          "label": "List item — 98 pages in a 7 × 10-inch journal format",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[1]",
+          "mode": "text",
+          "value": "98 pages in a 7 × 10-inch journal format"
+        },
+        {
+          "label": "List item — Nine chapter-by-chapter formation modules",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[2]",
+          "mode": "text",
+          "value": "Nine chapter-by-chapter formation modules"
+        },
+        {
+          "label": "List item — Fillable writing fields and clickable checkboxes",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[3]",
+          "mode": "text",
+          "value": "Fillable writing fields and clickable checkboxes"
+        },
+        {
+          "label": "List item — Personal-print edition with writing lines",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[4]",
+          "mode": "text",
+          "value": "Personal-print edition with writing lines"
+        },
+        {
+          "label": "List item — 90-day journey plan and chapter completion tracker",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[5]",
+          "mode": "text",
+          "value": "90-day journey plan and chapter completion tracker"
+        },
+        {
+          "label": "List item — Private by design—your journal entries never return to the webs…",
+          "xpath": "/html/body/main/section[2]/div/div[1]/ul/li[6]",
+          "mode": "text",
+          "value": "Private by design—your journal entries never return to the website"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "How Would You Like to Journey?",
+      "textFields": [
+        {
+          "label": "Heading — How Would You Like to Journey?",
+          "xpath": "/html/body/main/section[3]/div/div[1]/h2",
+          "mode": "text",
+          "value": "How Would You Like to Journey?"
+        },
+        {
+          "label": "Paragraph — Both editions contain the same guided formation content. Choose…",
+          "xpath": "/html/body/main/section[3]/div/div[1]/p",
+          "mode": "text",
+          "value": "Both editions contain the same guided formation content. Choose the format that best matches how you prefer to write."
+        },
+        {
+          "label": "Subheading — Fillable Digital Journal",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/h3",
+          "mode": "text",
+          "value": "Fillable Digital Journal"
+        },
+        {
+          "label": "Paragraph — Type directly inside the PDF, click practice checkboxes, save y…",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/p",
+          "mode": "text",
+          "value": "Type directly inside the PDF, click practice checkboxes, save your progress, and return whenever you are ready."
+        },
+        {
+          "label": "List item — Interactive multiline writing fields",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/ul/li[1]",
+          "mode": "text",
+          "value": "Interactive multiline writing fields"
+        },
+        {
+          "label": "List item — Clickable practice and checkpoint boxes",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/ul/li[2]",
+          "mode": "text",
+          "value": "Clickable practice and checkpoint boxes"
+        },
+        {
+          "label": "List item — Works offline after download",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/ul/li[3]",
+          "mode": "text",
+          "value": "Works offline after download"
+        },
+        {
+          "label": "List item — Your entries stay on your device",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/ul/li[4]",
+          "mode": "text",
+          "value": "Your entries stay on your device"
+        },
+        {
+          "label": "Small text — For best results, download first and open in Adobe Acrobat Read…",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/small",
+          "mode": "text",
+          "value": "For best results, download first and open in Adobe Acrobat Reader or another form-compatible PDF app."
+        },
+        {
+          "label": "Subheading — Print-Ready Personal Journal",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/h3",
+          "mode": "text",
+          "value": "Print-Ready Personal Journal"
+        },
+        {
+          "label": "Paragraph — Download a clean, flattened edition formatted at 7 × 10 inches…",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/p",
+          "mode": "text",
+          "value": "Download a clean, flattened edition formatted at 7 × 10 inches with writing lines and checkboxes for personal printing."
+        },
+        {
+          "label": "List item — No interactive form fields",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/ul/li[1]",
+          "mode": "text",
+          "value": "No interactive form fields"
+        },
+        {
+          "label": "List item — Consistent 7 × 10-inch page size",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/ul/li[2]",
+          "mode": "text",
+          "value": "Consistent 7 × 10-inch page size"
+        },
+        {
+          "label": "List item — Clear writing lines and reflection spaces",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/ul/li[3]",
+          "mode": "text",
+          "value": "Clear writing lines and reflection spaces"
+        },
+        {
+          "label": "List item — Suitable for home or local printing",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/ul/li[4]",
+          "mode": "text",
+          "value": "Suitable for home or local printing"
+        },
+        {
+          "label": "Small text — This is a personal-print interior. Commercial manufacturing may…",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/small",
+          "mode": "text",
+          "value": "This is a personal-print interior. Commercial manufacturing may require printer-specific bleed, paper, binding, and cover files."
+        },
+        {
+          "label": "Paragraph — The website may record only that an edition was selected when a…",
+          "xpath": "/html/body/main/section[3]/div/div[3]/p",
+          "mode": "text",
+          "value": "The website may record only that an edition was selected when analytics consent has been granted. It cannot see your prayers, journal entries, assessment responses, or anything typed into the downloaded PDF."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Download Fillable PDF ↓",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[1]/a",
+          "textEditable": true,
+          "text": "Download Fillable PDF ↓",
+          "url": "/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
+        },
+        {
+          "label": "Link — Download Print Edition ↓",
+          "xpath": "/html/body/main/section[3]/div/div[2]/article[2]/a",
+          "textEditable": true,
+          "text": "Download Print Edition ↓",
+          "url": "/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "A Repeatable Rhythm for Real Formation",
+      "textFields": [
+        {
+          "label": "Heading — A Repeatable Rhythm for Real Formation",
+          "xpath": "/html/body/main/section[4]/div/div[1]/h2",
+          "mode": "text",
+          "value": "A Repeatable Rhythm for Real Formation"
+        },
+        {
+          "label": "Subheading — Chapter Opener",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[1]/h3",
+          "mode": "text",
+          "value": "Chapter Opener"
+        },
+        {
+          "label": "Paragraph — Theme, key passage, and supporting Scriptures.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[1]/p",
+          "mode": "text",
+          "value": "Theme, key passage, and supporting Scriptures."
+        },
+        {
+          "label": "Subheading — Prepare Your Heart",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[2]/h3",
+          "mode": "text",
+          "value": "Prepare Your Heart"
+        },
+        {
+          "label": "Paragraph — Objectives and a prayer of surrender.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[2]/p",
+          "mode": "text",
+          "value": "Objectives and a prayer of surrender."
+        },
+        {
+          "label": "Subheading — Personal Inventory",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[3]/h3",
+          "mode": "text",
+          "value": "Personal Inventory"
+        },
+        {
+          "label": "Paragraph — Questions that locate your present condition.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[3]/p",
+          "mode": "text",
+          "value": "Questions that locate your present condition."
+        },
+        {
+          "label": "Subheading — Guided Reflection",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[4]/h3",
+          "mode": "text",
+          "value": "Guided Reflection"
+        },
+        {
+          "label": "Paragraph — Space to respond honestly to the chapter.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[4]/p",
+          "mode": "text",
+          "value": "Space to respond honestly to the chapter."
+        },
+        {
+          "label": "Subheading — Scripture Meditation",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[5]/h3",
+          "mode": "text",
+          "value": "Scripture Meditation"
+        },
+        {
+          "label": "Paragraph — Observation, understanding, and application.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[5]/p",
+          "mode": "text",
+          "value": "Observation, understanding, and application."
+        },
+        {
+          "label": "Subheading — My Story",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[6]/h3",
+          "mode": "text",
+          "value": "My Story"
+        },
+        {
+          "label": "Paragraph — Trace the evidence of God's work in your life.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[6]/p",
+          "mode": "text",
+          "value": "Trace the evidence of God's work in your life."
+        },
+        {
+          "label": "Subheading — Practice",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[7]/h3",
+          "mode": "text",
+          "value": "Practice"
+        },
+        {
+          "label": "Paragraph — Concrete acts that translate truth into obedience.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[7]/p",
+          "mode": "text",
+          "value": "Concrete acts that translate truth into obedience."
+        },
+        {
+          "label": "Subheading — Declarations",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[8]/h3",
+          "mode": "text",
+          "value": "Declarations"
+        },
+        {
+          "label": "Paragraph — Truth-filled statements to read and pray aloud.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[8]/p",
+          "mode": "text",
+          "value": "Truth-filled statements to read and pray aloud."
+        },
+        {
+          "label": "Subheading — Kingdom Journal",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[9]/h3",
+          "mode": "text",
+          "value": "Kingdom Journal"
+        },
+        {
+          "label": "Paragraph — Record what the Lord is emphasizing now.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[9]/p",
+          "mode": "text",
+          "value": "Record what the Lord is emphasizing now."
+        },
+        {
+          "label": "Subheading — Spiritual Checkpoint",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[10]/h3",
+          "mode": "text",
+          "value": "Spiritual Checkpoint"
+        },
+        {
+          "label": "Paragraph — Rate your response and record a milestone.",
+          "xpath": "/html/body/main/section[4]/div/div[2]/article[10]/p",
+          "mode": "text",
+          "value": "Rate your response and record a milestone."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Read. Reflect. Pray. Practice. Become.",
+      "textFields": [
+        {
+          "label": "Heading — Read. Reflect. Pray. Practice. Become.",
+          "xpath": "/html/body/main/section[5]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Read. Reflect. Pray. Practice. Become."
+        },
+        {
+          "label": "Subheading — Read",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[1]/h3",
+          "mode": "text",
+          "value": "Read"
+        },
+        {
+          "label": "Paragraph — Engage the chapter and its key Scriptures with purpose.",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[1]/p",
+          "mode": "text",
+          "value": "Engage the chapter and its key Scriptures with purpose."
+        },
+        {
+          "label": "Subheading — Reflect",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[2]/h3",
+          "mode": "text",
+          "value": "Reflect"
+        },
+        {
+          "label": "Paragraph — Identify what God is revealing about your heart and formation.",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[2]/p",
+          "mode": "text",
+          "value": "Identify what God is revealing about your heart and formation."
+        },
+        {
+          "label": "Subheading — Pray",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[3]/h3",
+          "mode": "text",
+          "value": "Pray"
+        },
+        {
+          "label": "Paragraph — Respond through surrender, thanksgiving, petition, and listenin…",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[3]/p",
+          "mode": "text",
+          "value": "Respond through surrender, thanksgiving, petition, and listening."
+        },
+        {
+          "label": "Subheading — Practice",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[4]/h3",
+          "mode": "text",
+          "value": "Practice"
+        },
+        {
+          "label": "Paragraph — Translate insight into a concrete act of obedience.",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[4]/p",
+          "mode": "text",
+          "value": "Translate insight into a concrete act of obedience."
+        },
+        {
+          "label": "Subheading — Become",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[5]/h3",
+          "mode": "text",
+          "value": "Become"
+        },
+        {
+          "label": "Paragraph — Track the ongoing transformation of character, identity, and pu…",
+          "xpath": "/html/body/main/section[5]/div/div[2]/div[5]/p",
+          "mode": "text",
+          "value": "Track the ongoing transformation of character, identity, and purpose."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Use It Freely. Share It Responsibly.",
+      "textFields": [
+        {
+          "label": "Heading — Use It Freely. Share It Responsibly.",
+          "xpath": "/html/body/main/section[6]/div/div/h2",
+          "mode": "text",
+          "value": "Use It Freely. Share It Responsibly."
+        },
+        {
+          "label": "Paragraph — Your download is for your individual spiritual formation journe…",
+          "xpath": "/html/body/main/section[6]/div/div/p",
+          "mode": "text",
+          "value": "Your download is for your individual spiritual formation journey. You may save the digital edition on your devices and print one personal copy. The journal may not be resold, redistributed, uploaded, reproduced for groups, or modified for commercial use without written permission from The Gleaning Ground."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Ask About Group Licensing",
+          "xpath": "/html/body/main/section[6]/div/a",
+          "textEditable": true,
+          "text": "Ask About Group Licensing",
+          "url": "/contact"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

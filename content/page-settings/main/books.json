@@ -1,0 +1,44 @@
+{
+  "adminTitle": "Books Landing Page",
+  "target": "main",
+  "pagePath": "/books/",
+  "seo": {
+    "title": "Books | Gleaning Ground",
+    "description": "Books, devotionals, and guided resources from Gleaning Ground."
+  },
+  "sections": [
+    {
+      "label": "Books and Guided Resources",
+      "textFields": [
+        {
+          "label": "Paragraph — Read and become",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Read and become"
+        },
+        {
+          "label": "Main heading — Books and Guided Resources",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Books and Guided Resources"
+        },
+        {
+          "label": "Paragraph — Scripture-centered books created for understanding, reflection,…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "Scripture-centered books created for understanding, reflection, discipleship, and practical growth."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "The Divine Blueprint",
+      "textFields": [],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

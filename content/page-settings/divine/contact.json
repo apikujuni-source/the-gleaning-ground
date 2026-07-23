@@ -1,0 +1,97 @@
+{
+  "adminTitle": "Contact",
+  "target": "divine",
+  "pagePath": "/contact",
+  "seo": {
+    "title": "Contact | The Divine Blueprint",
+    "description": "Contact — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "Contact The Divine Blueprint",
+      "textFields": [
+        {
+          "label": "Main heading — Contact The Divine Blueprint",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Contact The Divine Blueprint"
+        },
+        {
+          "label": "Paragraph — For speaking invitations, church studies, partnerships, or gene…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "For speaking invitations, church studies, partnerships, or general questions."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Section 2",
+      "textFields": [
+        {
+          "label": "Field label — Name",
+          "xpath": "/html/body/main/section[2]/div/form/label[1]",
+          "mode": "html",
+          "value": "Name<input name=\"name\" required>"
+        },
+        {
+          "label": "Field label — Email",
+          "xpath": "/html/body/main/section[2]/div/form/label[2]",
+          "mode": "html",
+          "value": "Email<input name=\"email\" type=\"email\" required>"
+        },
+        {
+          "label": "Field label — Subject",
+          "xpath": "/html/body/main/section[2]/div/form/label[3]",
+          "mode": "html",
+          "value": "Subject<input name=\"subject\" required>"
+        },
+        {
+          "label": "Field label — Message",
+          "xpath": "/html/body/main/section[2]/div/form/label[4]",
+          "mode": "html",
+          "value": "Message<textarea name=\"message\" rows=\"7\" required></textarea>"
+        },
+        {
+          "label": "Button — Send Message",
+          "xpath": "/html/body/main/section[2]/div/form/button",
+          "mode": "text",
+          "value": "Send Message"
+        },
+        {
+          "label": "Subheading — Gleaning Ground",
+          "xpath": "/html/body/main/section[2]/div/aside/div/h3",
+          "mode": "text",
+          "value": "Gleaning Ground"
+        },
+        {
+          "label": "Paragraph — gleaningground.com",
+          "xpath": "/html/body/main/section[2]/div/aside/div/p",
+          "mode": "html",
+          "value": "<a href=\"https://gleaningground.com\">gleaningground.com</a>"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — gleaningground.com",
+          "xpath": "/html/body/main/section[2]/div/aside/div/p/a",
+          "textEditable": true,
+          "text": "gleaningground.com",
+          "url": "https://gleaningground.com"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

@@ -29,6 +29,245 @@ collections:
             name: homepageBookCoverAlt
             widget: string
             hint: "Briefly describe the cover for visitors using screen readers."
+  - name: global_areas
+    label: Global Navigation & Footer
+    label_singular: Global Area
+    folder: content/page-settings/global
+    create: false
+    extension: json
+    format: json
+    identifier_field: adminTitle
+    description: "Edit the navigation and footer shared by every page on each website."
+    fields:
+      - {label: Area, name: adminTitle, widget: string}
+      - {label: Website, name: target, widget: hidden}
+      - {label: Page Path, name: pagePath, widget: hidden}
+      - label: Sections
+        name: sections
+        widget: list
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Section Name, name: label, widget: hidden}
+          - label: Text
+            name: textFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Formatting Mode, name: mode, widget: hidden}
+              - {label: Content, name: value, widget: text, hint: "Edit the words here. Preserve any visible HTML tags in specially formatted headings."}
+          - label: Links & Buttons
+            name: linkFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Editable Text, name: textEditable, widget: hidden, default: true}
+              - {label: Link Text, name: text, widget: string, required: false, condition: {field: textEditable, value: true}}
+              - {label: Destination URL, name: url, widget: string}
+          - label: Images
+            name: imageFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Image, name: src, widget: image}
+              - {label: Alternative Text, name: alt, widget: string, required: false}
+          - label: Form Fields
+            name: attributeFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Attribute, name: attribute, widget: hidden}
+              - {label: Content, name: value, widget: string}
+  - name: main_pages
+    label: Gleaning Ground Pages
+    label_singular: Gleaning Ground Page
+    folder: content/page-settings/main
+    create: false
+    extension: json
+    format: json
+    identifier_field: adminTitle
+    description: "Edit every static section on gleaningground.com. Devotional, teaching, book, and resource cards remain connected to their dedicated collections."
+    fields:
+      - {label: Page, name: adminTitle, widget: string}
+      - {label: Website, name: target, widget: hidden}
+      - {label: Page Path, name: pagePath, widget: hidden}
+      - label: Search & Sharing
+        name: seo
+        widget: object
+        collapsed: true
+        fields:
+          - {label: Browser & Search Title, name: title, widget: string}
+          - {label: Search Description, name: description, widget: text, required: false}
+      - label: Page Sections
+        name: sections
+        widget: list
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Section Name, name: label, widget: hidden}
+          - label: Headings & Paragraphs
+            name: textFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Formatting Mode, name: mode, widget: hidden}
+              - {label: Content, name: value, widget: text, hint: "Edit the words here. Preserve any visible HTML tags in specially formatted headings."}
+          - label: Links & Buttons
+            name: linkFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Editable Text, name: textEditable, widget: hidden, default: true}
+              - {label: Link Text, name: text, widget: string, required: false, condition: {field: textEditable, value: true}}
+              - {label: Destination URL, name: url, widget: string}
+          - label: Images
+            name: imageFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Image, name: src, widget: image}
+              - {label: Alternative Text, name: alt, widget: string, required: false}
+          - label: Form Fields
+            name: attributeFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Attribute, name: attribute, widget: hidden}
+              - {label: Content, name: value, widget: string}
+  - name: divine_pages
+    label: Divine Blueprint Pages
+    label_singular: Divine Blueprint Page
+    folder: content/page-settings/divine
+    create: false
+    extension: json
+    format: json
+    identifier_field: adminTitle
+    description: "Edit the homepage, Start Here, all nine chapters, studies, teachings, podcast, companion, and ministry pages."
+    fields:
+      - {label: Page, name: adminTitle, widget: string}
+      - {label: Website, name: target, widget: hidden}
+      - {label: Page Path, name: pagePath, widget: hidden}
+      - label: Search & Sharing
+        name: seo
+        widget: object
+        collapsed: true
+        fields:
+          - {label: Browser & Search Title, name: title, widget: string}
+          - {label: Search Description, name: description, widget: text, required: false}
+      - label: Page Sections
+        name: sections
+        widget: list
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Section Name, name: label, widget: hidden}
+          - label: Headings & Paragraphs
+            name: textFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Formatting Mode, name: mode, widget: hidden}
+              - {label: Content, name: value, widget: text, hint: "Edit the words here. Preserve any visible HTML tags in specially formatted headings."}
+          - label: Links & Buttons
+            name: linkFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Editable Text, name: textEditable, widget: hidden, default: true}
+              - {label: Link Text, name: text, widget: string, required: false, condition: {field: textEditable, value: true}}
+              - {label: Destination URL, name: url, widget: string}
+          - label: Images
+            name: imageFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Image, name: src, widget: image}
+              - {label: Alternative Text, name: alt, widget: string, required: false}
+          - label: Form Fields
+            name: attributeFields
+            widget: list
+            required: false
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.label}}"
+            fields:
+              - {label: Field Name, name: label, widget: hidden}
+              - {label: Page Selector, name: xpath, widget: hidden}
+              - {label: Attribute, name: attribute, widget: hidden}
+              - {label: Content, name: value, widget: string}
   - name: devotionals
     label: Devotionals
     label_singular: Devotional

@@ -1,0 +1,157 @@
+{
+  "adminTitle": "Start Here",
+  "target": "divine",
+  "pagePath": "/start-here",
+  "seo": {
+    "title": "Start Here | The Divine Blueprint",
+    "description": "Start Here — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "Start the Journey",
+      "textFields": [
+        {
+          "label": "Main heading — Start the Journey",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Start the Journey"
+        },
+        {
+          "label": "Paragraph — The Divine Blueprint is a guided journey from spiritual awakeni…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "The Divine Blueprint is a guided journey from spiritual awakening to mature, fruitful sonship."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "What Is Divine Sonship?",
+      "textFields": [
+        {
+          "label": "Heading — What Is Divine Sonship?",
+          "xpath": "/html/body/main/section[2]/div/article/h2[1]",
+          "mode": "text",
+          "value": "What Is Divine Sonship?"
+        },
+        {
+          "label": "Paragraph — Divine sonship begins with new birth, but it does not end there…",
+          "xpath": "/html/body/main/section[2]/div/article/p[1]",
+          "mode": "text",
+          "value": "Divine sonship begins with new birth, but it does not end there. God receives us as children and then forms us into mature sons who reflect His character, carry responsibility, and serve His purpose."
+        },
+        {
+          "label": "Heading — How to Use This Website",
+          "xpath": "/html/body/main/section[2]/div/article/h2[2]",
+          "mode": "text",
+          "value": "How to Use This Website"
+        },
+        {
+          "label": "List item — Read the corresponding chapter in the book.",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[1]",
+          "mode": "text",
+          "value": "Read the corresponding chapter in the book."
+        },
+        {
+          "label": "List item — Work through the expanded teaching and Bible study.",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[2]",
+          "mode": "text",
+          "value": "Work through the expanded teaching and Bible study."
+        },
+        {
+          "label": "List item — Watch or listen to the chapter teaching.",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[3]",
+          "mode": "text",
+          "value": "Watch or listen to the chapter teaching."
+        },
+        {
+          "label": "List item — Complete the journal prompts and obedience challenge.",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[4]",
+          "mode": "text",
+          "value": "Complete the journal prompts and obedience challenge."
+        },
+        {
+          "label": "List item — Mark the chapter complete and continue the journey.",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[5]",
+          "mode": "text",
+          "value": "Mark the chapter complete and continue the journey."
+        },
+        {
+          "label": "Heading — Recommended Pace",
+          "xpath": "/html/body/main/section[2]/div/article/h2[3]",
+          "mode": "text",
+          "value": "Recommended Pace"
+        },
+        {
+          "label": "Paragraph — Work through one chapter every one to two weeks. Take enough ti…",
+          "xpath": "/html/body/main/section[2]/div/article/p[2]",
+          "mode": "text",
+          "value": "Work through one chapter every one to two weeks. Take enough time to apply the truth before moving forward."
+        },
+        {
+          "label": "Subheading — Your Progress",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/h3",
+          "mode": "text",
+          "value": "Your Progress"
+        },
+        {
+          "label": "Paragraph — 0 of 9 chapters completed",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/p",
+          "mode": "text",
+          "value": "0 of 9 chapters completed"
+        },
+        {
+          "label": "Subheading — You Will Need",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/h3",
+          "mode": "text",
+          "value": "You Will Need"
+        },
+        {
+          "label": "List item — The Divine Blueprint",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/ul/li[1]",
+          "mode": "text",
+          "value": "The Divine Blueprint"
+        },
+        {
+          "label": "List item — A Bible",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/ul/li[2]",
+          "mode": "text",
+          "value": "A Bible"
+        },
+        {
+          "label": "List item — The Companion or a notebook",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/ul/li[3]",
+          "mode": "text",
+          "value": "The Companion or a notebook"
+        },
+        {
+          "label": "List item — Time for prayer and reflection",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/ul/li[4]",
+          "mode": "text",
+          "value": "Time for prayer and reflection"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Begin with Chapter One →",
+          "xpath": "/html/body/main/section[2]/div/article/a",
+          "textEditable": true,
+          "text": "Begin with Chapter One →",
+          "url": "/chapter-1"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "adminTitle": "Bible Studies",
+  "target": "divine",
+  "pagePath": "/bible-studies",
+  "seo": {
+    "title": "Bible Studies | The Divine Blueprint",
+    "description": "Bible Studies — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "Bible Study Outlines",
+      "textFields": [
+        {
+          "label": "Main heading — Bible Study Outlines",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Bible Study Outlines"
+        },
+        {
+          "label": "Paragraph — Structured studies designed for personal devotion, small groups…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "Structured studies designed for personal devotion, small groups, and discipleship classes."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Section 2",
+      "textFields": [
+        {
+          "label": "Subheading — Chapter 1: The Light of Men",
+          "xpath": "/html/body/main/section[2]/div/div/div[1]/h3",
+          "mode": "text",
+          "value": "Chapter 1: The Light of Men"
+        },
+        {
+          "label": "Paragraph — Recreation and spiritual awakening",
+          "xpath": "/html/body/main/section[2]/div/div/div[1]/p",
+          "mode": "text",
+          "value": "Recreation and spiritual awakening"
+        },
+        {
+          "label": "Subheading — Chapter 2: If Children, Then Heirs",
+          "xpath": "/html/body/main/section[2]/div/div/div[2]/h3",
+          "mode": "text",
+          "value": "Chapter 2: If Children, Then Heirs"
+        },
+        {
+          "label": "Paragraph — Adoption, belonging, and inheritance",
+          "xpath": "/html/body/main/section[2]/div/div/div[2]/p",
+          "mode": "text",
+          "value": "Adoption, belonging, and inheritance"
+        },
+        {
+          "label": "Subheading — Chapter 3: Partakers of His Divine Nature",
+          "xpath": "/html/body/main/section[2]/div/div/div[3]/h3",
+          "mode": "text",
+          "value": "Chapter 3: Partakers of His Divine Nature"
+        },
+        {
+          "label": "Paragraph — Holiness, access, and divine power",
+          "xpath": "/html/body/main/section[2]/div/div/div[3]/p",
+          "mode": "text",
+          "value": "Holiness, access, and divine power"
+        },
+        {
+          "label": "Subheading — Chapter 4: But Is Under Tutors",
+          "xpath": "/html/body/main/section[2]/div/div/div[4]/h3",
+          "mode": "text",
+          "value": "Chapter 4: But Is Under Tutors"
+        },
+        {
+          "label": "Paragraph — Instruction, process, and spiritual formation",
+          "xpath": "/html/body/main/section[2]/div/div/div[4]/p",
+          "mode": "text",
+          "value": "Instruction, process, and spiritual formation"
+        },
+        {
+          "label": "Subheading — Chapter 5: Becoming Sons",
+          "xpath": "/html/body/main/section[2]/div/div/div[5]/h3",
+          "mode": "text",
+          "value": "Chapter 5: Becoming Sons"
+        },
+        {
+          "label": "Paragraph — Maturity, character, and responsibility",
+          "xpath": "/html/body/main/section[2]/div/div/div[5]/p",
+          "mode": "text",
+          "value": "Maturity, character, and responsibility"
+        },
+        {
+          "label": "Subheading — Chapter 6: The Cross in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/div[6]/h3",
+          "mode": "text",
+          "value": "Chapter 6: The Cross in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Surrender, suffering, and obedience",
+          "xpath": "/html/body/main/section[2]/div/div/div[6]/p",
+          "mode": "text",
+          "value": "Surrender, suffering, and obedience"
+        },
+        {
+          "label": "Subheading — Chapter 7: Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/div[7]/h3",
+          "mode": "text",
+          "value": "Chapter 7: Knowledge in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Revelation, wisdom, and discernment",
+          "xpath": "/html/body/main/section[2]/div/div/div[7]/p",
+          "mode": "text",
+          "value": "Revelation, wisdom, and discernment"
+        },
+        {
+          "label": "Subheading — Chapter 8: The Fellowship of the Spirit in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/div[8]/h3",
+          "mode": "text",
+          "value": "Chapter 8: The Fellowship of the Spirit in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Intimacy, guidance, and spiritual community",
+          "xpath": "/html/body/main/section[2]/div/div/div[8]/p",
+          "mode": "text",
+          "value": "Intimacy, guidance, and spiritual community"
+        },
+        {
+          "label": "Subheading — Chapter 9: The Manifestation of the Sons of God",
+          "xpath": "/html/body/main/section[2]/div/div/div[9]/h3",
+          "mode": "text",
+          "value": "Chapter 9: The Manifestation of the Sons of God"
+        },
+        {
+          "label": "Paragraph — Service, stewardship, and kingdom impact",
+          "xpath": "/html/body/main/section[2]/div/div/div[9]/p",
+          "mode": "text",
+          "value": "Service, stewardship, and kingdom impact"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[1]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-1"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[2]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-2"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[3]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-3"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[4]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-4"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[5]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-5"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[6]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-6"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[7]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-7"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[8]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-8"
+        },
+        {
+          "label": "Link — Open study →",
+          "xpath": "/html/body/main/section[2]/div/div/div[9]/a",
+          "textEditable": true,
+          "text": "Open study →",
+          "url": "/chapter-9"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

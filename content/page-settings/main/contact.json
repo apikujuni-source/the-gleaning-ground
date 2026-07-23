@@ -1,0 +1,105 @@
+{
+  "adminTitle": "Contact",
+  "target": "main",
+  "pagePath": "/contact/",
+  "seo": {
+    "title": "Contact | Gleaning Ground",
+    "description": "Contact Gleaning Ground for ministry questions, speaking invitations, partnerships, and resources."
+  },
+  "sections": [
+    {
+      "label": "Let’s begin a conversation.",
+      "textFields": [
+        {
+          "label": "Paragraph — Connect with us",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Connect with us"
+        },
+        {
+          "label": "Main heading — Let’s begin a conversation.",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Let’s begin a conversation."
+        },
+        {
+          "label": "Paragraph — For speaking invitations, church studies, collaborations, publi…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "For speaking invitations, church studies, collaborations, publishing inquiries, or general questions."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "How can we help?",
+      "textFields": [
+        {
+          "label": "Heading — How can we help?",
+          "xpath": "/html/body/main/section[2]/div/div/h2",
+          "mode": "text",
+          "value": "How can we help?"
+        },
+        {
+          "label": "Paragraph — Use the form and your message will be collected securely throug…",
+          "xpath": "/html/body/main/section[2]/div/div/p",
+          "mode": "text",
+          "value": "Use the form and your message will be collected securely through Netlify Forms."
+        },
+        {
+          "label": "Paragraph — Speaking and teachingInvite Ayo-Paul for a church, conference,…",
+          "xpath": "/html/body/main/section[2]/div/div/div/p[1]",
+          "mode": "html",
+          "value": "<strong>Speaking and teaching</strong><br>Invite Ayo-Paul for a church, conference, or discipleship gathering."
+        },
+        {
+          "label": "Paragraph — Resources and curriculumAsk about group studies, children’s pro…",
+          "xpath": "/html/body/main/section[2]/div/div/div/p[2]",
+          "mode": "html",
+          "value": "<strong>Resources and curriculum</strong><br>Ask about group studies, children’s programs, and ministry licensing."
+        },
+        {
+          "label": "Paragraph — Books and publishingQuestions about current or upcoming publica…",
+          "xpath": "/html/body/main/section[2]/div/div/div/p[3]",
+          "mode": "html",
+          "value": "<strong>Books and publishing</strong><br>Questions about current or upcoming publications."
+        },
+        {
+          "label": "Field label — Name",
+          "xpath": "/html/body/main/section[2]/div/form/label[1]",
+          "mode": "html",
+          "value": "Name<input name=\"name\" required>"
+        },
+        {
+          "label": "Field label — Email",
+          "xpath": "/html/body/main/section[2]/div/form/label[2]",
+          "mode": "html",
+          "value": "Email<input name=\"email\" type=\"email\" required>"
+        },
+        {
+          "label": "Field label — Reason for contactingGeneral questionSpeaking invitationChurch…",
+          "xpath": "/html/body/main/section[2]/div/form/label[3]",
+          "mode": "html",
+          "value": "Reason for contacting<select name=\"reason\"><option>General question</option><option>Speaking invitation</option><option>Church or group study</option><option>Publishing or books</option><option>Partnership</option></select>"
+        },
+        {
+          "label": "Field label — Message",
+          "xpath": "/html/body/main/section[2]/div/form/label[4]",
+          "mode": "html",
+          "value": "Message<textarea name=\"message\" rows=\"7\" required></textarea>"
+        },
+        {
+          "label": "Button — Send message",
+          "xpath": "/html/body/main/section[2]/div/form/button",
+          "mode": "text",
+          "value": "Send message"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

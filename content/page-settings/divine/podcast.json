@@ -1,0 +1,107 @@
+{
+  "adminTitle": "Podcast",
+  "target": "divine",
+  "pagePath": "/podcast",
+  "seo": {
+    "title": "Podcast | The Divine Blueprint",
+    "description": "Podcast — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "The Divine Blueprint Podcast",
+      "textFields": [
+        {
+          "label": "Main heading — The Divine Blueprint Podcast",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "The Divine Blueprint Podcast"
+        },
+        {
+          "label": "Paragraph — Conversations on spiritual formation, maturity, fellowship, cal…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "Conversations on spiritual formation, maturity, fellowship, calling, and manifestation."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Season One: The Making of Sons",
+      "textFields": [
+        {
+          "label": "Heading — Season One: The Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/article/h2[1]",
+          "mode": "text",
+          "value": "Season One: The Making of Sons"
+        },
+        {
+          "label": "Paragraph — Solo teachings, testimonies, interviews, and reader questions c…",
+          "xpath": "/html/body/main/section[2]/div/article/p",
+          "mode": "text",
+          "value": "Solo teachings, testimonies, interviews, and reader questions centered on the early stages of the journey."
+        },
+        {
+          "label": "Heading — Podcast Formats",
+          "xpath": "/html/body/main/section[2]/div/article/h2[2]",
+          "mode": "text",
+          "value": "Podcast Formats"
+        },
+        {
+          "label": "List item — Chapter conversations",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[1]",
+          "mode": "text",
+          "value": "Chapter conversations"
+        },
+        {
+          "label": "List item — Questions from readers",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[2]",
+          "mode": "text",
+          "value": "Questions from readers"
+        },
+        {
+          "label": "List item — Testimonies of transformation",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[3]",
+          "mode": "text",
+          "value": "Testimonies of transformation"
+        },
+        {
+          "label": "List item — Interviews with pastors and discipleship leaders",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[4]",
+          "mode": "text",
+          "value": "Interviews with pastors and discipleship leaders"
+        },
+        {
+          "label": "List item — Short weekly devotionals",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[5]",
+          "mode": "text",
+          "value": "Short weekly devotionals"
+        },
+        {
+          "label": "Subheading — Subscribe",
+          "xpath": "/html/body/main/section[2]/div/aside/div/h3",
+          "mode": "text",
+          "value": "Subscribe"
+        },
+        {
+          "label": "Paragraph — Add your Apple Podcasts, Spotify, YouTube, or RSS links here wh…",
+          "xpath": "/html/body/main/section[2]/div/aside/div/p",
+          "mode": "text",
+          "value": "Add your Apple Podcasts, Spotify, YouTube, or RSS links here when the show launches."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "adminTitle": "About",
+  "target": "main",
+  "pagePath": "/about/",
+  "seo": {
+    "title": "About Gleaning Ground | Gleaning Ground",
+    "description": "A Scripture-centered ministry created to help people gather truth, grow in grace, and live fruitfully."
+  },
+  "sections": [
+    {
+      "label": "About Gleaning Ground",
+      "textFields": [
+        {
+          "label": "Paragraph — Our story",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Our story"
+        },
+        {
+          "label": "Main heading — About Gleaning Ground",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "About Gleaning Ground"
+        },
+        {
+          "label": "Paragraph — A Scripture-centered ministry created to help people gather tru…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "A Scripture-centered ministry created to help people gather truth, grow in grace, and live fruitfully."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Why “Gleaning Ground”?",
+      "textFields": [
+        {
+          "label": "Heading — Why “Gleaning Ground”?",
+          "xpath": "/html/body/main/section[2]/div/div[1]/div/h2",
+          "mode": "text",
+          "value": "Why “Gleaning Ground”?"
+        },
+        {
+          "label": "Paragraph — In Scripture, gleaning is the careful gathering of what remains…",
+          "xpath": "/html/body/main/section[2]/div/div[1]/div/p[1]",
+          "mode": "text",
+          "value": "In Scripture, gleaning is the careful gathering of what remains after the harvest. It is an act of attention, humility, provision, and stewardship."
+        },
+        {
+          "label": "Paragraph — Gleaning Ground is a place where people can gather enduring tru…",
+          "xpath": "/html/body/main/section[2]/div/div[1]/div/p[2]",
+          "mode": "text",
+          "value": "Gleaning Ground is a place where people can gather enduring truth from God’s Word—truth that strengthens faith, forms character, and equips believers to live with purpose."
+        },
+        {
+          "label": "Heading — Our mission",
+          "xpath": "/html/body/main/section[2]/div/h2[1]",
+          "mode": "text",
+          "value": "Our mission"
+        },
+        {
+          "label": "Paragraph — To create clear, thoughtful, Scripture-centered books, teaching…",
+          "xpath": "/html/body/main/section[2]/div/p[1]",
+          "mode": "text",
+          "value": "To create clear, thoughtful, Scripture-centered books, teachings, devotionals, and formation resources that help believers know God, mature in Christ, and serve faithfully."
+        },
+        {
+          "label": "Subheading — Scripture",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[1]/h3",
+          "mode": "text",
+          "value": "Scripture"
+        },
+        {
+          "label": "Paragraph — God’s Word is our foundation and final authority.",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[1]/p",
+          "mode": "text",
+          "value": "God’s Word is our foundation and final authority."
+        },
+        {
+          "label": "Subheading — Formation",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[2]/h3",
+          "mode": "text",
+          "value": "Formation"
+        },
+        {
+          "label": "Paragraph — Truth should shape character, habits, and obedience.",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[2]/p",
+          "mode": "text",
+          "value": "Truth should shape character, habits, and obedience."
+        },
+        {
+          "label": "Subheading — Stewardship",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[3]/h3",
+          "mode": "text",
+          "value": "Stewardship"
+        },
+        {
+          "label": "Paragraph — We use creativity and excellence to serve people well.",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[3]/p",
+          "mode": "text",
+          "value": "We use creativity and excellence to serve people well."
+        },
+        {
+          "label": "Subheading — Fruitfulness",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[4]/h3",
+          "mode": "text",
+          "value": "Fruitfulness"
+        },
+        {
+          "label": "Paragraph — Spiritual growth should overflow into faithful service.",
+          "xpath": "/html/body/main/section[2]/div/div[2]/div[4]/p",
+          "mode": "text",
+          "value": "Spiritual growth should overflow into faithful service."
+        },
+        {
+          "label": "Heading — About Ayo-Paul Ikujuni",
+          "xpath": "/html/body/main/section[2]/div/h2[2]",
+          "mode": "text",
+          "value": "About Ayo-Paul Ikujuni"
+        },
+        {
+          "label": "Paragraph — Ayo-Paul Ikujuni is a Christian author, teacher, and scientist…",
+          "xpath": "/html/body/main/section[2]/div/p[2]",
+          "mode": "text",
+          "value": "Ayo-Paul Ikujuni is a Christian author, teacher, and scientist committed to helping believers grow in spiritual understanding, maturity, and kingdom responsibility. His work brings biblical teaching into practical journeys readers can reflect on, discuss, and live."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

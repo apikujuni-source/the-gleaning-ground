@@ -1,0 +1,97 @@
+{
+  "adminTitle": "About",
+  "target": "divine",
+  "pagePath": "/about",
+  "seo": {
+    "title": "About | The Divine Blueprint",
+    "description": "About — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "A Platform for Spiritual Formation",
+      "textFields": [
+        {
+          "label": "Main heading — A Platform for Spiritual Formation",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "A Platform for Spiritual Formation"
+        },
+        {
+          "label": "Paragraph — The Divine Blueprint exists to help believers understand and co…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "The Divine Blueprint exists to help believers understand and cooperate with God’s process of making mature sons."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "The Vision",
+      "textFields": [
+        {
+          "label": "Heading — The Vision",
+          "xpath": "/html/body/main/section[2]/div/article/h2[1]",
+          "mode": "text",
+          "value": "The Vision"
+        },
+        {
+          "label": "Paragraph — The book is the foundation. The website expands each chapter th…",
+          "xpath": "/html/body/main/section[2]/div/article/p[1]",
+          "mode": "text",
+          "value": "The book is the foundation. The website expands each chapter through Bible studies, teaching series, podcast conversations, journal exercises, and group resources."
+        },
+        {
+          "label": "Heading — Gleaning Ground",
+          "xpath": "/html/body/main/section[2]/div/article/h2[2]",
+          "mode": "text",
+          "value": "Gleaning Ground"
+        },
+        {
+          "label": "Paragraph — The Divine Blueprint is a discipleship initiative of Gleaning G…",
+          "xpath": "/html/body/main/section[2]/div/article/p[2]",
+          "mode": "text",
+          "value": "The Divine Blueprint is a discipleship initiative of Gleaning Ground, created to equip believers with Scripture-centered resources for spiritual growth and faithful service."
+        },
+        {
+          "label": "Heading — About the Author",
+          "xpath": "/html/body/main/section[2]/div/article/h2[3]",
+          "mode": "text",
+          "value": "About the Author"
+        },
+        {
+          "label": "Paragraph — Ayo-Paul Ikujuni is a Christian author and teacher committed to…",
+          "xpath": "/html/body/main/section[2]/div/article/p[3]",
+          "mode": "text",
+          "value": "Ayo-Paul Ikujuni is a Christian author and teacher committed to helping believers grow in their identity, maturity, and kingdom responsibility."
+        },
+        {
+          "label": "Subheading — Core Themes",
+          "xpath": "/html/body/main/section[2]/div/aside/div/h3",
+          "mode": "text",
+          "value": "Core Themes"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Contact the Ministry →",
+          "xpath": "/html/body/main/section[2]/div/article/a",
+          "textEditable": true,
+          "text": "Contact the Ministry →",
+          "url": "/contact"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

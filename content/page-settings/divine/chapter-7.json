@@ -1,0 +1,237 @@
+{
+  "adminTitle": "Chapter 7",
+  "target": "divine",
+  "pagePath": "/chapter-7",
+  "seo": {
+    "title": "Chapter 7: Knowledge in the Making of Sons | The Divine Blueprint",
+    "description": "Chapter 7: Knowledge in the Making of Sons — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "Knowledge in the Making of Sons",
+      "textFields": [
+        {
+          "label": "Main heading — Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Knowledge in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Distinguish information from transforming knowledge and learn h…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "Distinguish information from transforming knowledge and learn how truth, revelation, and spiritual understanding shape mature sons."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a[1]",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        },
+        {
+          "label": "Link — The Journey",
+          "xpath": "/html/body/main/section[1]/div/div/a[2]",
+          "textEditable": true,
+          "text": "The Journey",
+          "url": "/journey"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "The Big Idea",
+      "textFields": [
+        {
+          "label": "Heading — The Big Idea",
+          "xpath": "/html/body/main/section[2]/div/article/h2[1]",
+          "mode": "text",
+          "value": "The Big Idea"
+        },
+        {
+          "label": "Paragraph — Distinguish information from transforming knowledge and learn h…",
+          "xpath": "/html/body/main/section[2]/div/article/p[1]",
+          "mode": "text",
+          "value": "Distinguish information from transforming knowledge and learn how truth, revelation, and spiritual understanding shape mature sons."
+        },
+        {
+          "label": "Heading — Bible Study Outline",
+          "xpath": "/html/body/main/section[2]/div/article/h2[2]",
+          "mode": "text",
+          "value": "Bible Study Outline"
+        },
+        {
+          "label": "Subheading — Study Objective",
+          "xpath": "/html/body/main/section[2]/div/article/h3[1]",
+          "mode": "text",
+          "value": "Study Objective"
+        },
+        {
+          "label": "Paragraph — Understand the central truth of this chapter, examine the suppo…",
+          "xpath": "/html/body/main/section[2]/div/article/p[2]",
+          "mode": "text",
+          "value": "Understand the central truth of this chapter, examine the supporting Scriptures, and identify one specific response of faith and obedience."
+        },
+        {
+          "label": "Subheading — Key Scriptures",
+          "xpath": "/html/body/main/section[2]/div/article/h3[2]",
+          "mode": "text",
+          "value": "Key Scriptures"
+        },
+        {
+          "label": "Subheading — Observe",
+          "xpath": "/html/body/main/section[2]/div/article/h3[3]",
+          "mode": "text",
+          "value": "Observe"
+        },
+        {
+          "label": "List item — Which words or ideas repeat in the passages?",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[1]",
+          "mode": "text",
+          "value": "Which words or ideas repeat in the passages?"
+        },
+        {
+          "label": "List item — What do the passages reveal about God?",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[2]",
+          "mode": "text",
+          "value": "What do the passages reveal about God?"
+        },
+        {
+          "label": "List item — What do they reveal about spiritual formation?",
+          "xpath": "/html/body/main/section[2]/div/article/ul/li[3]",
+          "mode": "text",
+          "value": "What do they reveal about spiritual formation?"
+        },
+        {
+          "label": "Subheading — Discuss",
+          "xpath": "/html/body/main/section[2]/div/article/h3[4]",
+          "mode": "text",
+          "value": "Discuss"
+        },
+        {
+          "label": "List item — What part of this chapter most challenges your current understa…",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[1]",
+          "mode": "text",
+          "value": "What part of this chapter most challenges your current understanding?"
+        },
+        {
+          "label": "List item — Where do you see this truth operating in your own life?",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[2]",
+          "mode": "text",
+          "value": "Where do you see this truth operating in your own life?"
+        },
+        {
+          "label": "List item — What practical response does this truth require?",
+          "xpath": "/html/body/main/section[2]/div/article/ol/li[3]",
+          "mode": "text",
+          "value": "What practical response does this truth require?"
+        },
+        {
+          "label": "Heading — Teaching Series",
+          "xpath": "/html/body/main/section[2]/div/article/h2[3]",
+          "mode": "text",
+          "value": "Teaching Series"
+        },
+        {
+          "label": "Heading — Journal and Reflection",
+          "xpath": "/html/body/main/section[2]/div/article/h2[4]",
+          "mode": "text",
+          "value": "Journal and Reflection"
+        },
+        {
+          "label": "Heading — Prayer",
+          "xpath": "/html/body/main/section[2]/div/article/h2[5]",
+          "mode": "text",
+          "value": "Prayer"
+        },
+        {
+          "label": "Paragraph — Father, bring the truth of this chapter from information into t…",
+          "xpath": "/html/body/main/section[2]/div/article/p[3]",
+          "mode": "text",
+          "value": "Father, bring the truth of this chapter from information into transformation. Give me grace to receive Your work, obey Your voice, and grow into the person You designed me to become. Amen."
+        },
+        {
+          "label": "Field label — Mark Chapter 7 complete",
+          "xpath": "/html/body/main/section[2]/div/article/div[4]/label",
+          "mode": "text",
+          "value": "Mark Chapter 7 complete"
+        },
+        {
+          "label": "Subheading — Chapter Resources",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/h3",
+          "mode": "text",
+          "value": "Chapter Resources"
+        },
+        {
+          "label": "List item — Expanded teaching",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/ul/li[1]",
+          "mode": "text",
+          "value": "Expanded teaching"
+        },
+        {
+          "label": "List item — Personal Bible study",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/ul/li[2]",
+          "mode": "text",
+          "value": "Personal Bible study"
+        },
+        {
+          "label": "List item — Small-group questions",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/ul/li[3]",
+          "mode": "text",
+          "value": "Small-group questions"
+        },
+        {
+          "label": "List item — Teaching series",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/ul/li[4]",
+          "mode": "text",
+          "value": "Teaching series"
+        },
+        {
+          "label": "List item — Journal prompts",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/ul/li[5]",
+          "mode": "text",
+          "value": "Journal prompts"
+        },
+        {
+          "label": "Button — Print this study",
+          "xpath": "/html/body/main/section[2]/div/aside/div[1]/button",
+          "mode": "text",
+          "value": "Print this study"
+        },
+        {
+          "label": "Subheading — Memory Declaration",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/h3",
+          "mode": "text",
+          "value": "Memory Declaration"
+        },
+        {
+          "label": "Paragraph — The knowledge of God is transforming my mind, choices, and char…",
+          "xpath": "/html/body/main/section[2]/div/aside/div[2]/p",
+          "mode": "text",
+          "value": "The knowledge of God is transforming my mind, choices, and character."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — ← Previous",
+          "xpath": "/html/body/main/section[2]/div/article/div[5]/a[1]",
+          "textEditable": true,
+          "text": "← Previous",
+          "url": "/chapter-6"
+        },
+        {
+          "label": "Link — Next →",
+          "xpath": "/html/body/main/section[2]/div/article/div[5]/a[2]",
+          "textEditable": true,
+          "text": "Next →",
+          "url": "/chapter-8"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

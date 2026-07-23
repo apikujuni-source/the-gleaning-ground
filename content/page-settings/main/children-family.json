@@ -1,0 +1,119 @@
+{
+  "adminTitle": "Children & Family",
+  "target": "main",
+  "pagePath": "/children-family/",
+  "seo": {
+    "title": "Children & Family | Gleaning Ground",
+    "description": "Creative Bible resources that help children encounter truth, grow in character, and become agents of light."
+  },
+  "sections": [
+    {
+      "label": "Helping children know truth—and live it.",
+      "textFields": [
+        {
+          "label": "Paragraph — Faith that takes root early",
+          "xpath": "/html/body/main/section[1]/div/div[1]/p[1]",
+          "mode": "text",
+          "value": "Faith that takes root early"
+        },
+        {
+          "label": "Main heading — Helping children know truth—and live it.",
+          "xpath": "/html/body/main/section[1]/div/div[1]/h1",
+          "mode": "text",
+          "value": "Helping children know truth—and live it."
+        },
+        {
+          "label": "Paragraph — Stories, activities, teaching series, leader guides, and family…",
+          "xpath": "/html/body/main/section[1]/div/div[1]/p[2]",
+          "mode": "text",
+          "value": "Stories, activities, teaching series, leader guides, and family conversations designed to make biblical formation memorable and joyful."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Explore family resources",
+          "xpath": "/html/body/main/section[1]/div/div[1]/a",
+          "textEditable": true,
+          "text": "Explore family resources",
+          "url": "/resources/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Built for children, families, and ministry leaders",
+      "textFields": [
+        {
+          "label": "Paragraph — Featured programs",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p",
+          "mode": "text",
+          "value": "Featured programs"
+        },
+        {
+          "label": "Heading — Built for children, families, and ministry leaders",
+          "xpath": "/html/body/main/section[2]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Built for children, families, and ministry leaders"
+        },
+        {
+          "label": "Paragraph — Four-week children’s series",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[1]/p[1]",
+          "mode": "text",
+          "value": "Four-week children’s series"
+        },
+        {
+          "label": "Subheading — The Bright Bunch: Agents of Light",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[1]/h3",
+          "mode": "text",
+          "value": "The Bright Bunch: Agents of Light"
+        },
+        {
+          "label": "Paragraph — A character-driven journey that helps children understand how t…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[1]/p[2]",
+          "mode": "text",
+          "value": "A character-driven journey that helps children understand how to live as light through truth, courage, kindness, and faith."
+        },
+        {
+          "label": "Paragraph — Stage play and episodic story",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[2]/p[1]",
+          "mode": "text",
+          "value": "Stage play and episodic story"
+        },
+        {
+          "label": "Subheading — The Trials of the Kingdom Within",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[2]/h3",
+          "mode": "text",
+          "value": "The Trials of the Kingdom Within"
+        },
+        {
+          "label": "Paragraph — An imaginative story world that translates spiritual formation…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[2]/p[2]",
+          "mode": "text",
+          "value": "An imaginative story world that translates spiritual formation into memorable characters, choices, and challenges."
+        },
+        {
+          "label": "Paragraph — Family discipleship",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[3]/p[1]",
+          "mode": "text",
+          "value": "Family discipleship"
+        },
+        {
+          "label": "Subheading — Table Talk Guides",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[3]/h3",
+          "mode": "text",
+          "value": "Table Talk Guides"
+        },
+        {
+          "label": "Paragraph — Simple weekly Scripture conversations, reflection questions, an…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/article[3]/p[2]",
+          "mode": "text",
+          "value": "Simple weekly Scripture conversations, reflection questions, and practical family challenges."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

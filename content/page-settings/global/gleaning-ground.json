@@ -1,0 +1,245 @@
+{
+  "adminTitle": "Gleaning Ground — Navigation & Footer",
+  "target": "main",
+  "pagePath": "*",
+  "sections": [
+    {
+      "label": "Header & navigation",
+      "textFields": [
+        {
+          "label": "Brand text — Gleaning",
+          "xpath": "/html/body/header/div/a/span/strong",
+          "mode": "text",
+          "value": "Gleaning"
+        },
+        {
+          "label": "Brand accent — Ground",
+          "xpath": "/html/body/header/div/a/span/em",
+          "mode": "text",
+          "value": "Ground"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — GleaningGround",
+          "xpath": "/html/body/header/div/a",
+          "textEditable": false,
+          "text": "",
+          "url": "/"
+        },
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/header/div/nav/a[1]",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        },
+        {
+          "label": "Link — About",
+          "xpath": "/html/body/header/div/nav/a[2]",
+          "textEditable": true,
+          "text": "About",
+          "url": "/about/"
+        },
+        {
+          "label": "Link — Devotionals",
+          "xpath": "/html/body/header/div/nav/a[3]",
+          "textEditable": true,
+          "text": "Devotionals",
+          "url": "/devotionals/"
+        },
+        {
+          "label": "Link — Teachings",
+          "xpath": "/html/body/header/div/nav/a[4]",
+          "textEditable": true,
+          "text": "Teachings",
+          "url": "/teachings/"
+        },
+        {
+          "label": "Link — Books",
+          "xpath": "/html/body/header/div/nav/a[5]",
+          "textEditable": true,
+          "text": "Books",
+          "url": "/books/"
+        },
+        {
+          "label": "Link — Children & Family",
+          "xpath": "/html/body/header/div/nav/a[6]",
+          "textEditable": true,
+          "text": "Children & Family",
+          "url": "/children-family/"
+        },
+        {
+          "label": "Link — Resources",
+          "xpath": "/html/body/header/div/nav/a[7]",
+          "textEditable": true,
+          "text": "Resources",
+          "url": "/resources/"
+        },
+        {
+          "label": "Link — The Divine Blueprint",
+          "xpath": "/html/body/header/div/nav/a[8]",
+          "textEditable": true,
+          "text": "The Divine Blueprint",
+          "url": "/divine-blueprint/"
+        },
+        {
+          "label": "Link — Connect",
+          "xpath": "/html/body/header/div/nav/a[9]",
+          "textEditable": true,
+          "text": "Connect",
+          "url": "/contact/"
+        }
+      ],
+      "imageFields": [
+        {
+          "label": "Image — mark.svg",
+          "xpath": "/html/body/header/div/a/img",
+          "src": "/assets/mark.svg",
+          "alt": ""
+        }
+      ],
+      "attributeFields": []
+    },
+    {
+      "label": "Footer",
+      "textFields": [
+        {
+          "label": "Paragraph — A place to gather what strengthens faith and nourishes life.",
+          "xpath": "/html/body/footer/div[1]/section[1]/p[1]",
+          "mode": "text",
+          "value": "A place to gather what strengthens faith and nourishes life."
+        },
+        {
+          "label": "Paragraph — “Gather up the fragments that remain, that nothing be lost.” —…",
+          "xpath": "/html/body/footer/div[1]/section[1]/p[2]",
+          "mode": "html",
+          "value": "“Gather up the fragments that remain, that nothing be lost.” <span>— John 6:12</span>"
+        },
+        {
+          "label": "Heading — Explore",
+          "xpath": "/html/body/footer/div[1]/section[2]/h2",
+          "mode": "text",
+          "value": "Explore"
+        },
+        {
+          "label": "Heading — Ministry",
+          "xpath": "/html/body/footer/div[1]/section[3]/h2",
+          "mode": "text",
+          "value": "Ministry"
+        },
+        {
+          "label": "Heading — Stay connected",
+          "xpath": "/html/body/footer/div[1]/section[4]/h2",
+          "mode": "text",
+          "value": "Stay connected"
+        },
+        {
+          "label": "Field label — Email address",
+          "xpath": "/html/body/footer/div[1]/section[4]/form/label",
+          "mode": "text",
+          "value": "Email address"
+        },
+        {
+          "label": "Button — Join",
+          "xpath": "/html/body/footer/div[1]/section[4]/form/div/button",
+          "mode": "text",
+          "value": "Join"
+        },
+        {
+          "label": "Brand text — Gleaning",
+          "xpath": "/html/body/footer/div[1]/section[1]/a/span/strong",
+          "mode": "text",
+          "value": "Gleaning"
+        },
+        {
+          "label": "Brand accent — Ground",
+          "xpath": "/html/body/footer/div[1]/section[1]/a/span/em",
+          "mode": "text",
+          "value": "Ground"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — GleaningGround",
+          "xpath": "/html/body/footer/div[1]/section[1]/a",
+          "textEditable": false,
+          "text": "",
+          "url": "/"
+        },
+        {
+          "label": "Link — Devotionals",
+          "xpath": "/html/body/footer/div[1]/section[2]/a[1]",
+          "textEditable": true,
+          "text": "Devotionals",
+          "url": "/devotionals/"
+        },
+        {
+          "label": "Link — Teachings",
+          "xpath": "/html/body/footer/div[1]/section[2]/a[2]",
+          "textEditable": true,
+          "text": "Teachings",
+          "url": "/teachings/"
+        },
+        {
+          "label": "Link — Books",
+          "xpath": "/html/body/footer/div[1]/section[2]/a[3]",
+          "textEditable": true,
+          "text": "Books",
+          "url": "/books/"
+        },
+        {
+          "label": "Link — Resources",
+          "xpath": "/html/body/footer/div[1]/section[2]/a[4]",
+          "textEditable": true,
+          "text": "Resources",
+          "url": "/resources/"
+        },
+        {
+          "label": "Link — About",
+          "xpath": "/html/body/footer/div[1]/section[3]/a[1]",
+          "textEditable": true,
+          "text": "About",
+          "url": "/about/"
+        },
+        {
+          "label": "Link — Children & Family",
+          "xpath": "/html/body/footer/div[1]/section[3]/a[2]",
+          "textEditable": true,
+          "text": "Children & Family",
+          "url": "/children-family/"
+        },
+        {
+          "label": "Link — The Divine Blueprint",
+          "xpath": "/html/body/footer/div[1]/section[3]/a[3]",
+          "textEditable": true,
+          "text": "The Divine Blueprint",
+          "url": "https://divineblueprint.gleaningground.com/"
+        },
+        {
+          "label": "Link — Contact",
+          "xpath": "/html/body/footer/div[1]/section[3]/a[4]",
+          "textEditable": true,
+          "text": "Contact",
+          "url": "/contact/"
+        }
+      ],
+      "imageFields": [
+        {
+          "label": "Image — mark.svg",
+          "xpath": "/html/body/footer/div[1]/section[1]/a/img",
+          "src": "/assets/mark.svg",
+          "alt": ""
+        }
+      ],
+      "attributeFields": [
+        {
+          "label": "Input — you@example.com",
+          "xpath": "/html/body/footer/div[1]/section[4]/form/div/input",
+          "attribute": "placeholder",
+          "value": "you@example.com"
+        }
+      ]
+    }
+  ]
+}

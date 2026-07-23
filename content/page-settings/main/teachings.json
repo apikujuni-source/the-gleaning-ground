@@ -1,0 +1,44 @@
+{
+  "adminTitle": "Teachings Landing Page",
+  "target": "main",
+  "pagePath": "/teachings/",
+  "seo": {
+    "title": "Teachings | Gleaning Ground",
+    "description": "Bible teaching for spiritual understanding, maturity, and faithful practice."
+  },
+  "sections": [
+    {
+      "label": "Teachings",
+      "textFields": [
+        {
+          "label": "Paragraph — Go deeper",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Go deeper"
+        },
+        {
+          "label": "Main heading — Teachings",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Teachings"
+        },
+        {
+          "label": "Paragraph — Explore articles, teaching notes, video outlines, and podcast c…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "Explore articles, teaching notes, video outlines, and podcast conversations built around Scripture."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "What Spiritual Maturity Looks Like",
+      "textFields": [],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

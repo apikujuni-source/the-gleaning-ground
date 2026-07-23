@@ -1,0 +1,214 @@
+{
+  "adminTitle": "Divine Blueprint — Navigation & Footer",
+  "target": "divine",
+  "pagePath": "*",
+  "sections": [
+    {
+      "label": "Header & navigation",
+      "textFields": [
+        {
+          "label": "Button — Get the Book",
+          "xpath": "/html/body/header/div/div/button[1]",
+          "mode": "text",
+          "value": "Get the Book"
+        },
+        {
+          "label": "Button — ☰",
+          "xpath": "/html/body/header/div/div/button[2]",
+          "mode": "text",
+          "value": "☰"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — The DivineBlueprint",
+          "xpath": "/html/body/header/div/a",
+          "textEditable": false,
+          "text": "",
+          "url": "/"
+        },
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/header/div/nav/a[1]",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        },
+        {
+          "label": "Link — Start Here",
+          "xpath": "/html/body/header/div/nav/a[2]",
+          "textEditable": true,
+          "text": "Start Here",
+          "url": "/start-here"
+        },
+        {
+          "label": "Link — The Journey",
+          "xpath": "/html/body/header/div/nav/a[3]",
+          "textEditable": true,
+          "text": "The Journey",
+          "url": "/journey"
+        },
+        {
+          "label": "Link — Bible Studies",
+          "xpath": "/html/body/header/div/nav/a[4]",
+          "textEditable": true,
+          "text": "Bible Studies",
+          "url": "/bible-studies"
+        },
+        {
+          "label": "Link — Teachings",
+          "xpath": "/html/body/header/div/nav/a[5]",
+          "textEditable": true,
+          "text": "Teachings",
+          "url": "/teachings"
+        },
+        {
+          "label": "Link — Podcast",
+          "xpath": "/html/body/header/div/nav/a[6]",
+          "textEditable": true,
+          "text": "Podcast",
+          "url": "/podcast"
+        },
+        {
+          "label": "Link — The Companion",
+          "xpath": "/html/body/header/div/nav/a[7]",
+          "textEditable": true,
+          "text": "The Companion",
+          "url": "/companion"
+        },
+        {
+          "label": "Link — About",
+          "xpath": "/html/body/header/div/nav/a[8]",
+          "textEditable": true,
+          "text": "About",
+          "url": "/about"
+        }
+      ],
+      "imageFields": [
+        {
+          "label": "Image — logo.svg",
+          "xpath": "/html/body/header/div/a/img",
+          "src": "assets/logo.svg",
+          "alt": ""
+        }
+      ],
+      "attributeFields": []
+    },
+    {
+      "label": "Footer",
+      "textFields": [
+        {
+          "label": "Paragraph — A discipleship initiative of Gleaning Ground.",
+          "xpath": "/html/body/footer/div/div[1]/div[1]/p[1]",
+          "mode": "text",
+          "value": "A discipleship initiative of Gleaning Ground."
+        },
+        {
+          "label": "Paragraph — Read. Reflect. Pray. Practice. Become.",
+          "xpath": "/html/body/footer/div/div[1]/div[1]/p[2]",
+          "mode": "text",
+          "value": "Read. Reflect. Pray. Practice. Become."
+        },
+        {
+          "label": "Subheading — Journey",
+          "xpath": "/html/body/footer/div/div[1]/div[2]/h3",
+          "mode": "text",
+          "value": "Journey"
+        },
+        {
+          "label": "Subheading — Media",
+          "xpath": "/html/body/footer/div/div[1]/div[3]/h3",
+          "mode": "text",
+          "value": "Media"
+        },
+        {
+          "label": "Subheading — Connect",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/h3",
+          "mode": "text",
+          "value": "Connect"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — The Divine Blueprint",
+          "xpath": "/html/body/footer/div/div[1]/div[1]/a",
+          "textEditable": false,
+          "text": "",
+          "url": "/"
+        },
+        {
+          "label": "Link — Start Here",
+          "xpath": "/html/body/footer/div/div[1]/div[2]/a[1]",
+          "textEditable": true,
+          "text": "Start Here",
+          "url": "/start-here"
+        },
+        {
+          "label": "Link — All Chapters",
+          "xpath": "/html/body/footer/div/div[1]/div[2]/a[2]",
+          "textEditable": true,
+          "text": "All Chapters",
+          "url": "/journey"
+        },
+        {
+          "label": "Link — Bible Studies",
+          "xpath": "/html/body/footer/div/div[1]/div[2]/a[3]",
+          "textEditable": true,
+          "text": "Bible Studies",
+          "url": "/bible-studies"
+        },
+        {
+          "label": "Link — Teachings",
+          "xpath": "/html/body/footer/div/div[1]/div[3]/a[1]",
+          "textEditable": true,
+          "text": "Teachings",
+          "url": "/teachings"
+        },
+        {
+          "label": "Link — Podcast",
+          "xpath": "/html/body/footer/div/div[1]/div[3]/a[2]",
+          "textEditable": true,
+          "text": "Podcast",
+          "url": "/podcast"
+        },
+        {
+          "label": "Link — The Companion",
+          "xpath": "/html/body/footer/div/div[1]/div[3]/a[3]",
+          "textEditable": true,
+          "text": "The Companion",
+          "url": "/companion"
+        },
+        {
+          "label": "Link — About",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/a[1]",
+          "textEditable": true,
+          "text": "About",
+          "url": "/about"
+        },
+        {
+          "label": "Link — Contact",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/a[2]",
+          "textEditable": true,
+          "text": "Contact",
+          "url": "/contact"
+        },
+        {
+          "label": "Link — Gleaning Ground",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/a[3]",
+          "textEditable": true,
+          "text": "Gleaning Ground",
+          "url": "https://gleaningground.com"
+        }
+      ],
+      "imageFields": [
+        {
+          "label": "Image — logo.svg",
+          "xpath": "/html/body/footer/div/div[1]/div[1]/a/img",
+          "src": "assets/logo.svg",
+          "alt": ""
+        }
+      ],
+      "attributeFields": []
+    }
+  ]
+}

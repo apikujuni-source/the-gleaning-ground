@@ -1,0 +1,589 @@
+{
+  "adminTitle": "Homepage",
+  "target": "divine",
+  "pagePath": "/",
+  "seo": {
+    "title": "Home | The Divine Blueprint",
+    "description": "Home — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "God Has a Blueprint for Your Becoming",
+      "textFields": [
+        {
+          "label": "Main heading — God Has a Blueprint for Your Becoming",
+          "xpath": "/html/body/main/section[1]/div/div[1]/h1",
+          "mode": "text",
+          "value": "God Has a Blueprint for Your Becoming"
+        },
+        {
+          "label": "Paragraph — Discover the divine process through which God makes, matures, a…",
+          "xpath": "/html/body/main/section[1]/div/div[1]/p",
+          "mode": "text",
+          "value": "Discover the divine process through which God makes, matures, and manifests His sons."
+        },
+        {
+          "label": "Button — Get the Book",
+          "xpath": "/html/body/main/section[1]/div/div[1]/div/button",
+          "mode": "text",
+          "value": "Get the Book"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Begin the Journey →",
+          "xpath": "/html/body/main/section[1]/div/div[1]/div/a",
+          "textEditable": true,
+          "text": "Begin the Journey →",
+          "url": "/start-here"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Nine Stages of Spiritual Formation",
+      "textFields": [
+        {
+          "label": "Heading — Nine Stages of Spiritual Formation",
+          "xpath": "/html/body/main/section[2]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Nine Stages of Spiritual Formation"
+        },
+        {
+          "label": "Paragraph — Move from encounter and identity into maturity, responsibility,…",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p",
+          "mode": "text",
+          "value": "Move from encounter and identity into maturity, responsibility, fellowship, and manifestation."
+        },
+        {
+          "label": "Subheading — The Light of Men",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]/h3",
+          "mode": "text",
+          "value": "The Light of Men"
+        },
+        {
+          "label": "Paragraph — Explore how God brings light, identity, order, and purpose into…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]/p",
+          "mode": "text",
+          "value": "Explore how God brings light, identity, order, and purpose into a life that was once without form, void, and in darkness."
+        },
+        {
+          "label": "Subheading — If Children, Then Heirs",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]/h3",
+          "mode": "text",
+          "value": "If Children, Then Heirs"
+        },
+        {
+          "label": "Paragraph — Discover the spiritual transaction of redemption and translatio…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]/p",
+          "mode": "text",
+          "value": "Discover the spiritual transaction of redemption and translation, and what it means to become an heir of God and a joint heir with Christ."
+        },
+        {
+          "label": "Subheading — Partakers of His Divine Nature",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]/h3",
+          "mode": "text",
+          "value": "Partakers of His Divine Nature"
+        },
+        {
+          "label": "Paragraph — Understand how believers participate in Christ’s holiness, acce…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]/p",
+          "mode": "text",
+          "value": "Understand how believers participate in Christ’s holiness, access to the Father, and resurrection power through the indwelling Spirit."
+        },
+        {
+          "label": "Subheading — But Is Under Tutors",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]/h3",
+          "mode": "text",
+          "value": "But Is Under Tutors"
+        },
+        {
+          "label": "Paragraph — Learn why spiritual inheritance does not eliminate the need for…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]/p",
+          "mode": "text",
+          "value": "Learn why spiritual inheritance does not eliminate the need for instruction, discipline, mentors, and God’s appointed formation process."
+        },
+        {
+          "label": "Subheading — Becoming Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[5]/h3",
+          "mode": "text",
+          "value": "Becoming Sons"
+        },
+        {
+          "label": "Paragraph — Move from spiritual childhood toward mature sonship marked by r…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[5]/p",
+          "mode": "text",
+          "value": "Move from spiritual childhood toward mature sonship marked by responsibility, obedience, discernment, and Christlike character."
+        },
+        {
+          "label": "Subheading — The Cross in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[6]/h3",
+          "mode": "text",
+          "value": "The Cross in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Examine the indispensable work of the cross in producing humili…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[6]/p",
+          "mode": "text",
+          "value": "Examine the indispensable work of the cross in producing humility, obedience, endurance, and a life fully surrendered to God."
+        },
+        {
+          "label": "Subheading — Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[7]/h3",
+          "mode": "text",
+          "value": "Knowledge in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Distinguish information from transforming knowledge and learn h…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[7]/p",
+          "mode": "text",
+          "value": "Distinguish information from transforming knowledge and learn how truth, revelation, and spiritual understanding shape mature sons."
+        },
+        {
+          "label": "Subheading — The Fellowship of the Spirit in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[8]/h3",
+          "mode": "text",
+          "value": "The Fellowship of the Spirit in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Discover how fellowship with the Holy Spirit and the body of Ch…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[8]/p",
+          "mode": "text",
+          "value": "Discover how fellowship with the Holy Spirit and the body of Christ nurtures intimacy, guidance, power, and maturity."
+        },
+        {
+          "label": "Subheading — The Manifestation of the Sons of God",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[9]/h3",
+          "mode": "text",
+          "value": "The Manifestation of the Sons of God"
+        },
+        {
+          "label": "Paragraph — Bring the journey to its intended fruit: mature sons expressing…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[9]/p",
+          "mode": "text",
+          "value": "Bring the journey to its intended fruit: mature sons expressing God’s character, stewarding His gifts, serving others, and raising disciples."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Card link — The Light of Men",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-1"
+        },
+        {
+          "label": "Card link — If Children, Then Heirs",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-2"
+        },
+        {
+          "label": "Card link — Partakers of His Divine Nature",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-3"
+        },
+        {
+          "label": "Card link — But Is Under Tutors",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-4"
+        },
+        {
+          "label": "Card link — Becoming Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[5]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-5"
+        },
+        {
+          "label": "Card link — The Cross in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[6]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-6"
+        },
+        {
+          "label": "Card link — Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[7]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-7"
+        },
+        {
+          "label": "Card link — The Fellowship of the Spirit in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[8]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-8"
+        },
+        {
+          "label": "Card link — The Manifestation of the Sons of God",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[9]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-9"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "One Message, Four Ways to Engage",
+      "textFields": [
+        {
+          "label": "Heading — One Message, Four Ways to Engage",
+          "xpath": "/html/body/main/section[3]/div/div[1]/h2",
+          "mode": "text",
+          "value": "One Message, Four Ways to Engage"
+        },
+        {
+          "label": "Subheading — Bible Study Outlines",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[1]/h3",
+          "mode": "text",
+          "value": "Bible Study Outlines"
+        },
+        {
+          "label": "Paragraph — Personal and small-group studies for every chapter.",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[1]/p",
+          "mode": "text",
+          "value": "Personal and small-group studies for every chapter."
+        },
+        {
+          "label": "Subheading — Teaching Series",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[2]/h3",
+          "mode": "text",
+          "value": "Teaching Series"
+        },
+        {
+          "label": "Paragraph — Focused teaching episodes that expand the book.",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[2]/p",
+          "mode": "text",
+          "value": "Focused teaching episodes that expand the book."
+        },
+        {
+          "label": "Subheading — Podcast",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[3]/h3",
+          "mode": "text",
+          "value": "Podcast"
+        },
+        {
+          "label": "Paragraph — Conversations on formation, maturity, and ministry.",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[3]/p",
+          "mode": "text",
+          "value": "Conversations on formation, maturity, and ministry."
+        },
+        {
+          "label": "Subheading — Companion Journal",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[4]/h3",
+          "mode": "text",
+          "value": "Companion Journal"
+        },
+        {
+          "label": "Paragraph — Guided reflection for applying each chapter.",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[4]/p",
+          "mode": "text",
+          "value": "Guided reflection for applying each chapter."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Explore studies →",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[1]/a",
+          "textEditable": true,
+          "text": "Explore studies →",
+          "url": "/bible-studies"
+        },
+        {
+          "label": "Link — View series →",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[2]/a",
+          "textEditable": true,
+          "text": "View series →",
+          "url": "/teachings"
+        },
+        {
+          "label": "Link — Listen in →",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[3]/a",
+          "textEditable": true,
+          "text": "Listen in →",
+          "url": "/podcast"
+        },
+        {
+          "label": "Link — See the Companion →",
+          "xpath": "/html/body/main/section[3]/div/div[2]/div[4]/a",
+          "textEditable": true,
+          "text": "See the Companion →",
+          "url": "/companion"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Read. Reflect. Pray. Practice. Become.",
+      "textFields": [
+        {
+          "label": "Heading — Read. Reflect. Pray. Practice. Become.",
+          "xpath": "/html/body/main/section[4]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Read. Reflect. Pray. Practice. Become."
+        },
+        {
+          "label": "Paragraph — The Companion turns each chapter into a guided spiritual format…",
+          "xpath": "/html/body/main/section[4]/div/div[1]/p",
+          "mode": "text",
+          "value": "The Companion turns each chapter into a guided spiritual formation experience."
+        },
+        {
+          "label": "List item — Guided reflections",
+          "xpath": "/html/body/main/section[4]/div/div[1]/ul/li[1]",
+          "mode": "text",
+          "value": "Guided reflections"
+        },
+        {
+          "label": "List item — Prayer pages",
+          "xpath": "/html/body/main/section[4]/div/div[1]/ul/li[2]",
+          "mode": "text",
+          "value": "Prayer pages"
+        },
+        {
+          "label": "List item — Scripture meditation",
+          "xpath": "/html/body/main/section[4]/div/div[1]/ul/li[3]",
+          "mode": "text",
+          "value": "Scripture meditation"
+        },
+        {
+          "label": "List item — 90-day journey",
+          "xpath": "/html/body/main/section[4]/div/div[1]/ul/li[4]",
+          "mode": "text",
+          "value": "90-day journey"
+        },
+        {
+          "label": "List item — Spiritual checkpoints",
+          "xpath": "/html/body/main/section[4]/div/div[1]/ul/li[5]",
+          "mode": "text",
+          "value": "Spiritual checkpoints"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Explore the Companion →",
+          "xpath": "/html/body/main/section[4]/div/div[1]/a",
+          "textEditable": true,
+          "text": "Explore the Companion →",
+          "url": "/companion"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Where Are You in the Journey?",
+      "textFields": [
+        {
+          "label": "Heading — Where Are You in the Journey?",
+          "xpath": "/html/body/main/section[5]/div/div/div[1]/h2",
+          "mode": "text",
+          "value": "Where Are You in the Journey?"
+        },
+        {
+          "label": "Paragraph — Rate each statement from 1 to 5 to receive a suggested next ste…",
+          "xpath": "/html/body/main/section[5]/div/div/div[1]/p",
+          "mode": "text",
+          "value": "Rate each statement from 1 to 5 to receive a suggested next step."
+        },
+        {
+          "label": "Field label — I understand my identity in Christ.",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/label",
+          "mode": "text",
+          "value": "I understand my identity in Christ."
+        },
+        {
+          "label": "Field label — 1",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/div/label[1]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q1\" value=\"1\">1"
+        },
+        {
+          "label": "Field label — 2",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/div/label[2]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q1\" value=\"2\">2"
+        },
+        {
+          "label": "Field label — 3",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/div/label[3]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q1\" value=\"3\">3"
+        },
+        {
+          "label": "Field label — 4",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/div/label[4]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q1\" value=\"4\">4"
+        },
+        {
+          "label": "Field label — 5",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[1]/div/label[5]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q1\" value=\"5\">5"
+        },
+        {
+          "label": "Field label — I receive correction and spiritual instruction.",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/label",
+          "mode": "text",
+          "value": "I receive correction and spiritual instruction."
+        },
+        {
+          "label": "Field label — 1",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/div/label[1]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q2\" value=\"1\">1"
+        },
+        {
+          "label": "Field label — 2",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/div/label[2]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q2\" value=\"2\">2"
+        },
+        {
+          "label": "Field label — 3",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/div/label[3]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q2\" value=\"3\">3"
+        },
+        {
+          "label": "Field label — 4",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/div/label[4]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q2\" value=\"4\">4"
+        },
+        {
+          "label": "Field label — 5",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[2]/div/label[5]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q2\" value=\"5\">5"
+        },
+        {
+          "label": "Field label — My habits increasingly reflect Christlike maturity.",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/label",
+          "mode": "text",
+          "value": "My habits increasingly reflect Christlike maturity."
+        },
+        {
+          "label": "Field label — 1",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/div/label[1]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q3\" value=\"1\">1"
+        },
+        {
+          "label": "Field label — 2",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/div/label[2]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q3\" value=\"2\">2"
+        },
+        {
+          "label": "Field label — 3",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/div/label[3]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q3\" value=\"3\">3"
+        },
+        {
+          "label": "Field label — 4",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/div/label[4]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q3\" value=\"4\">4"
+        },
+        {
+          "label": "Field label — 5",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[3]/div/label[5]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q3\" value=\"5\">5"
+        },
+        {
+          "label": "Field label — I am actively serving and helping others grow.",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/label",
+          "mode": "text",
+          "value": "I am actively serving and helping others grow."
+        },
+        {
+          "label": "Field label — 1",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/div/label[1]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q4\" value=\"1\">1"
+        },
+        {
+          "label": "Field label — 2",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/div/label[2]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q4\" value=\"2\">2"
+        },
+        {
+          "label": "Field label — 3",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/div/label[3]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q4\" value=\"3\">3"
+        },
+        {
+          "label": "Field label — 4",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/div/label[4]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q4\" value=\"4\">4"
+        },
+        {
+          "label": "Field label — 5",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/div[4]/div/label[5]",
+          "mode": "html",
+          "value": "<input type=\"radio\" name=\"q4\" value=\"5\">5"
+        },
+        {
+          "label": "Button — Find My Next Step",
+          "xpath": "/html/body/main/section[5]/div/div/div[2]/button",
+          "mode": "text",
+          "value": "Find My Next Step"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Receive new teachings and study resources.",
+      "textFields": [
+        {
+          "label": "Heading — Receive new teachings and study resources.",
+          "xpath": "/html/body/main/section[6]/div/div/h2",
+          "mode": "text",
+          "value": "Receive new teachings and study resources."
+        },
+        {
+          "label": "Field label — Email address",
+          "xpath": "/html/body/main/section[6]/div/form/label",
+          "mode": "text",
+          "value": "Email address"
+        },
+        {
+          "label": "Button — Join the Journey →",
+          "xpath": "/html/body/main/section[6]/div/form/button",
+          "mode": "text",
+          "value": "Join the Journey →"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": [
+        {
+          "label": "Input — Enter your email",
+          "xpath": "/html/body/main/section[6]/div/form/input[2]",
+          "attribute": "placeholder",
+          "value": "Enter your email"
+        }
+      ]
+    }
+  ]
+}

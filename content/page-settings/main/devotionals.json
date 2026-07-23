@@ -1,0 +1,64 @@
+{
+  "adminTitle": "Devotionals Landing Page",
+  "target": "main",
+  "pagePath": "/devotionals/",
+  "seo": {
+    "title": "Devotionals | Gleaning Ground",
+    "description": "Scripture-centered reflections for everyday faith and spiritual formation."
+  },
+  "sections": [
+    {
+      "label": "Devotionals",
+      "textFields": [
+        {
+          "label": "Paragraph — Fresh from the ground",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Fresh from the ground"
+        },
+        {
+          "label": "Main heading — Devotionals",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Devotionals"
+        },
+        {
+          "label": "Paragraph — Short, thoughtful reflections to help you pause, receive truth,…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "Short, thoughtful reflections to help you pause, receive truth, and respond with faith."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Light for the Next Step",
+      "textFields": [
+        {
+          "label": "Paragraph — 3 devotionals",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p",
+          "mode": "text",
+          "value": "3 devotionals"
+        },
+        {
+          "label": "Field label — Search",
+          "xpath": "/html/body/main/section[2]/div/div[1]/label",
+          "mode": "html",
+          "value": "Search <input type=\"search\" placeholder=\"Search devotionals\" data-search-input>"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": [
+        {
+          "label": "Input — Search devotionals",
+          "xpath": "/html/body/main/section[2]/div/div[1]/label/input",
+          "attribute": "placeholder",
+          "value": "Search devotionals"
+        }
+      ]
+    }
+  ]
+}

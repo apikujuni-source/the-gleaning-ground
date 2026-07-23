@@ -1,0 +1,219 @@
+{
+  "adminTitle": "The Journey",
+  "target": "divine",
+  "pagePath": "/journey",
+  "seo": {
+    "title": "The Journey | The Divine Blueprint",
+    "description": "The Journey — The Divine Blueprint discipleship journey."
+  },
+  "sections": [
+    {
+      "label": "The Journey of Becoming",
+      "textFields": [
+        {
+          "label": "Main heading — The Journey of Becoming",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "The Journey of Becoming"
+        },
+        {
+          "label": "Paragraph — Follow the progression from light and adoption to maturity, fel…",
+          "xpath": "/html/body/main/section[1]/div/p",
+          "mode": "text",
+          "value": "Follow the progression from light and adoption to maturity, fellowship, and manifestation."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Home",
+          "xpath": "/html/body/main/section[1]/div/div/a",
+          "textEditable": true,
+          "text": "Home",
+          "url": "/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Section 2",
+      "textFields": [
+        {
+          "label": "Subheading — The Light of Men",
+          "xpath": "/html/body/main/section[2]/div/div/a[1]/h3",
+          "mode": "text",
+          "value": "The Light of Men"
+        },
+        {
+          "label": "Paragraph — Explore how God brings light, identity, order, and purpose into…",
+          "xpath": "/html/body/main/section[2]/div/div/a[1]/p",
+          "mode": "text",
+          "value": "Explore how God brings light, identity, order, and purpose into a life that was once without form, void, and in darkness."
+        },
+        {
+          "label": "Subheading — If Children, Then Heirs",
+          "xpath": "/html/body/main/section[2]/div/div/a[2]/h3",
+          "mode": "text",
+          "value": "If Children, Then Heirs"
+        },
+        {
+          "label": "Paragraph — Discover the spiritual transaction of redemption and translatio…",
+          "xpath": "/html/body/main/section[2]/div/div/a[2]/p",
+          "mode": "text",
+          "value": "Discover the spiritual transaction of redemption and translation, and what it means to become an heir of God and a joint heir with Christ."
+        },
+        {
+          "label": "Subheading — Partakers of His Divine Nature",
+          "xpath": "/html/body/main/section[2]/div/div/a[3]/h3",
+          "mode": "text",
+          "value": "Partakers of His Divine Nature"
+        },
+        {
+          "label": "Paragraph — Understand how believers participate in Christ’s holiness, acce…",
+          "xpath": "/html/body/main/section[2]/div/div/a[3]/p",
+          "mode": "text",
+          "value": "Understand how believers participate in Christ’s holiness, access to the Father, and resurrection power through the indwelling Spirit."
+        },
+        {
+          "label": "Subheading — But Is Under Tutors",
+          "xpath": "/html/body/main/section[2]/div/div/a[4]/h3",
+          "mode": "text",
+          "value": "But Is Under Tutors"
+        },
+        {
+          "label": "Paragraph — Learn why spiritual inheritance does not eliminate the need for…",
+          "xpath": "/html/body/main/section[2]/div/div/a[4]/p",
+          "mode": "text",
+          "value": "Learn why spiritual inheritance does not eliminate the need for instruction, discipline, mentors, and God’s appointed formation process."
+        },
+        {
+          "label": "Subheading — Becoming Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[5]/h3",
+          "mode": "text",
+          "value": "Becoming Sons"
+        },
+        {
+          "label": "Paragraph — Move from spiritual childhood toward mature sonship marked by r…",
+          "xpath": "/html/body/main/section[2]/div/div/a[5]/p",
+          "mode": "text",
+          "value": "Move from spiritual childhood toward mature sonship marked by responsibility, obedience, discernment, and Christlike character."
+        },
+        {
+          "label": "Subheading — The Cross in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[6]/h3",
+          "mode": "text",
+          "value": "The Cross in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Examine the indispensable work of the cross in producing humili…",
+          "xpath": "/html/body/main/section[2]/div/div/a[6]/p",
+          "mode": "text",
+          "value": "Examine the indispensable work of the cross in producing humility, obedience, endurance, and a life fully surrendered to God."
+        },
+        {
+          "label": "Subheading — Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[7]/h3",
+          "mode": "text",
+          "value": "Knowledge in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Distinguish information from transforming knowledge and learn h…",
+          "xpath": "/html/body/main/section[2]/div/div/a[7]/p",
+          "mode": "text",
+          "value": "Distinguish information from transforming knowledge and learn how truth, revelation, and spiritual understanding shape mature sons."
+        },
+        {
+          "label": "Subheading — The Fellowship of the Spirit in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[8]/h3",
+          "mode": "text",
+          "value": "The Fellowship of the Spirit in the Making of Sons"
+        },
+        {
+          "label": "Paragraph — Discover how fellowship with the Holy Spirit and the body of Ch…",
+          "xpath": "/html/body/main/section[2]/div/div/a[8]/p",
+          "mode": "text",
+          "value": "Discover how fellowship with the Holy Spirit and the body of Christ nurtures intimacy, guidance, power, and maturity."
+        },
+        {
+          "label": "Subheading — The Manifestation of the Sons of God",
+          "xpath": "/html/body/main/section[2]/div/div/a[9]/h3",
+          "mode": "text",
+          "value": "The Manifestation of the Sons of God"
+        },
+        {
+          "label": "Paragraph — Bring the journey to its intended fruit: mature sons expressing…",
+          "xpath": "/html/body/main/section[2]/div/div/a[9]/p",
+          "mode": "text",
+          "value": "Bring the journey to its intended fruit: mature sons expressing God’s character, stewarding His gifts, serving others, and raising disciples."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Card link — The Light of Men",
+          "xpath": "/html/body/main/section[2]/div/div/a[1]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-1"
+        },
+        {
+          "label": "Card link — If Children, Then Heirs",
+          "xpath": "/html/body/main/section[2]/div/div/a[2]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-2"
+        },
+        {
+          "label": "Card link — Partakers of His Divine Nature",
+          "xpath": "/html/body/main/section[2]/div/div/a[3]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-3"
+        },
+        {
+          "label": "Card link — But Is Under Tutors",
+          "xpath": "/html/body/main/section[2]/div/div/a[4]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-4"
+        },
+        {
+          "label": "Card link — Becoming Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[5]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-5"
+        },
+        {
+          "label": "Card link — The Cross in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[6]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-6"
+        },
+        {
+          "label": "Card link — Knowledge in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[7]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-7"
+        },
+        {
+          "label": "Card link — The Fellowship of the Spirit in the Making of Sons",
+          "xpath": "/html/body/main/section[2]/div/div/a[8]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-8"
+        },
+        {
+          "label": "Card link — The Manifestation of the Sons of God",
+          "xpath": "/html/body/main/section[2]/div/div/a[9]",
+          "textEditable": false,
+          "text": "",
+          "url": "/chapter-9"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

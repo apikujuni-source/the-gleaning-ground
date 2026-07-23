@@ -1,0 +1,44 @@
+{
+  "adminTitle": "Resources Landing Page",
+  "target": "main",
+  "pagePath": "/resources/",
+  "seo": {
+    "title": "Resources | Gleaning Ground",
+    "description": "Bible studies, reflection guides, printables, and ministry tools."
+  },
+  "sections": [
+    {
+      "label": "Resources",
+      "textFields": [
+        {
+          "label": "Paragraph — Tools for the journey",
+          "xpath": "/html/body/main/section[1]/div/p[1]",
+          "mode": "text",
+          "value": "Tools for the journey"
+        },
+        {
+          "label": "Main heading — Resources",
+          "xpath": "/html/body/main/section[1]/div/h1",
+          "mode": "text",
+          "value": "Resources"
+        },
+        {
+          "label": "Paragraph — Downloadable and guided resources for personal study, families,…",
+          "xpath": "/html/body/main/section[1]/div/p[2]",
+          "mode": "text",
+          "value": "Downloadable and guided resources for personal study, families, small groups, and churches."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "The Light of Men — Chapter One Study",
+      "textFields": [],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    }
+  ]
+}

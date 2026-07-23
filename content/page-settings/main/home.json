@@ -1,0 +1,301 @@
+{
+  "adminTitle": "Home",
+  "target": "main",
+  "pagePath": "/",
+  "seo": {
+    "title": "Home | Gleaning Ground",
+    "description": "Scripture-centered resources for spiritual growth, faithful service, and purposeful living."
+  },
+  "sections": [
+    {
+      "label": "Gather truth.Grow in grace.Live fruitfully.",
+      "textFields": [
+        {
+          "label": "Paragraph — A place of gathering and growth",
+          "xpath": "/html/body/main/section[1]/div[2]/div[1]/p[1]",
+          "mode": "text",
+          "value": "A place of gathering and growth"
+        },
+        {
+          "label": "Main heading — Gather truth.Grow in grace.Live fruitfully.",
+          "xpath": "/html/body/main/section[1]/div[2]/div[1]/h1",
+          "mode": "html",
+          "value": "Gather truth.<br><span>Grow in grace.</span><br>Live fruitfully."
+        },
+        {
+          "label": "Paragraph — Scripture-centered resources for spiritual growth, faithful ser…",
+          "xpath": "/html/body/main/section[1]/div[2]/div[1]/p[2]",
+          "mode": "text",
+          "value": "Scripture-centered resources for spiritual growth, faithful service, and purposeful living."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Explore devotionals",
+          "xpath": "/html/body/main/section[1]/div[2]/div[1]/div[1]/a[1]",
+          "textEditable": true,
+          "text": "Explore devotionals",
+          "url": "/devotionals/"
+        },
+        {
+          "label": "Link — Discover the ministry",
+          "xpath": "/html/body/main/section[1]/div[2]/div[1]/div[1]/a[2]",
+          "textEditable": true,
+          "text": "Discover the ministry",
+          "url": "/about/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "What do you need in this season?",
+      "textFields": [
+        {
+          "label": "Paragraph — Begin where you are",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p[1]",
+          "mode": "text",
+          "value": "Begin where you are"
+        },
+        {
+          "label": "Heading — What do you need in this season?",
+          "xpath": "/html/body/main/section[2]/div/div[1]/h2",
+          "mode": "text",
+          "value": "What do you need in this season?"
+        },
+        {
+          "label": "Paragraph — Choose a pathway and find content designed to meet you there.",
+          "xpath": "/html/body/main/section[2]/div/div[1]/p[2]",
+          "mode": "text",
+          "value": "Choose a pathway and find content designed to meet you there."
+        },
+        {
+          "label": "Subheading — Daily encouragement",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]/div/h3",
+          "mode": "text",
+          "value": "Daily encouragement"
+        },
+        {
+          "label": "Paragraph — Short Scripture-centered reflections for strength, clarity, and…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]/div/p",
+          "mode": "text",
+          "value": "Short Scripture-centered reflections for strength, clarity, and renewed faith."
+        },
+        {
+          "label": "Subheading — Deeper understanding",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]/div/h3",
+          "mode": "text",
+          "value": "Deeper understanding"
+        },
+        {
+          "label": "Paragraph — Bible teaching that helps truth move from information into form…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]/div/p",
+          "mode": "text",
+          "value": "Bible teaching that helps truth move from information into formation."
+        },
+        {
+          "label": "Subheading — Faith for the family",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]/div/h3",
+          "mode": "text",
+          "value": "Faith for the family"
+        },
+        {
+          "label": "Paragraph — Creative resources that help children encounter truth and pract…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]/div/p",
+          "mode": "text",
+          "value": "Creative resources that help children encounter truth and practice it."
+        },
+        {
+          "label": "Subheading — Tools for the journey",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]/div/h3",
+          "mode": "text",
+          "value": "Tools for the journey"
+        },
+        {
+          "label": "Paragraph — Guides, worksheets, studies, and practical resources for intent…",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]/div/p",
+          "mode": "text",
+          "value": "Guides, worksheets, studies, and practical resources for intentional growth."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Card link — Daily encouragement",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[1]",
+          "textEditable": false,
+          "text": "",
+          "url": "/devotionals/"
+        },
+        {
+          "label": "Card link — Deeper understanding",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[2]",
+          "textEditable": false,
+          "text": "",
+          "url": "/teachings/"
+        },
+        {
+          "label": "Card link — Faith for the family",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[3]",
+          "textEditable": false,
+          "text": "",
+          "url": "/children-family/"
+        },
+        {
+          "label": "Card link — Tools for the journey",
+          "xpath": "/html/body/main/section[2]/div/div[2]/a[4]",
+          "textEditable": false,
+          "text": "",
+          "url": "/resources/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "The Divine Blueprint",
+      "textFields": [
+        {
+          "label": "Paragraph — Featured journey",
+          "xpath": "/html/body/main/section[3]/div/div[1]/p[1]",
+          "mode": "text",
+          "value": "Featured journey"
+        },
+        {
+          "label": "Heading — The Divine Blueprint",
+          "xpath": "/html/body/main/section[3]/div/div[1]/h2",
+          "mode": "text",
+          "value": "The Divine Blueprint"
+        },
+        {
+          "label": "Paragraph — The Making, Maturing and Manifestation of God’s Sons",
+          "xpath": "/html/body/main/section[3]/div/div[1]/p[2]",
+          "mode": "text",
+          "value": "The Making, Maturing and Manifestation of God’s Sons"
+        },
+        {
+          "label": "Paragraph — A book, study journey, teaching series, podcast, and companion…",
+          "xpath": "/html/body/main/section[3]/div/div[1]/p[3]",
+          "mode": "text",
+          "value": "A book, study journey, teaching series, podcast, and companion journal designed to help believers understand and cooperate with God’s process of spiritual formation."
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — Explore the journey",
+          "xpath": "/html/body/main/section[3]/div/div[1]/div/a[1]",
+          "textEditable": true,
+          "text": "Explore the journey",
+          "url": "https://divineblueprint.gleaningground.com/"
+        },
+        {
+          "label": "Link — View the book →",
+          "xpath": "/html/body/main/section[3]/div/div[1]/div/a[2]",
+          "textEditable": true,
+          "text": "View the book →",
+          "url": "https://divineblueprint.gleaningground.com/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Latest devotionals",
+      "textFields": [
+        {
+          "label": "Paragraph — Fresh from the ground",
+          "xpath": "/html/body/main/section[4]/div/div[1]/div/p",
+          "mode": "text",
+          "value": "Fresh from the ground"
+        },
+        {
+          "label": "Heading — Latest devotionals",
+          "xpath": "/html/body/main/section[4]/div/div[1]/div/h2",
+          "mode": "text",
+          "value": "Latest devotionals"
+        }
+      ],
+      "linkFields": [
+        {
+          "label": "Link — View all →",
+          "xpath": "/html/body/main/section[4]/div/div[1]/a",
+          "textEditable": true,
+          "text": "View all →",
+          "url": "/devotionals/"
+        }
+      ],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Resources to read, reflect, and practice",
+      "textFields": [
+        {
+          "label": "Paragraph — Books and guided journeys",
+          "xpath": "/html/body/main/section[5]/div/div[1]/p",
+          "mode": "text",
+          "value": "Books and guided journeys"
+        },
+        {
+          "label": "Heading — Resources to read, reflect, and practice",
+          "xpath": "/html/body/main/section[5]/div/div[1]/h2",
+          "mode": "text",
+          "value": "Resources to read, reflect, and practice"
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": []
+    },
+    {
+      "label": "Receive truth worth carrying.",
+      "textFields": [
+        {
+          "label": "Paragraph — A weekly gathering",
+          "xpath": "/html/body/main/section[6]/div/div/p[1]",
+          "mode": "text",
+          "value": "A weekly gathering"
+        },
+        {
+          "label": "Heading — Receive truth worth carrying.",
+          "xpath": "/html/body/main/section[6]/div/div/h2",
+          "mode": "text",
+          "value": "Receive truth worth carrying."
+        },
+        {
+          "label": "Paragraph — Join the email community for devotionals, new teachings, book u…",
+          "xpath": "/html/body/main/section[6]/div/div/p[2]",
+          "mode": "text",
+          "value": "Join the email community for devotionals, new teachings, book updates, and ministry resources."
+        },
+        {
+          "label": "Field label — Email address",
+          "xpath": "/html/body/main/section[6]/div/form/label",
+          "mode": "text",
+          "value": "Email address"
+        },
+        {
+          "label": "Button — Join the gathering",
+          "xpath": "/html/body/main/section[6]/div/form/div/button",
+          "mode": "text",
+          "value": "Join the gathering"
+        },
+        {
+          "label": "Small text — Thoughtful emails. No noise.",
+          "xpath": "/html/body/main/section[6]/div/form/small",
+          "mode": "text",
+          "value": "Thoughtful emails. No noise."
+        }
+      ],
+      "linkFields": [],
+      "imageFields": [],
+      "attributeFields": [
+        {
+          "label": "Input — Enter your email",
+          "xpath": "/html/body/main/section[6]/div/form/div/input",
+          "attribute": "placeholder",
+          "value": "Enter your email"
+        }
+      ]
+    }
+  ]
+}
