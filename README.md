@@ -24,3 +24,15 @@ npm run dev
 ## Migration caution
 
 Do not cancel Hostinger until the new website, domain, email, forms, and redirects have all been tested.
+
+
+## Editing the Divine Blueprint homepage cover
+
+1. Open https://gleaningground.com/admin/.
+2. Choose **The Divine Blueprint**.
+3. Open **Homepage Settings**.
+4. Upload the new image under **Homepage Book Cover**.
+5. Update the alt text if needed.
+6. Choose **Save** and then **Publish**.
+
+The CMS stores the uploaded image in `content/uploads`. The Netlify build copies the selected image into the standalone Divine Blueprint site and uses it for the homepage hero without running it through the canonical-cover replacement.
