@@ -1,4 +1,4 @@
-name: Validate Divine Blueprint routes
+name: Validate Divine Blueprint routes and cover
 
 on:
   push:
@@ -27,12 +27,13 @@ jobs:
       - name: Build website
         run: npm run build
 
-      - name: Validate Companion CTA and clean navigation
+      - name: Validate routes, downloads, and canonical cover
         shell: bash
         run: |
           set -euo pipefail
           ROOT="_site/divine-blueprint-site"
           PAGE="$ROOT/companion/index.html"
+          STYLES="$ROOT/assets/styles.css"
 
           test -s "$ROOT/companion.html"
           test -s "$PAGE"
@@ -41,8 +42,16 @@ jobs:
           test -s "$ROOT/teachings/index.html"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
+          test -s "$ROOT/assets/divine-blueprint-cover.webp"
+          test -s "$ROOT/assets/canonical-book-cover.js"
 
           grep -q '<base href="/">' "$PAGE"
+          grep -q 'class="[^"]*companion-page' "$PAGE"
+          grep -q '/assets/canonical-book-cover.js' "$PAGE"
+          grep -q 'Canonical Divine Blueprint book cover' "$STYLES"
+          grep -q 'Companion full-cover display safeguard' "$STYLES"
+          grep -q 'object-fit:contain!important' "$STYLES"
+
           grep -q 'Get the Companion</a>' "$PAGE"
           grep -Eq 'href="#(companion-downloads|download-editions)"[^>]*>Get the Companion</a>' "$PAGE"
           grep -q 'Download Fillable PDF' "$PAGE"
@@ -63,4 +72,32 @@ jobs:
             exit 1
           fi
 
-          echo "Companion downloads and clean Journey, Bible Studies, and Teachings routes are present."
+          node --input-type=module <<'NODE'
+          import { readFile, readdir } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const root = '_site/divine-blueprint-site';
+          const canonical = '/assets/divine-blueprint-cover.webp';
+          const failures = [];
+          async function walk(dir) {
+            for (const entry of await readdir(dir, { withFileTypes: true })) {
+              const path = join(dir, entry.name);
+              if (entry.isDirectory()) await walk(path);
+              else if (entry.name.endsWith('.html')) {
+                const html = await readFile(path, 'utf8');
+                for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
+                  const src = tag.match(/\bsrc=(['"])(.*?)\1/i)?.[2] || '';
+                  const identity = tag.toLowerCase();
+                  const isBookCover = identity.includes('divine blueprint book cover') ||
+                    identity.includes('hero-book-cover-image') ||
+                    identity.includes('canonical-book-cover-image');
+                  if (isBookCover && src !== canonical) failures.push(`${path}: ${src}`);
+                }
+              }
+            }
+          }
+          await walk(root);
+          if (failures.length) throw new Error(`Non-canonical book covers found:\n${failures.join('\n')}`);
+          console.log('Every identified book-cover image uses the canonical Divine Blueprint cover.');
+          NODE
+
+          echo "Companion cover displays fully, all book images are canonical, and clean routes are present."
