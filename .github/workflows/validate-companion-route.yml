@@ -52,6 +52,15 @@ jobs:
           grep -q 'Companion full-cover display safeguard' "$STYLES"
           grep -q 'object-fit:contain!important' "$STYLES"
 
+          # The old CSS-built journal mockup must be gone from the Companion hero.
+          grep -q 'class="journal-visual companion-book-cover-visual"' "$PAGE"
+          grep -q 'class="canonical-book-cover-image companion-page-book-cover"' "$PAGE"
+          grep -q 'src="/assets/divine-blueprint-cover.webp"' "$PAGE"
+          if grep -Eq 'class="[^"]*(open-journal|closed-journal|journal-lines)' "$PAGE"; then
+            echo "The old cropped Companion journal mockup is still present." >&2
+            exit 1
+          fi
+
           grep -q 'Get the Companion</a>' "$PAGE"
           grep -Eq 'href="#(companion-downloads|download-editions)"[^>]*>Get the Companion</a>' "$PAGE"
           grep -q 'Download Fillable PDF' "$PAGE"
@@ -100,4 +109,4 @@ jobs:
           console.log('Every identified book-cover image uses the canonical Divine Blueprint cover.');
           NODE
 
-          echo "Companion cover displays fully, all book images are canonical, and clean routes are present."
+          echo "Companion mockup was replaced by the complete cover; all book images are canonical; clean routes are present."
