@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-const VERSION = "20260723-cover-migration-1";
+const VERSION = "20260723-scroll-cover-purge-2";
 const publicRoots = ["_site", "_site/divine-blueprint-site"];
 
 const retirementWorker = `/* Legacy site cache retirement: ${VERSION} */
