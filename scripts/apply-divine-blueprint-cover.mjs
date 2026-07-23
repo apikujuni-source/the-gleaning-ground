@@ -11,7 +11,7 @@ const mockupChunkNames = ["00", "01", "02", "03", "04", "05a", "05b"];
 const mockupOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup-final.webp");
 const originalChunksDir = ".source/divine-blueprint-home-original/chunks";
 const originalChunkNames = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
-const originalOutputImage = join(siteRoot, "assets/divine-blueprint-home-mockup-47e42f5d.png");
+const originalOutputImage = join(siteRoot, "assets/divine-blueprint-homepage-book-47e42f5d.png");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
 
@@ -86,7 +86,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-home-mockup-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover" width="1122" height="1402" loading="eager" fetchpriority="high" decoding="async">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-homepage-book-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover" width="1122" height="1402" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
@@ -94,8 +94,8 @@ if (!index.includes("hero-book-cover-image")) {
   if (!index.includes(oldHero)) throw new Error("Could not find the existing Divine Blueprint book mockup.");
   index = index.replace(oldHero, newHero);
 }
-if (!index.includes('rel="preload" as="image" href="assets/divine-blueprint-home-mockup-47e42f5d.png"')) {
-  index = index.replace("</head>", '  <link rel="preload" as="image" href="assets/divine-blueprint-home-mockup-47e42f5d.png" fetchpriority="high">\n</head>');
+if (!index.includes('rel="preload" as="image" href="assets/divine-blueprint-homepage-book-47e42f5d.png"')) {
+  index = index.replace("</head>", '  <link rel="preload" as="image" href="assets/divine-blueprint-homepage-book-47e42f5d.png" fetchpriority="high">\n</head>');
 }
 await writeFile(indexPath, index, "utf8");
 
