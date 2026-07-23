@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
 const chunksDir = ".source/divine-blueprint-cover/chunks";
@@ -14,6 +14,9 @@ const originalChunkNames = ["00", "01", "02", "03", "04", "05", "06", "07", "08"
 const originalOutputImage = join(siteRoot, "assets/divine-blueprint-homepage-book-47e42f5d.png");
 const indexPath = join(siteRoot, "index.html");
 const stylesPath = join(siteRoot, "assets/styles.css");
+const settingsPath = "content/divine-blueprint.json";
+const fallbackHomepageCover = "/assets/divine-blueprint-homepage-book-47e42f5d.png";
+const fallbackHomepageCoverAlt = "The Divine Blueprint by Ayo-Paul Ikujuni book cover";
 
 for (const name of chunkNames) {
   const path = join(chunksDir, name);
@@ -73,6 +76,39 @@ if (
 }
 await writeFile(originalOutputImage, originalImage);
 
+let homepageSettings = {};
+if (existsSync(settingsPath)) {
+  homepageSettings = JSON.parse(await readFile(settingsPath, "utf8"));
+}
+const homepageCover =
+  typeof homepageSettings.homepageBookCover === "string" && homepageSettings.homepageBookCover.trim()
+    ? homepageSettings.homepageBookCover.trim()
+    : fallbackHomepageCover;
+const homepageCoverAlt =
+  typeof homepageSettings.homepageBookCoverAlt === "string" && homepageSettings.homepageBookCoverAlt.trim()
+    ? homepageSettings.homepageBookCoverAlt.trim()
+    : fallbackHomepageCoverAlt;
+
+if (!homepageCover.startsWith("/assets/")) {
+  throw new Error("The Divine Blueprint homepage cover must be an /assets/ path selected through the CMS.");
+}
+
+if (homepageCover.startsWith("/assets/uploads/")) {
+  const relativeCover = homepageCover.replace(/^\/+/, "");
+  const uploadedSource = join("_site", relativeCover);
+  const uploadedTarget = join(siteRoot, relativeCover);
+  if (!existsSync(uploadedSource)) {
+    throw new Error(`The CMS-selected Divine Blueprint cover was not found: ${uploadedSource}`);
+  }
+  await mkdir(dirname(uploadedTarget), { recursive: true });
+  await cp(uploadedSource, uploadedTarget);
+}
+
+const escapeAttribute = (value) =>
+  value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const homepageCoverHtml = escapeAttribute(homepageCover);
+const homepageCoverAltHtml = escapeAttribute(homepageCoverAlt);
+
 const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book concept">
       <div class="light-orb"></div>
       <div class="book-mockup">
@@ -86,7 +122,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-homepage-book-47e42f5d.png" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover" width="1122" height="1402" loading="eager" fetchpriority="high" decoding="async">
+      <img class="hero-book-cover-image" src="${homepageCoverHtml}" alt="${homepageCoverAltHtml}" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
@@ -94,8 +130,9 @@ if (!index.includes("hero-book-cover-image")) {
   if (!index.includes(oldHero)) throw new Error("Could not find the existing Divine Blueprint book mockup.");
   index = index.replace(oldHero, newHero);
 }
-if (!index.includes('rel="preload" as="image" href="assets/divine-blueprint-homepage-book-47e42f5d.png"')) {
-  index = index.replace("</head>", '  <link rel="preload" as="image" href="assets/divine-blueprint-homepage-book-47e42f5d.png" fetchpriority="high">\n</head>');
+const preloadTag = `  <link rel="preload" as="image" href="${homepageCoverHtml}" fetchpriority="high">`;
+if (!index.includes(preloadTag)) {
+  index = index.replace("</head>", `${preloadTag}\n</head>`);
 }
 await writeFile(indexPath, index, "utf8");
 
