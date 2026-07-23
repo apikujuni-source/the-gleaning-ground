@@ -10,6 +10,7 @@ const requiredFiles = [
   "bible-studies/index.html",
   "teachings/index.html",
   "assets/divine-blueprint-cover.webp",
+  "assets/companion-journal-cover.webp",
   "assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf",
   "assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
 ];
@@ -29,8 +30,8 @@ const requiredCompanionFragments = [
   'More Than a<br>Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
-  'src="/assets/divine-blueprint-cover.webp?v=20260723-single-flat"',
-  'width="1024" height="1536"',
+  'src="/assets/companion-journal-cover.webp?v=20260722-journal-cover"',
+  'width="512" height="768"',
   'href="#download-editions">Get the Companion</a>',
   'Download Fillable PDF',
   'Download Print Edition',
@@ -99,11 +100,13 @@ async function walk(directory) {
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
       const src = tag.match(/\bsrc=(["'])(.*?)\1/i)?.[2] || "";
       const identity = tag.toLowerCase();
+      const isCompanionJournalCover = identity.includes("companion-flat-book-image");
       const isBookCover = identity.includes("divine blueprint book cover") ||
         identity.includes("hero-book-cover-image") ||
-        identity.includes("canonical-book-cover-image") ||
-        identity.includes("companion-flat-book-image");
-      if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp")) {
+        identity.includes("canonical-book-cover-image");
+      if (isCompanionJournalCover && !src.startsWith("/assets/companion-journal-cover.webp")) {
+        failures.push(`${path}: incorrect Companion Journal cover ${src}`);
+      } else if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp")) {
         failures.push(`${path}: non-canonical book cover ${src}`);
       }
     }
@@ -112,4 +115,4 @@ async function walk(directory) {
 
 await walk(root);
 if (failures.length) throw new Error(failures.join("\n"));
-console.log("Validated simplified Companion page with one flat cover, working downloads, and clean routes.");
+console.log("Validated the Companion Journal cover, downloads, and clean Divine Blueprint routes.");
