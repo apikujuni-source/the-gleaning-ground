@@ -26,6 +26,7 @@ const styles = await readFile(join(root, "assets/styles.css"), "utf8");
 
 const requiredCompanionFragments = [
   '<base href="/">',
+  'href="/assets/styles.css?v=20260723-cover-final"',
   'class="divine-blueprint-full-cover"',
   'class="divine-blueprint-full-cover-image canonical-book-cover-image"',
   'src="/assets/divine-blueprint-cover.webp?v=20260723-final-cover"',
@@ -80,6 +81,9 @@ async function walk(directory) {
     if (/href=["']\/?divine-blueprint-site\//i.test(html)) {
       failures.push(`${path}: exposes internal folder in a public link`);
     }
+    if (!html.includes('href="/assets/styles.css?v=20260723-cover-final"')) {
+      failures.push(`${path}: stylesheet reference is not cache-busted`);
+    }
 
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
       const src = tag.match(/\bsrc=(['"])(.*?)\1/i)?.[2] || "";
@@ -97,4 +101,4 @@ async function walk(directory) {
 
 await walk(root);
 if (failures.length) throw new Error(failures.join("\n"));
-console.log("Validated complete uncropped cover, Companion downloads, and clean routes.");
+console.log("Validated complete uncropped cover, fresh stylesheet, Companion downloads, and clean routes.");
