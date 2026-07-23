@@ -13,6 +13,13 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
+# Never cache the worker used to retire the previous Hostinger PWA.
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+    Service-Worker-Allowed = "/"
+
 # CSS, JavaScript, images, and downloadable resources are generated during
 # production builds. They must be revalidated so a corrected build is not
 # hidden behind the previous one-year immutable cache policy.
