@@ -46,7 +46,7 @@ const oldHero = `<div class="hero-art" aria-label="The Divine Blueprint book con
 
 const newHero = `<div class="hero-art hero-book-cover" aria-label="The Divine Blueprint book cover">
       <div class="light-orb"></div>
-      <img class="hero-book-cover-image" src="assets/divine-blueprint-cover.webp" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
+      <img class="hero-book-cover-image" src="assets/divine-blueprint-cover.webp?v=20260723-cover-v2" alt="The Divine Blueprint by Ayo-Paul Ikujuni book cover">
     </div>`;
 
 let index = await readFile(indexPath, "utf8");
