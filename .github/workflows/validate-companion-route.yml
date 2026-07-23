@@ -1,4 +1,4 @@
-name: Validate Companion route
+name: Validate Divine Blueprint routes
 
 on:
   push:
@@ -27,26 +27,40 @@ jobs:
       - name: Build website
         run: npm run build
 
-      - name: Validate Companion CTA and downloads
+      - name: Validate Companion CTA and clean navigation
         shell: bash
         run: |
           set -euo pipefail
           ROOT="_site/divine-blueprint-site"
           PAGE="$ROOT/companion/index.html"
+
           test -s "$ROOT/companion.html"
           test -s "$PAGE"
+          test -s "$ROOT/journey/index.html"
+          test -s "$ROOT/bible-studies/index.html"
+          test -s "$ROOT/teachings/index.html"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf"
           test -s "$ROOT/assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
+
           grep -q '<base href="/">' "$PAGE"
           grep -q 'Get the Companion</a>' "$PAGE"
           grep -Eq 'href="#(companion-downloads|download-editions)"[^>]*>Get the Companion</a>' "$PAGE"
           grep -q 'Download Fillable PDF' "$PAGE"
           grep -Eq 'Download (Print-Ready PDF|Print Edition)' "$PAGE"
-          grep -q 'The-Divine-Blueprint-Companion-Fillable.pdf' "$PAGE"
-          grep -q 'The-Divine-Blueprint-Companion-Print-Ready.pdf' "$PAGE"
+
+          grep -q 'href="/journey"' "$PAGE"
+          grep -q 'href="/bible-studies"' "$PAGE"
+          grep -q 'href="/teachings"' "$PAGE"
+          grep -q 'href="/companion"' "$ROOT/index.html"
+
+          if grep -R -E 'href=["'"']/?divine-blueprint-site/' "$ROOT" --include='*.html'; then
+            echo "A public link still exposes the internal divine-blueprint-site folder." >&2
+            exit 1
+          fi
+
           if grep -Eq '<[^>]*data-modal-open[^>]*>[^<]*Get the Companion' "$PAGE"; then
             echo "Get the Companion is still connected to the store modal." >&2
             exit 1
           fi
-          grep -q 'href="/companion"' "$ROOT/index.html"
-          echo "Companion CTA opens download choices and both PDF editions are present."
+
+          echo "Companion downloads and clean Journey, Bible Studies, and Teachings routes are present."
