@@ -13,10 +13,13 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
+# CSS, JavaScript, images, and downloadable resources are generated during
+# production builds. They must be revalidated so a corrected build is not
+# hidden behind the previous one-year immutable cache policy.
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Send legacy Divine Blueprint pages on the main domain to the standalone site.
 [[redirects]]
