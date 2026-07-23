@@ -34,12 +34,11 @@ function isBookCoverImage(tag) {
   const alt = tag.match(/\balt=(['"])(.*?)\1/i)?.[2] || "";
   const classes = tag.match(/\bclass=(['"])(.*?)\1/i)?.[2] || "";
   const identity = `${src} ${alt} ${classes}`.toLowerCase();
-  if (identity.includes("home-mockup")) return false;
+  if (identity.includes("home-mockup") || identity.includes("homepage-book") || identity.includes("hero-book-cover-image")) return false;
   if (identity.includes("companion") && !identity.includes("book cover")) return false;
   return (
     identity.includes("divine-blueprint-cover") ||
     identity.includes("divine blueprint book cover") ||
-    identity.includes("hero-book-cover-image") ||
     /(?:^|[\s_-])book[\s_-]*cover(?:$|[\s_-])/.test(identity)
   );
 }
@@ -73,11 +72,10 @@ const runtime = `(() => {
   function isBookCoverImage(img) {
     const identity = [img.getAttribute('src'), img.getAttribute('alt'), img.className]
       .filter(Boolean).join(' ').toLowerCase();
-    if (identity.includes('home-mockup')) return false;
+    if (identity.includes('home-mockup') || identity.includes('homepage-book') || identity.includes('hero-book-cover-image')) return false;
     if (identity.includes('companion') && !identity.includes('book cover')) return false;
     return identity.includes('divine-blueprint-cover') ||
       identity.includes('divine blueprint book cover') ||
-      identity.includes('hero-book-cover-image') ||
       /(?:^|[\\s_-])book[\\s_-]*cover(?:$|[\\s_-])/.test(identity);
   }
 
