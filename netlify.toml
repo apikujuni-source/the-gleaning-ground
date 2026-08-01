@@ -28,6 +28,12 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+[[headers]]
+  for = "/admin/config.yml"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+    Content-Type = "text/yaml; charset=utf-8"
+
 # Send legacy Divine Blueprint pages on the main domain to the standalone site.
 [[redirects]]
   from = "https://gleaningground.com/divine-blueprint/"
@@ -85,7 +91,7 @@
   status = 301
   force = true
 
-# Send Divine Blueprint administrators to the shared CMS.
+# Send Divine Blueprint administrators and every CMS asset to the shared CMS.
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/admin"
   to = "https://gleaningground.com/admin/"
@@ -95,6 +101,18 @@
 [[redirects]]
   from = "https://divineblueprint.gleaningground.com/admin/"
   to = "https://gleaningground.com/admin/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/admin/config.yml"
+  to = "https://gleaningground.com/admin/config.yml"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/admin/*"
+  to = "https://gleaningground.com/admin/:splat"
   status = 302
   force = true
 
