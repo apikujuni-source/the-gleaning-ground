@@ -25,12 +25,25 @@ const expectedRomansCount = 28;
 const expectedRomansStart = "2025-11-21";
 const expectedRomansEnd = "2025-12-18";
 
+const philippiansEphesiansParts = [
+  "content/imports/devotionals/philippians-ephesians-00.json",
+  "content/imports/devotionals/philippians-ephesians-01.json",
+  "content/imports/devotionals/philippians-ephesians-02.json",
+  "content/imports/devotionals/philippians-ephesians-03.json",
+  "content/imports/devotionals/philippians-ephesians-04.json",
+  "content/imports/devotionals/philippians-ephesians-05.json"
+];
+const expectedPhilippiansEphesiansCount = 33;
+const expectedPhilippiansEphesiansStart = "2025-12-19";
+const expectedPhilippiansEphesiansEnd = "2026-01-20";
+
 const outputDirectory = "content/devotionals";
 const legacyMarker = "legacyImport: gleaning-ground-old-website-2025";
 const romansMarker = "romansImport: updated-romans-2026-08";
+const philippiansEphesiansMarker = "philippiansEphesiansImport: 2026-08";
 const dateShiftMarker = "dateShift: one-day-later-2026-08";
 
-for (const part of [...legacyParts, ...romansParts]) {
+for (const part of [...legacyParts, ...romansParts, ...philippiansEphesiansParts]) {
   if (!existsSync(part)) throw new Error(`Missing devotional source: ${part}`);
 }
 
@@ -43,12 +56,13 @@ if (actualLegacySha256 !== expectedLegacySha256) {
 const legacySource = JSON.parse(legacyBuffer.toString("utf8"));
 const legacyDevotionals = Array.isArray(legacySource.devotionals) ? legacySource.devotionals : [];
 
-const romansPartObjects = await Promise.all(
-  romansParts.map(async (path) => JSON.parse(await readFile(path, "utf8")))
-);
-const romansDevotionals = romansPartObjects.flatMap((part) =>
-  Array.isArray(part.devotionals) ? part.devotionals : []
-);
+async function loadPlainParts(paths) {
+  const objects = await Promise.all(paths.map(async (path) => JSON.parse(await readFile(path, "utf8"))));
+  return objects.flatMap((part) => (Array.isArray(part.devotionals) ? part.devotionals : []));
+}
+
+const romansDevotionals = await loadPlainParts(romansParts);
+const philippiansEphesiansDevotionals = await loadPlainParts(philippiansEphesiansParts);
 
 function addDays(value, days = 1) {
   const parsed = new Date(`${String(value).trim()}T00:00:00Z`);
@@ -92,6 +106,8 @@ function render(entry, marker, extra = []) {
   const scriptureText = String(entry.scriptureText || "").trim();
   const body = String(entry.body || "").replace(/\r/g, "").trim();
   const prayer = String(entry.prayer || "").replace(/\r/g, "").trim();
+  const specialLabel = String(entry.specialLabel || "").replace(/\r/g, "").trim();
+  const afterPrayer = String(entry.afterPrayer || "").replace(/\r/g, "").trim();
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !title || !scripture || !scriptureText || !body) {
     throw new Error(`Incomplete devotional: ${title || date || "unknown"}`);
@@ -100,14 +116,18 @@ function render(entry, marker, extra = []) {
   const titleSlug = slugify(title);
   const slug = `${date}-${titleSlug}`;
   const permalink = `/devotionals/${slug}/index.html`;
-  const sections = [
+  const sections = [];
+
+  if (specialLabel) sections.push(`**${specialLabel}**`, "");
+  sections.push(
     `**Scripture Reading:** ${scripture}`,
     "",
     `> ${scriptureText.replace(/\n+/g, " ").trim()}`,
     "",
     body
-  ];
+  );
   if (prayer) sections.push("", `**Pray with me:** ${prayer}`);
+  if (afterPrayer) sections.push("", `**${afterPrayer}**`);
 
   const frontmatter = [
     "---",
@@ -139,16 +159,59 @@ function shiftManual(content) {
   return shifted.replace(/^---\s*$/m, `---\n${dateShiftMarker}`);
 }
 
+function validateSeries(entries, expectedCount, expectedStart, expectedEnd, label) {
+  if (entries.length !== expectedCount) {
+    throw new Error(`Expected ${expectedCount} ${label} devotionals, found ${entries.length}.`);
+  }
+
+  const dates = entries.map((entry) => entry.date).sort();
+  if (dates[0] !== expectedStart || dates.at(-1) !== expectedEnd) {
+    throw new Error(`${label} date range is ${dates[0]} to ${dates.at(-1)}.`);
+  }
+
+  for (let index = 1; index < dates.length; index += 1) {
+    const previous = new Date(`${dates[index - 1]}T00:00:00Z`);
+    const current = new Date(`${dates[index]}T00:00:00Z`);
+    if (current - previous !== 86_400_000) {
+      throw new Error(`${label} dates are not consecutive: ${dates[index - 1]} to ${dates[index]}.`);
+    }
+  }
+}
+
+validateSeries(
+  romansDevotionals,
+  expectedRomansCount,
+  expectedRomansStart,
+  expectedRomansEnd,
+  "Romans"
+);
+validateSeries(
+  philippiansEphesiansDevotionals,
+  expectedPhilippiansEphesiansCount,
+  expectedPhilippiansEphesiansStart,
+  expectedPhilippiansEphesiansEnd,
+  "Philippians and Ephesians"
+);
+if (addDays(expectedRomansEnd, 1) !== expectedPhilippiansEphesiansStart) {
+  throw new Error("The Philippians and Ephesians series must begin the day after Romans ends.");
+}
+
 await mkdir(outputDirectory, { recursive: true });
 
 for (const name of await readdir(outputDirectory)) {
   if (!name.endsWith(".md")) continue;
   const path = join(outputDirectory, name);
   const content = await readFile(path, "utf8");
-  if (content.includes(legacyMarker) || content.includes(romansMarker) || content.includes("series: Romans")) {
+  if (
+    content.includes(legacyMarker) ||
+    content.includes(romansMarker) ||
+    content.includes(philippiansEphesiansMarker) ||
+    content.includes("series: Romans")
+  ) {
     await rm(path, { force: true });
     continue;
   }
+
   const shifted = shiftManual(content);
   if (shifted !== content) await writeFile(path, shifted, "utf8");
 }
@@ -156,7 +219,11 @@ for (const name of await readdir(outputDirectory)) {
 const romansTitles = new Set(romansDevotionals.map((entry) => String(entry.title || "").trim()));
 const originalRomansStart = addDays(expectedRomansStart, -1);
 const shiftedLegacy = legacyDevotionals
-  .filter((entry) => !romansTitles.has(String(entry.title || "").trim()) && String(entry.date || "") < originalRomansStart)
+  .filter(
+    (entry) =>
+      !romansTitles.has(String(entry.title || "").trim()) &&
+      String(entry.date || "") < originalRomansStart
+  )
   .map((entry) => ({ ...entry, date: addDays(entry.date, 1) }));
 
 const seenDates = new Set();
@@ -170,23 +237,20 @@ async function writeEntry(rendered) {
 }
 
 for (const entry of shiftedLegacy) await writeEntry(render(entry, legacyMarker));
-for (const entry of romansDevotionals) await writeEntry(render(entry, romansMarker, ["series: Romans"]));
-
-if (romansDevotionals.length !== expectedRomansCount) {
-  throw new Error(`Expected ${expectedRomansCount} Romans devotionals, found ${romansDevotionals.length}.`);
+for (const entry of romansDevotionals) {
+  await writeEntry(render(entry, romansMarker, ["series: Romans"]));
 }
-const romansDates = romansDevotionals.map((entry) => entry.date).sort();
-if (romansDates[0] !== expectedRomansStart || romansDates.at(-1) !== expectedRomansEnd) {
-  throw new Error(`Romans date range is ${romansDates[0]} to ${romansDates.at(-1)}.`);
-}
-for (let index = 1; index < romansDates.length; index += 1) {
-  const previous = new Date(`${romansDates[index - 1]}T00:00:00Z`);
-  const current = new Date(`${romansDates[index]}T00:00:00Z`);
-  if (current - previous !== 86_400_000) {
-    throw new Error(`Romans dates are not consecutive: ${romansDates[index - 1]} to ${romansDates[index]}.`);
-  }
+for (const entry of philippiansEphesiansDevotionals) {
+  await writeEntry(
+    render(entry, philippiansEphesiansMarker, [
+      `series: ${yamlString(entry.series || "Philippians and Ephesians")}`
+    ])
+  );
 }
 
 console.log(
-  `Imported ${shiftedLegacy.length} shifted legacy devotionals and ${romansDevotionals.length} revised Romans devotionals (${expectedRomansStart} to ${expectedRomansEnd}).`
+  `Imported ${shiftedLegacy.length} shifted legacy devotionals, ` +
+    `${romansDevotionals.length} Romans devotionals (${expectedRomansStart} to ${expectedRomansEnd}), and ` +
+    `${philippiansEphesiansDevotionals.length} Philippians/Ephesians devotionals ` +
+    `(${expectedPhilippiansEphesiansStart} to ${expectedPhilippiansEphesiansEnd}).`
 );
