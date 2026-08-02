@@ -1,0 +1,142 @@
+  - name: divine_chapter_resources
+    label: "1. Edit Chapter Resources"
+    label_singular: "Chapter Resource"
+    description: "Edit the teaching, Bible study, group questions, episode outline, journal prompts, declaration, and prayer for each Divine Blueprint chapter."
+    folder: content/divine-blueprint/chapters
+    create: false
+    extension: json
+    format: json
+    identifier_field: title
+    summary: "Chapter {{chapter}} — {{title}}"
+    sortable_fields: [chapter, title]
+    fields:
+      - {label: Chapter Number, name: chapter, widget: number, value_type: int, min: 1, max: 9}
+      - {label: Chapter Title, name: title, widget: string}
+      - {label: Chapter Label, name: kicker, widget: string, hint: "The short line above the chapter title."}
+      - {label: Chapter Introduction, name: introduction, widget: text}
+      - {label: The Central Truth, name: centralTruth, widget: text, hint: "A clear one-paragraph summary of the chapter’s central message."}
+      - {label: Expanded Teaching, name: expandedTeaching, widget: markdown, required: false, hint: "Add the fuller teaching here. Headings, lists, bold text, and links are supported."}
+      - {label: Memory Declaration, name: declaration, widget: text}
+      - label: Personal Bible Study
+        name: personalBibleStudy
+        widget: object
+        collapsed: true
+        fields:
+          - {label: Study Objective, name: objective, widget: text}
+          - label: Key Scriptures
+            name: keyScriptures
+            widget: list
+            field: {label: Scripture, name: scripture, widget: string}
+          - label: Observation Questions
+            name: observeQuestions
+            widget: list
+            field: {label: Question, name: question, widget: string}
+          - label: Personal Application Questions
+            name: applicationQuestions
+            widget: list
+            field: {label: Question, name: question, widget: string}
+      - label: Small-Group Questions
+        name: smallGroupQuestions
+        widget: list
+        field: {label: Question, name: question, widget: string}
+      - {label: Facilitator Note, name: facilitatorNote, widget: text}
+      - label: Teaching-Series Outline
+        name: teachingOutline
+        widget: list
+        hint: "These episode titles appear when no published teaching has been uploaded for the chapter."
+        field: {label: Episode Title, name: episode, widget: string}
+      - label: Journal Prompts
+        name: journalPrompts
+        widget: list
+        field: {label: Prompt, name: prompt, widget: string}
+      - {label: Closing Prayer, name: prayer, widget: text}
+
+  - name: divine_teachings
+    label: "2. Upload & Publish Teachings"
+    label_singular: "Divine Blueprint Teaching"
+    description: "Create a video, audio, article, podcast, or downloadable teaching and connect it to one of the nine chapters. Published entries appear automatically on the Teachings page and inside the selected chapter."
+    folder: content/divine-blueprint/teachings
+    create: true
+    extension: json
+    format: json
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    identifier_field: title
+    summary: "{{title}} — Chapter {{chapter}} — {{status}}"
+    sortable_fields: [publishDate, title, chapter, status]
+    view_filters:
+      - {label: Published, field: status, pattern: published}
+      - {label: Drafts, field: status, pattern: draft}
+      - {label: Chapter 1, field: chapter, pattern: 1}
+      - {label: Chapter 2, field: chapter, pattern: 2}
+      - {label: Chapter 3, field: chapter, pattern: 3}
+      - {label: Chapter 4, field: chapter, pattern: 4}
+      - {label: Chapter 5, field: chapter, pattern: 5}
+      - {label: Chapter 6, field: chapter, pattern: 6}
+      - {label: Chapter 7, field: chapter, pattern: 7}
+      - {label: Chapter 8, field: chapter, pattern: 8}
+      - {label: Chapter 9, field: chapter, pattern: 9}
+    fields:
+      - {label: Teaching Title, name: title, widget: string}
+      - label: Chapter
+        name: chapter
+        widget: select
+        options:
+          - {label: "1 — The Light of Men", value: 1}
+          - {label: "2 — If Children, Then Heirs", value: 2}
+          - {label: "3 — Partakers of His Divine Nature", value: 3}
+          - {label: "4 — But Is Under Tutors", value: 4}
+          - {label: "5 — Becoming Sons", value: 5}
+          - {label: "6 — The Cross in the Making of Sons", value: 6}
+          - {label: "7 — Knowledge in the Making of Sons", value: 7}
+          - {label: "8 — The Fellowship of the Spirit in the Making of Sons", value: 8}
+          - {label: "9 — The Manifestation of the Sons of God", value: 9}
+      - {label: Episode Number, name: episodeNumber, widget: number, value_type: int, min: 1, required: false}
+      - label: Publication Status
+        name: status
+        widget: select
+        default: draft
+        options:
+          - {label: Draft — keep hidden, value: draft}
+          - {label: Published — show on website, value: published}
+      - {label: Publish Date, name: publishDate, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false}
+      - label: Teaching Format
+        name: format
+        widget: select
+        options: [Video Teaching, Audio Teaching, Written Teaching, Podcast, Livestream, Downloadable Study]
+      - {label: Short Summary, name: summary, widget: text, hint: "Used on the teaching card and in search descriptions."}
+      - {label: Speaker or Teacher, name: speaker, widget: string, default: "Ayo-Paul Ikujuni", required: false}
+      - {label: Duration, name: duration, widget: string, required: false, hint: "For example: 28 minutes."}
+      - {label: Series Name, name: seriesTitle, widget: string, required: false, hint: "For example: The Light of Men Teaching Series."}
+      - {label: Featured Teaching, name: featured, widget: boolean, default: false, required: false}
+      - label: Thumbnail Image
+        name: thumbnail
+        widget: image
+        required: false
+        hint: "Upload a landscape image for the teaching card."
+      - {label: Thumbnail Description, name: thumbnailAlt, widget: string, required: false}
+      - label: YouTube or Vimeo URL
+        name: videoUrl
+        widget: string
+        required: false
+        hint: "Paste the full YouTube or Vimeo link. It will be embedded automatically."
+      - label: Audio URL
+        name: audioUrl
+        widget: string
+        required: false
+        hint: "Paste a direct MP3/audio URL when the audio is hosted elsewhere."
+      - label: Upload Media File
+        name: mediaFile
+        widget: file
+        required: false
+        hint: "Upload an MP3, MP4, PDF, or other teaching file. Keep large video files on YouTube or Vimeo."
+      - label: Downloadable Notes or Workbook
+        name: downloadFile
+        widget: file
+        required: false
+        hint: "Upload a PDF, DOCX, or study handout."
+      - label: External Teaching Link
+        name: externalUrl
+        widget: string
+        required: false
+        hint: "Optional link to a podcast platform, livestream, or another host."
+      - {label: Teaching Content or Notes, name: body, widget: markdown, required: false}
