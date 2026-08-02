@@ -1,21 +1,27 @@
-import { copyFile, readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { extname, join } from "node:path";
+import { basename, extname, join } from "node:path";
 
-const infoEmail = "info@gleaningground.com";
-const logoPath = "/assets/uploads/gleaning-ground-logo.svg";
-const markPath = "/assets/uploads/gleaning-ground-mark.svg";
-const markSource = "content/uploads/gleaning-ground-mark.svg";
-const markDestination = "src/assets/mark.svg";
+const siteSettingsPath = "content/site.json";
+const infoEmailFallback = "info@gleaningground.com";
+const exactLogoFallback = "/assets/uploads/logo_official.png";
 
-if (!existsSync("content/uploads/gleaning-ground-logo.svg")) {
-  throw new Error("Official Gleaning Ground logo asset is missing.");
-}
-if (!existsSync(markSource)) {
-  throw new Error("Official Gleaning Ground mark asset is missing.");
+if (!existsSync(siteSettingsPath)) {
+  throw new Error(`Missing site settings: ${siteSettingsPath}`);
 }
 
-await copyFile(markSource, markDestination);
+const siteSettings = JSON.parse(await readFile(siteSettingsPath, "utf8"));
+const infoEmail = String(siteSettings.email || infoEmailFallback).trim();
+const logoPath = String(siteSettings.logo || exactLogoFallback).trim();
+const logoAlt = String(siteSettings.logoAlt || "The Gleaning Ground official logo").trim();
+const uploadedLogoSource = logoPath.startsWith("/assets/uploads/")
+  ? join("content/uploads", basename(logoPath))
+  : null;
+
+if (!logoPath) throw new Error("The official logo path is empty in content/site.json.");
+if (uploadedLogoSource && !existsSync(uploadedLogoSource)) {
+  throw new Error(`The official logo file does not exist: ${uploadedLogoSource}`);
+}
 
 async function replaceInFile(path, transform) {
   if (!existsSync(path)) return;
@@ -24,20 +30,32 @@ async function replaceInFile(path, transform) {
   if (updated !== original) await writeFile(path, updated, "utf8");
 }
 
-const headerBrandMarkup = `<img class="official-site-mark" src="${markPath}" alt=""><span class="official-site-name"><strong>Gleaning</strong><em>Ground</em></span>`;
-const footerBrandMarkup = `<img class="official-site-logo" src="${logoPath}" alt="The Gleaning Ground">`;
-const oldBrandPattern = /<img src="\/assets\/mark\.svg" alt="">\s*<span><strong>Gleaning<\/strong><em>Ground<\/em><\/span>/g;
+const escapeAttribute = (value) => String(value)
+  .replaceAll("&", "&amp;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;");
 
-await replaceInFile("src/_includes/partials/header.njk", (content) =>
-  content.replace(oldBrandPattern, headerBrandMarkup)
-);
+const exactLogoMarkup = `<img class="official-site-logo" src="${escapeAttribute(logoPath)}" alt="${escapeAttribute(logoAlt)}">`;
+const originalBrandPattern = /<img src="\/assets\/mark\.svg" alt="">\s*<span><strong>Gleaning<\/strong><em>Ground<\/em><\/span>/g;
+const priorMarkBrandPattern = /<img class="official-site-mark"[^>]*>\s*<span class="official-site-name">[\s\S]*?<\/span>/g;
+const priorLogoPattern = /<img class="official-site-logo"[^>]*>/g;
+
+await replaceInFile("src/_includes/partials/header.njk", (content) => {
+  let updated = content.replace(priorMarkBrandPattern, exactLogoMarkup);
+  updated = updated.replace(originalBrandPattern, exactLogoMarkup);
+  updated = updated.replace(priorLogoPattern, exactLogoMarkup);
+  return updated;
+});
 
 await replaceInFile("src/_includes/partials/footer.njk", (content) => {
-  let updated = content.replace(oldBrandPattern, footerBrandMarkup);
+  let updated = content.replace(priorMarkBrandPattern, exactLogoMarkup);
+  updated = updated.replace(originalBrandPattern, exactLogoMarkup);
+  updated = updated.replace(priorLogoPattern, exactLogoMarkup);
   if (!updated.includes('class="footer-email"')) {
     updated = updated.replace(
       "</form></section>",
-      `</form><a class="footer-email" href="mailto:${infoEmail}">${infoEmail}</a></section>`
+      `</form><a class="footer-email" href="mailto:${escapeAttribute(infoEmail)}">${escapeAttribute(infoEmail)}</a></section>`
     );
   }
   return updated;
@@ -47,7 +65,7 @@ await replaceInFile("src/contact.njk", (content) => {
   if (content.includes(`mailto:${infoEmail}`)) return content;
   return content.replace(
     '<div class="contact-notes">',
-    `<div class="contact-notes"><p><strong>Email</strong><br><a href="mailto:${infoEmail}">${infoEmail}</a></p>`
+    `<div class="contact-notes"><p><strong>Email</strong><br><a href="mailto:${escapeAttribute(infoEmail)}">${escapeAttribute(infoEmail)}</a></p>`
   );
 });
 
@@ -55,10 +73,10 @@ await replaceInFile("src/admin/config.yml", (content) =>
   content.replace(/^logo_url:.*$/m, `logo_url: https://gleaningground.com${logoPath}`)
 );
 
-const cssMarker = "/* Official Gleaning Ground logo */";
+const cssMarker = "/* Exact official Gleaning Ground logo */";
 await replaceInFile("src/assets/css/styles.css", (content) => {
   if (content.includes(cssMarker)) return content;
-  return `${content}\n${cssMarker}\n.brand .official-site-mark{width:58px;height:58px;object-fit:contain;border-radius:10px}.brand .official-site-name{display:flex;flex-direction:column;line-height:.95}.brand .official-site-name strong{font-size:1.05rem;letter-spacing:.04em}.brand .official-site-name em{font-size:.86rem;letter-spacing:.18em;text-transform:uppercase}.footer-brand{display:inline-flex;background:#f7e8ce;border-radius:14px;padding:.55rem}.footer-brand .official-site-logo{width:175px;height:auto;display:block}.footer-email{display:inline-block;margin-top:1rem;color:var(--gold-soft);font-weight:750}.footer-email:hover{color:white}@media(max-width:680px){.brand .official-site-mark{width:50px;height:50px}.footer-brand .official-site-logo{width:150px}}\n`;
+  return `${content}\n${cssMarker}\n.brand .official-site-logo{display:block;width:92px;height:92px;max-width:none;object-fit:contain;object-position:center;background:transparent;border:0;border-radius:0;filter:none;transform:none}.footer-brand{display:inline-flex;align-items:center;justify-content:center;background:transparent;border-radius:0;padding:0}.footer-brand .official-site-logo{display:block;width:190px;height:190px;max-width:100%;object-fit:contain;object-position:center;background:transparent;border:0;border-radius:0;filter:none;transform:none}.footer-email{display:inline-block;margin-top:1rem;color:var(--gold-soft);font-weight:750}.footer-email:hover{color:white}@media(max-width:680px){.brand .official-site-logo{width:76px;height:76px}.footer-brand .official-site-logo{width:160px;height:160px}}\n`;
 });
 
 const emailVariants = [
@@ -68,22 +86,23 @@ const emailVariants = [
 ];
 const textExtensions = new Set([".css", ".html", ".js", ".json", ".md", ".njk", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
 
-async function updateEmailReferences(directory) {
+async function updateSiteReferences(directory) {
   if (!existsSync(directory)) return;
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      await updateEmailReferences(path);
+      await updateSiteReferences(path);
       continue;
     }
     if (!textExtensions.has(extname(entry.name).toLowerCase())) continue;
     const original = await readFile(path, "utf8");
     let updated = original;
     for (const oldEmail of emailVariants) updated = updated.split(oldEmail).join(infoEmail);
+    updated = updated.split("/assets/mark.svg").join(logoPath);
     if (updated !== original) await writeFile(path, updated, "utf8");
   }
 }
 
-await updateEmailReferences("src");
+await updateSiteReferences("src");
 
-console.log(`Applied the official Gleaning Ground logo, matching mark, and site email ${infoEmail}.`);
+console.log(`Applied the exact official logo ${logoPath} and site email ${infoEmail}.`);
