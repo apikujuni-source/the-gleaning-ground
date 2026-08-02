@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const seriesRoot = "content/divine-blueprint/series";
+const seriesRoot = "content/divine-blueprint/teaching-series";
 const teachingRoot = "content/divine-blueprint/teachings";
 const generatedPrefix = "_series-";
 
@@ -15,55 +15,51 @@ for (const name of await readdir(teachingRoot)) {
 }
 
 if (!existsSync(seriesRoot)) {
-  console.log("No Divine Blueprint 5-part series directory found; nothing to expand.");
-  process.exit(0);
+  throw new Error(`Missing consolidated Divine Blueprint teaching series directory: ${seriesRoot}`);
 }
 
-const seriesFiles = (await readdir(seriesRoot))
-  .filter((name) => name.endsWith(".json"))
-  .sort();
+const sourceFiles = (await readdir(seriesRoot))
+  .filter((name) => /^chapter-[1-9]-part-[1-5]\.json$/.test(name))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
-let generated = 0;
+if (sourceFiles.length !== 45) {
+  throw new Error(`Expected 45 individual chapter-series teachings, found ${sourceFiles.length}.`);
+}
 
-for (const name of seriesFiles) {
-  const source = JSON.parse(await readFile(join(seriesRoot, name), "utf8"));
-  const chapter = Number(source.chapter);
-  if (!Number.isInteger(chapter) || chapter < 1 || chapter > 9) continue;
+const seen = new Set();
+let copied = 0;
+let published = 0;
 
-  const episodes = Array.isArray(source.episodes) ? source.episodes : [];
-  for (const episode of episodes) {
-    if (episode.status !== "published") continue;
+for (const name of sourceFiles) {
+  const teaching = JSON.parse(await readFile(join(seriesRoot, name), "utf8"));
+  const chapter = Number(teaching.chapter);
+  const episodeNumber = Number(teaching.episodeNumber);
+  const title = String(teaching.title || "").trim();
+  const key = `${chapter}-${episodeNumber}`;
 
-    const episodeNumber = Number(episode.episodeNumber);
-    const title = String(episode.title || "").trim();
-    if (!Number.isInteger(episodeNumber) || episodeNumber < 1 || !title) continue;
-
-    const teaching = {
-      title,
-      chapter,
-      episodeNumber,
-      status: "published",
-      publishDate: episode.publishDate || new Date().toISOString().slice(0, 10),
-      format: episode.format || "Video Teaching",
-      summary: episode.summary || "",
-      speaker: episode.speaker || "Ayo-Paul Ikujuni",
-      duration: episode.duration || "",
-      seriesTitle: source.seriesTitle || `${source.chapterTitle || `Chapter ${chapter}`} — 5-Part Teaching Series`,
-      featured: Boolean(episode.featured),
-      thumbnail: episode.thumbnail || "",
-      thumbnailAlt: episode.thumbnailAlt || "",
-      videoUrl: episode.videoUrl || "",
-      audioUrl: episode.audioUrl || "",
-      mediaFile: episode.mediaFile || "",
-      downloadFile: episode.downloadFile || "",
-      externalUrl: episode.externalUrl || "",
-      body: episode.body || ""
-    };
-
-    const outputName = `${generatedPrefix}chapter-${chapter}-part-${episodeNumber}.json`;
-    await writeFile(join(teachingRoot, outputName), `${JSON.stringify(teaching, null, 2)}\n`, "utf8");
-    generated += 1;
+  if (!Number.isInteger(chapter) || chapter < 1 || chapter > 9) {
+    throw new Error(`Invalid chapter number in ${name}.`);
   }
+  if (!Number.isInteger(episodeNumber) || episodeNumber < 1 || episodeNumber > 5) {
+    throw new Error(`Invalid teaching number in ${name}.`);
+  }
+  if (!title) throw new Error(`Missing teaching title in ${name}.`);
+  if (seen.has(key)) throw new Error(`Duplicate chapter teaching: ${key}.`);
+  seen.add(key);
+
+  const normalized = {
+    ...teaching,
+    chapter,
+    episodeNumber,
+    title,
+    status: String(teaching.status || "draft").toLowerCase(),
+    seriesTitle: teaching.seriesTitle || `${teaching.chapterTitle || `Chapter ${chapter}`} Teaching Series`
+  };
+
+  const outputName = `${generatedPrefix}chapter-${chapter}-part-${episodeNumber}.json`;
+  await writeFile(join(teachingRoot, outputName), `${JSON.stringify(normalized, null, 2)}\n`, "utf8");
+  copied += 1;
+  if (normalized.status === "published") published += 1;
 }
 
-console.log(`Expanded ${generated} published 5-part-series episode(s) into Divine Blueprint teaching entries.`);
+console.log(`Synchronized ${copied} consolidated chapter-series teachings; ${published} currently published.`);
