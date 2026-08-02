@@ -1,17 +1,17 @@
 {
-  "name": "The Gleaning Ground",
-  "url": "https://gleaningground.com",
-  "description": "Scripture-centered resources for spiritual growth, faithful service, and purposeful living.",
-  "tagline": "Gather Truth. Grow in Grace. Live Fruitfully.",
-  "ministryLine": "A place to gather what strengthens faith and nourishes life.",
   "author": "Ayo-Paul Ikujuni",
-  "email": "info@gleaningground.com",
   "logo": "/assets/uploads/logo_official.png",
-  "logoAlt": "The Gleaning Ground official logo",
+  "name": "Gleaning Ground",
   "social": {
-    "youtube": "#",
-    "instagram": "#",
-    "facebook": "#",
+    "youtube": "https://www.youtube.com/@TheGleaningGround",
+    "instagram": "https://www.instagram.com/the_gleaning_ground/",
+    "facebook": "https://www.facebook.com/TheGleaningGround/",
     "podcast": "#"
-  }
+  },
+  "tagline": "Gather Truth. Grow in Grace. Live Fruitfully.",
+  "url": "https://gleaningground.com",
+  "ministryLine": "A place to gather what strengthens faith and nourishes life.",
+  "email": "info@gleaningground.com",
+  "description": "Scripture-centered resources for spiritual growth, faithful service, and purposeful living.",
+  "logoAlt": "The Gleaning Ground official logo"
 }
