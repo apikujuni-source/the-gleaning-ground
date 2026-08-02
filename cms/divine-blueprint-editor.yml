@@ -1,7 +1,7 @@
   - name: divine_chapter_resources
     label: "1. Edit Chapter Resources"
     label_singular: "Chapter Resource"
-    description: "Edit the teaching, Bible study, group questions, episode outline, journal prompts, declaration, and prayer for each Divine Blueprint chapter."
+    description: "Edit the central truth, expanded teaching, Bible study, group questions, journal prompts, declaration, and prayer for each Divine Blueprint chapter."
     folder: content/divine-blueprint/chapters
     create: false
     extension: json
@@ -40,71 +40,70 @@
         widget: list
         field: {label: Question, name: question, widget: string}
       - {label: Facilitator Note, name: facilitatorNote, widget: text}
-      - label: Teaching-Series Outline
-        name: teachingOutline
-        widget: list
-        hint: "These episode titles appear when no published teaching has been uploaded for the chapter."
-        field: {label: Episode Title, name: episode, widget: string}
       - label: Journal Prompts
         name: journalPrompts
         widget: list
         field: {label: Prompt, name: prompt, widget: string}
       - {label: Closing Prayer, name: prayer, widget: text}
 
-  - name: divine_series
-    label: "2. Upload 5-Part Series"
-    label_singular: "Chapter 5-Part Series"
-    description: "Open a chapter and upload or link all five parts of its teaching series from one screen. Draft parts remain hidden; published parts appear automatically on the website."
-    folder: content/divine-blueprint/series
+  - name: divine_series_teachings
+    label: "2. Chapter Teaching Series"
+    label_singular: "Series Teaching"
+    description: "The original five teachings already assigned to each chapter. Every teaching is a separate entry, so it can be opened, updated, uploaded, drafted, and published independently."
+    folder: content/divine-blueprint/teaching-series
     create: false
     extension: json
     format: json
-    identifier_field: chapterTitle
-    summary: "Chapter {{chapter}} — {{chapterTitle}}"
-    sortable_fields: [chapter, chapterTitle]
+    identifier_field: title
+    summary: "Chapter {{chapter}} · Teaching {{episodeNumber}} — {{title}} — {{status}}"
+    sortable_fields: [chapter, episodeNumber, title, status]
+    view_filters:
+      - {label: Published, field: status, pattern: "published"}
+      - {label: Drafts, field: status, pattern: "draft"}
+      - {label: Chapter 1, field: chapter, pattern: "1"}
+      - {label: Chapter 2, field: chapter, pattern: "2"}
+      - {label: Chapter 3, field: chapter, pattern: "3"}
+      - {label: Chapter 4, field: chapter, pattern: "4"}
+      - {label: Chapter 5, field: chapter, pattern: "5"}
+      - {label: Chapter 6, field: chapter, pattern: "6"}
+      - {label: Chapter 7, field: chapter, pattern: "7"}
+      - {label: Chapter 8, field: chapter, pattern: "8"}
+      - {label: Chapter 9, field: chapter, pattern: "9"}
     fields:
       - {label: Chapter Number, name: chapter, widget: number, value_type: int, min: 1, max: 9}
       - {label: Chapter Title, name: chapterTitle, widget: string}
-      - {label: Series Title, name: seriesTitle, widget: string}
-      - label: Five Teaching Parts
-        name: episodes
-        widget: list
-        allow_add: false
-        collapsed: true
-        minimize_collapsed: false
-        summary: "Part {{fields.episodeNumber}} — {{fields.title}} — {{fields.status}}"
-        fields:
-          - {label: Part Number, name: episodeNumber, widget: number, value_type: int, min: 1, max: 5}
-          - {label: Teaching Title, name: title, widget: string}
-          - label: Publication Status
-            name: status
-            widget: select
-            default: draft
-            options:
-              - {label: Draft — keep hidden, value: draft}
-              - {label: Published — show on website, value: published}
-          - {label: Publish Date, name: publishDate, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false, required: false}
-          - label: Teaching Format
-            name: format
-            widget: select
-            options: [Video Teaching, Audio Teaching, Written Teaching, Podcast, Livestream, Downloadable Study]
-          - {label: Short Summary, name: summary, widget: text, required: false}
-          - {label: Speaker or Teacher, name: speaker, widget: string, default: "Ayo-Paul Ikujuni", required: false}
-          - {label: Duration, name: duration, widget: string, required: false, hint: "For example: 28 minutes."}
-          - {label: Featured Teaching, name: featured, widget: boolean, default: false, required: false}
-          - {label: Thumbnail Image, name: thumbnail, widget: image, required: false}
-          - {label: Thumbnail Description, name: thumbnailAlt, widget: string, required: false}
-          - {label: YouTube or Vimeo URL, name: videoUrl, widget: string, required: false, hint: "Paste the full YouTube or Vimeo link."}
-          - {label: Audio URL, name: audioUrl, widget: string, required: false}
-          - {label: Upload Media File, name: mediaFile, widget: file, required: false, hint: "Upload an MP3, MP4, PDF, or other teaching file. Keep large video files on YouTube or Vimeo."}
-          - {label: Downloadable Notes or Workbook, name: downloadFile, widget: file, required: false}
-          - {label: External Teaching Link, name: externalUrl, widget: string, required: false}
-          - {label: Teaching Content or Notes, name: body, widget: markdown, required: false}
+      - {label: Teaching Number, name: episodeNumber, widget: number, value_type: int, min: 1, max: 5}
+      - {label: Teaching Title, name: title, widget: string}
+      - label: Publication Status
+        name: status
+        widget: select
+        default: draft
+        options:
+          - {label: Draft — keep hidden, value: draft}
+          - {label: Published — show on website, value: published}
+      - {label: Publish Date, name: publishDate, widget: datetime, format: YYYY-MM-DD, date_format: MMMM D, YYYY, time_format: false, required: false}
+      - label: Teaching Format
+        name: format
+        widget: select
+        options: [Video Teaching, Audio Teaching, Written Teaching, Podcast, Livestream, Downloadable Study]
+      - {label: Short Summary, name: summary, widget: text, required: false}
+      - {label: Speaker or Teacher, name: speaker, widget: string, default: "Ayo-Paul Ikujuni", required: false}
+      - {label: Duration, name: duration, widget: string, required: false, hint: "For example: 28 minutes."}
+      - {label: Series Name, name: seriesTitle, widget: string, required: false}
+      - {label: Featured Teaching, name: featured, widget: boolean, default: false, required: false}
+      - {label: Thumbnail Image, name: thumbnail, widget: image, required: false}
+      - {label: Thumbnail Description, name: thumbnailAlt, widget: string, required: false}
+      - {label: YouTube or Vimeo URL, name: videoUrl, widget: string, required: false, hint: "Paste the full YouTube or Vimeo link."}
+      - {label: Audio URL, name: audioUrl, widget: string, required: false}
+      - {label: Upload Media File, name: mediaFile, widget: file, required: false, hint: "Upload an MP3, MP4, PDF, or other teaching file. Keep large video files on YouTube or Vimeo."}
+      - {label: Downloadable Notes or Workbook, name: downloadFile, widget: file, required: false}
+      - {label: External Teaching Link, name: externalUrl, widget: string, required: false}
+      - {label: Teaching Content or Notes, name: body, widget: markdown, required: false}
 
   - name: divine_teachings
-    label: "3. Upload Individual Teaching"
-    label_singular: "Divine Blueprint Teaching"
-    description: "Create a standalone video, audio, article, podcast, or downloadable teaching and connect it to one of the nine chapters."
+    label: "3. Additional Teachings"
+    label_singular: "Additional Divine Blueprint Teaching"
+    description: "Create a teaching that is not one of the original five teachings assigned to a chapter."
     folder: content/divine-blueprint/teachings
     create: true
     extension: json
@@ -156,37 +155,13 @@
       - {label: Short Summary, name: summary, widget: text, hint: "Used on the teaching card and in search descriptions."}
       - {label: Speaker or Teacher, name: speaker, widget: string, default: "Ayo-Paul Ikujuni", required: false}
       - {label: Duration, name: duration, widget: string, required: false, hint: "For example: 28 minutes."}
-      - {label: Series Name, name: seriesTitle, widget: string, required: false, hint: "For example: The Light of Men Teaching Series."}
+      - {label: Series Name, name: seriesTitle, widget: string, required: false}
       - {label: Featured Teaching, name: featured, widget: boolean, default: false, required: false}
-      - label: Thumbnail Image
-        name: thumbnail
-        widget: image
-        required: false
-        hint: "Upload a landscape image for the teaching card."
+      - {label: Thumbnail Image, name: thumbnail, widget: image, required: false, hint: "Upload a landscape image for the teaching card."}
       - {label: Thumbnail Description, name: thumbnailAlt, widget: string, required: false}
-      - label: YouTube or Vimeo URL
-        name: videoUrl
-        widget: string
-        required: false
-        hint: "Paste the full YouTube or Vimeo link. It will be embedded automatically."
-      - label: Audio URL
-        name: audioUrl
-        widget: string
-        required: false
-        hint: "Paste a direct MP3/audio URL when the audio is hosted elsewhere."
-      - label: Upload Media File
-        name: mediaFile
-        widget: file
-        required: false
-        hint: "Upload an MP3, MP4, PDF, or other teaching file. Keep large video files on YouTube or Vimeo."
-      - label: Downloadable Notes or Workbook
-        name: downloadFile
-        widget: file
-        required: false
-        hint: "Upload a PDF, DOCX, or study handout."
-      - label: External Teaching Link
-        name: externalUrl
-        widget: string
-        required: false
-        hint: "Optional link to a podcast platform, livestream, or another host."
+      - {label: YouTube or Vimeo URL, name: videoUrl, widget: string, required: false, hint: "Paste the full YouTube or Vimeo link. It will be embedded automatically."}
+      - {label: Audio URL, name: audioUrl, widget: string, required: false}
+      - {label: Upload Media File, name: mediaFile, widget: file, required: false, hint: "Upload an MP3, MP4, PDF, or other teaching file. Keep large video files on YouTube or Vimeo."}
+      - {label: Downloadable Notes or Workbook, name: downloadFile, widget: file, required: false}
+      - {label: External Teaching Link, name: externalUrl, widget: string, required: false}
       - {label: Teaching Content or Notes, name: body, widget: markdown, required: false}
