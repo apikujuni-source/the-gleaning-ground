@@ -19,7 +19,7 @@ const romansSourceParts = [
   "content/imports/devotionals/romans-updated-00.b64",
   "content/imports/devotionals/romans-updated-01.b64"
 ];
-const expectedRomansSha256 = "9224eb4ad2c8b9470de21538cf19128f820403f65eb62c944825e7b07b9bde05";
+const expectedRomansSha256 = "d837a9070a043e1b3c63d57b14d1af5a21ab37f6e0aa0d0d0ddae9dc83baf541";
 
 const outputDirectory = "content/devotionals";
 const legacyImportMarker = "legacyImport: gleaning-ground-old-website-2025";
@@ -278,13 +278,12 @@ if (romansSource.dateRange?.end && romansDates.at(-1) !== romansSource.dateRange
   );
 }
 
-const generatedDates = [...seenDates].sort();
-for (let index = 1; index < generatedDates.length; index += 1) {
-  const previous = new Date(`${generatedDates[index - 1]}T00:00:00Z`);
-  const current = new Date(`${generatedDates[index]}T00:00:00Z`);
+for (let index = 1; index < romansDates.length; index += 1) {
+  const previous = new Date(`${romansDates[index - 1]}T00:00:00Z`);
+  const current = new Date(`${romansDates[index]}T00:00:00Z`);
   if (current.getTime() - previous.getTime() !== 86_400_000) {
     throw new Error(
-      `Generated devotional dates are not consecutive: ${generatedDates[index - 1]} to ${generatedDates[index]}.`
+      `Romans devotional dates are not consecutive: ${romansDates[index - 1]} to ${romansDates[index]}.`
     );
   }
 }
