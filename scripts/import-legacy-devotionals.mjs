@@ -7,7 +7,9 @@ import { gunzipSync } from "node:zlib";
 const sourceParts = [
   "content/imports/devotionals/part-00.b64",
   "content/imports/devotionals/part-01.b64",
-  "content/imports/devotionals/part-02.b64",
+  "content/imports/devotionals/part-02a.b64",
+  "content/imports/devotionals/part-02b.b64",
+  "content/imports/devotionals/part-02c.b64",
   "content/imports/devotionals/part-03.b64",
   "content/imports/devotionals/part-04.b64"
 ];
