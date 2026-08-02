@@ -12,11 +12,23 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 const mainRoot = resolve("_site");
 const divineRoot = resolve("_site/divine-blueprint-site");
 const settingsRoot = resolve("content/page-settings");
+const siteSettingsPath = resolve("content/site.json");
 const runtimeMarker = "cms-page-data";
+
+if (!existsSync(siteSettingsPath)) {
+  throw new Error("Missing content/site.json. The official logo cannot be resolved.");
+}
+
+const siteSettings = JSON.parse(await readFile(siteSettingsPath, "utf8"));
+const officialLogoPath = String(siteSettings.logo || "/assets/uploads/logo_official.png").trim();
+const officialLogoAlt = String(siteSettings.logoAlt || "The Gleaning Ground official logo").trim();
 
 const runtime = `(() => {
   const source = document.getElementById("cms-page-data");
   if (!source) return;
+
+  const officialLogoPath = ${JSON.stringify(officialLogoPath)};
+  const officialLogoAlt = ${JSON.stringify(officialLogoAlt)};
 
   const warn = (message, item) => {
     if (window.console && console.warn) console.warn("[CMS page content]", message, item || "");
@@ -33,6 +45,23 @@ const runtime = `(() => {
     } catch (error) {
       warn("Invalid page selector", { xpath, error });
       return null;
+    }
+  };
+
+  const enforceOfficialLogo = (element) => {
+    if (!element || !element.matches || !element.matches(".official-site-logo")) return false;
+    if (element.getAttribute("src") !== officialLogoPath) element.setAttribute("src", officialLogoPath);
+    if (element.getAttribute("alt") !== officialLogoAlt) element.setAttribute("alt", officialLogoAlt);
+    if (element.hasAttribute("srcset")) element.removeAttribute("srcset");
+    if (element.hasAttribute("sizes")) element.removeAttribute("sizes");
+    return true;
+  };
+
+  const protectLogosIn = (node) => {
+    if (!(node instanceof Element)) return;
+    enforceOfficialLogo(node);
+    for (const logo of node.querySelectorAll?.(".official-site-logo") || []) {
+      enforceOfficialLogo(logo);
     }
   };
 
@@ -88,6 +117,15 @@ const runtime = `(() => {
         warn("Image target was not found", item);
         continue;
       }
+
+      const protectedLogo = element.matches?.(".official-site-logo")
+        ? element
+        : element.querySelector?.(".official-site-logo");
+      if (protectedLogo) {
+        enforceOfficialLogo(protectedLogo);
+        continue;
+      }
+
       if (typeof item.src === "string" && item.src) element.setAttribute("src", item.src);
       if (typeof item.alt === "string") element.setAttribute("alt", item.alt);
     }
@@ -99,10 +137,38 @@ const runtime = `(() => {
         continue;
       }
       if (typeof item.attribute === "string" && item.attribute) {
+        if (
+          element.matches?.(".official-site-logo") &&
+          ["src", "srcset", "sizes", "alt"].includes(item.attribute)
+        ) {
+          enforceOfficialLogo(element);
+          continue;
+        }
         element.setAttribute(item.attribute, item.value ?? "");
       }
     }
   }
+
+  for (const logo of document.querySelectorAll(".official-site-logo")) {
+    enforceOfficialLogo(logo);
+  }
+
+  const logoObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === "attributes") {
+        enforceOfficialLogo(mutation.target);
+        continue;
+      }
+      for (const node of mutation.addedNodes) protectLogosIn(node);
+    }
+  });
+
+  logoObserver.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ["src", "srcset", "sizes", "alt"]
+  });
 })();`;
 
 const runtimeHash = createHash("sha256").update(runtime).digest("hex").slice(0, 12);
@@ -291,5 +357,5 @@ for (const [path, values] of assignments) {
 }
 
 console.log(
-  `Applied admin-managed page content to ${updated} HTML files using ${runtimeUrl}.`
+  `Applied admin-managed page content to ${updated} HTML files using ${runtimeUrl}, while protecting the official logo ${officialLogoPath}.`
 );
