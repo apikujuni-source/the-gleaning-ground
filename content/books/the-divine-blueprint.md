@@ -5,7 +5,7 @@ subtitle: The Making, Maturing and Manifestation of God’s Sons
 description: A biblical journey through God’s process of recreating, forming,
   maturing, and manifesting His sons.
 format: Book
-status: Forthcoming
+status: Available
 category: Spiritual Formation
 topics:
   - Sonship
