@@ -2,11 +2,15 @@
 layout: layouts/post.njk
 title: The Faithful Servant
 subtitle: Living with Responsibility Before God
+description: A Scripture-centered call to faithfulness, stewardship, obedience,
+  and service in God’s household.
 format: Book and devotional series
-status: In development
-description: A Scripture-centered call to faithfulness, stewardship, obedience, and service in God’s household.
+status: Forthcoming
 category: Christian Living
-topics: [Faithfulness, Stewardship, Service]
+topics:
+  - Faithfulness
+  - Stewardship
+  - Service
 collectionName: books
 collectionLabel: Books
 permalink: /books/the-faithful-servant/index.html
