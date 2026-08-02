@@ -64,17 +64,17 @@
     summary: "{{title}} — Chapter {{chapter}} — {{status}}"
     sortable_fields: [publishDate, title, chapter, status]
     view_filters:
-      - {label: Published, field: status, pattern: published}
-      - {label: Drafts, field: status, pattern: draft}
-      - {label: Chapter 1, field: chapter, pattern: 1}
-      - {label: Chapter 2, field: chapter, pattern: 2}
-      - {label: Chapter 3, field: chapter, pattern: 3}
-      - {label: Chapter 4, field: chapter, pattern: 4}
-      - {label: Chapter 5, field: chapter, pattern: 5}
-      - {label: Chapter 6, field: chapter, pattern: 6}
-      - {label: Chapter 7, field: chapter, pattern: 7}
-      - {label: Chapter 8, field: chapter, pattern: 8}
-      - {label: Chapter 9, field: chapter, pattern: 9}
+      - {label: Published, field: status, pattern: "published"}
+      - {label: Drafts, field: status, pattern: "draft"}
+      - {label: Chapter 1, field: chapter, pattern: "1"}
+      - {label: Chapter 2, field: chapter, pattern: "2"}
+      - {label: Chapter 3, field: chapter, pattern: "3"}
+      - {label: Chapter 4, field: chapter, pattern: "4"}
+      - {label: Chapter 5, field: chapter, pattern: "5"}
+      - {label: Chapter 6, field: chapter, pattern: "6"}
+      - {label: Chapter 7, field: chapter, pattern: "7"}
+      - {label: Chapter 8, field: chapter, pattern: "8"}
+      - {label: Chapter 9, field: chapter, pattern: "9"}
     fields:
       - {label: Teaching Title, name: title, widget: string}
       - label: Chapter
