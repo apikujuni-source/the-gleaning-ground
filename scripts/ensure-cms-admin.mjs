@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import YAML from "yaml";
 
 const outputDirectory = "_site/admin";
 const sourceConfig = "cms/config.yml";
@@ -35,6 +36,23 @@ config = config
     '    description: "Advanced section-by-section editor. Use Edit Chapter Resources and Upload & Publish Teachings for normal Divine Blueprint updates."'
   );
 
+let parsedConfig;
+try {
+  parsedConfig = YAML.parse(config);
+} catch (error) {
+  throw new Error(`Invalid generated CMS configuration: ${error.message}`);
+}
+
+if (!parsedConfig || typeof parsedConfig !== "object" || !Array.isArray(parsedConfig.collections)) {
+  throw new Error("Generated CMS configuration is missing its collections array.");
+}
+
+// Manual initialization embeds the complete configuration directly in the
+// admin page. This removes the browser's dependency on fetching config.yml,
+// while the YAML copy remains available for inspection and troubleshooting.
+parsedConfig.load_config_file = false;
+const inlineConfig = JSON.stringify(parsedConfig).replaceAll("<", "\\u003c");
+
 await writeFile(outputConfig, config, "utf8");
 
 const adminHtml = `<!doctype html>
@@ -44,7 +62,6 @@ const adminHtml = `<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Gleaning Ground Content Manager</title>
-  <link rel="cms-config-url" type="text/yaml" href="/admin/config.yml">
   <style>
     :root{color-scheme:light}
     body{margin:0;background:#f4f1e9}
@@ -55,7 +72,9 @@ const adminHtml = `<!doctype html>
     .admin-help ol{margin:.4rem 0 .7rem;padding-left:1.25rem}
     .admin-help li{margin:.35rem 0}
     .admin-help a{color:#8a6424;font-weight:700}
+    .cms-startup-error{max-width:760px;margin:4rem auto;padding:1.25rem 1.4rem;font:16px/1.55 Arial,sans-serif;color:#6b1d1d;background:#fff;border:1px solid #d8a9a9;border-radius:14px}
   </style>
+  <script>window.CMS_MANUAL_INIT = true;</script>
 </head>
 <body>
   <details class="admin-help">
@@ -70,9 +89,30 @@ const adminHtml = `<!doctype html>
     </div>
   </details>
   <script src="https://unpkg.com/decap-cms@3.8.4/dist/decap-cms.js"></script>
+  <script>
+    (() => {
+      try {
+        const init = window.initCMS || window.CMS?.init;
+        if (typeof init !== "function") {
+          throw new Error("The Decap CMS application did not finish loading.");
+        }
+        init({ config: ${inlineConfig} });
+      } catch (error) {
+        console.error("CMS startup failed", error);
+        const message = document.createElement("div");
+        message.className = "cms-startup-error";
+        message.innerHTML = "<strong>The content manager could not start.</strong><br>" +
+          String(error?.message || error) +
+          "<br><br>Reload the page once. If the problem remains, check the latest Netlify deployment log.";
+        document.body.prepend(message);
+      }
+    })();
+  </script>
 </body>
 </html>
 `;
 
 await writeFile(outputIndex, adminHtml, "utf8");
-console.log("Built the easy Divine Blueprint CMS and verified /admin/config.yml.");
+console.log(
+  `Built the easy Divine Blueprint CMS with ${parsedConfig.collections.length} collections and embedded configuration.`
+);
