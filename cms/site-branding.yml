@@ -1,0 +1,34 @@
+  - name: site_branding
+    label: "0. Site Logo & Branding"
+    description: "Upload the official Gleaning Ground logo and update the main site identity and contact details. The same logo is used in the website header, footer, and CMS."
+    files:
+      - label: "Official Logo & Site Details"
+        name: site
+        file: content/site.json
+        format: json
+        fields:
+          - {label: Site Name, name: name, widget: string}
+          - {label: Website URL, name: url, widget: string}
+          - {label: Site Description, name: description, widget: text}
+          - {label: Tagline, name: tagline, widget: string}
+          - {label: Ministry Line, name: ministryLine, widget: text}
+          - {label: Author, name: author, widget: string}
+          - {label: Contact Email, name: email, widget: string}
+          - label: Official Logo
+            name: logo
+            widget: image
+            choose_url: false
+            media_library:
+              config:
+                multiple: false
+            hint: "Upload the exact official PNG, JPG, or WebP logo. It will be used without redrawing, recoloring, cropping, or separating the symbol from the text."
+          - {label: Logo Alternative Text, name: logoAlt, widget: string, default: "The Gleaning Ground official logo"}
+          - label: Social Links
+            name: social
+            widget: object
+            collapsed: true
+            fields:
+              - {label: YouTube URL, name: youtube, widget: string, required: false}
+              - {label: Instagram URL, name: instagram, widget: string, required: false}
+              - {label: Facebook URL, name: facebook, widget: string, required: false}
+              - {label: Podcast URL, name: podcast, widget: string, required: false}
