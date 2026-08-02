@@ -33,7 +33,7 @@ config = config
   .replace("    label: Divine Blueprint Pages\n", '    label: "Advanced — Divine Blueprint Pages"\n')
   .replace(
     '    description: "Edit the homepage, Start Here, all nine chapters, studies, teachings, podcast, companion, and ministry pages."',
-    '    description: "Advanced section-by-section editor. Use Edit Chapter Resources, Chapter Teaching Series, and Additional Teachings for normal Divine Blueprint updates."'
+    '    description: "Advanced section-by-section editor. Use Edit Chapter Resources, Teaching Series, and Additional Teachings for normal Divine Blueprint updates."'
   );
 
 let parsedConfig;
@@ -108,11 +108,11 @@ const adminHtml = `<!doctype html>
     <div>
       <ol>
         <li><strong>Edit Chapter Resources</strong> changes the Central Truth, studies, questions, journal prompts, declarations, and prayers.</li>
-        <li><strong>Chapter Teaching Series</strong> contains the original five teachings already listed under every chapter. Each teaching is now a separate editable entry.</li>
-        <li><strong>Additional Teachings</strong> is only for material outside those original five chapter teachings.</li>
+        <li><strong>Teaching Series</strong> contains the five teachings already listed under every chapter. Each teaching is a separate editable entry.</li>
+        <li><strong>Additional Teachings</strong> is only for material outside a chapter’s Teaching Series.</li>
         <li>Keep a teaching as <strong>Draft</strong> while working. Change it to <strong>Published</strong> when it is ready for the website.</li>
       </ol>
-      <h3>Edit an original series teaching directly</h3>
+      <h3>Edit a Teaching Series item directly</h3>
       <div class="series-shortcuts">${seriesLinks}</div>
       <p><a href="https://divineblueprint.gleaningground.com/teachings" target="_blank" rel="noopener">Open the public teachings page ↗</a></p>
     </div>
@@ -143,5 +143,5 @@ const adminHtml = `<!doctype html>
 
 await writeFile(outputIndex, adminHtml, "utf8");
 console.log(
-  `Built the Divine Blueprint CMS with ${parsedConfig.collections.length} collections and 45 direct series-teaching links.`
+  `Built the Divine Blueprint CMS with ${parsedConfig.collections.length} collections and 45 direct Teaching Series links.`
 );
