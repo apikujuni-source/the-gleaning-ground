@@ -18,13 +18,13 @@ await mkdir(outputDirectory, { recursive: true });
 
 let config = await readFile(sourceConfig, "utf8");
 const fragment = (await readFile(editorFragment, "utf8")).trimEnd();
-const insertionMarker = "  - name: global_areas";
+const insertionMarker = "collections:\n";
 
 if (!config.includes("name: divine_chapter_resources")) {
   if (!config.includes(insertionMarker)) {
     throw new Error("Could not locate the CMS collection insertion point.");
   }
-  config = config.replace(insertionMarker, `${fragment}\n\n${insertionMarker}`);
+  config = config.replace(insertionMarker, `${insertionMarker}${fragment}\n\n`);
 }
 
 config = config
