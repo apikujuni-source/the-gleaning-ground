@@ -16,8 +16,14 @@ const sourceParts = [
 const expectedSourceSha256 = "61b79b86398f5128cbe4751171439fd93260cffaf14d0b9bbc3448b36254336e";
 
 const romansSourceParts = [
-  "content/imports/devotionals/romans-updated-00.b64",
-  "content/imports/devotionals/romans-updated-01.b64"
+  "content/imports/devotionals/romans-v2-00.b64",
+  "content/imports/devotionals/romans-v2-01.b64",
+  "content/imports/devotionals/romans-v2-02.b64",
+  "content/imports/devotionals/romans-v2-03.b64",
+  "content/imports/devotionals/romans-v2-04.b64",
+  "content/imports/devotionals/romans-v2-05.b64",
+  "content/imports/devotionals/romans-v2-06.b64",
+  "content/imports/devotionals/romans-v2-07.b64"
 ];
 const expectedRomansSha256 = "d837a9070a043e1b3c63d57b14d1af5a21ab37f6e0aa0d0d0ddae9dc83baf541";
 
