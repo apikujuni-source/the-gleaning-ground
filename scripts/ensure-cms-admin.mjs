@@ -5,35 +5,42 @@ import YAML from "yaml";
 const outputDirectory = "_site/admin";
 const sourceConfig = "cms/config.yml";
 const editorFragment = "cms/divine-blueprint-editor.yml";
+const brandingFragment = "cms/site-branding.yml";
+const siteSettingsPath = "content/site.json";
 const outputConfig = `${outputDirectory}/config.yml`;
 const outputIndex = `${outputDirectory}/index.html`;
 
-if (!existsSync(sourceConfig)) {
-  throw new Error(`Missing Decap CMS configuration: ${sourceConfig}`);
-}
-if (!existsSync(editorFragment)) {
-  throw new Error(`Missing Divine Blueprint editor configuration: ${editorFragment}`);
+for (const requiredPath of [sourceConfig, editorFragment, brandingFragment, siteSettingsPath]) {
+  if (!existsSync(requiredPath)) throw new Error(`Missing CMS source file: ${requiredPath}`);
 }
 
 await mkdir(outputDirectory, { recursive: true });
 
 let config = await readFile(sourceConfig, "utf8");
-const fragment = (await readFile(editorFragment, "utf8")).trimEnd();
+const editorContent = (await readFile(editorFragment, "utf8")).trimEnd();
+const brandingContent = (await readFile(brandingFragment, "utf8")).trimEnd();
+const siteSettings = JSON.parse(await readFile(siteSettingsPath, "utf8"));
+const logoPath = String(siteSettings.logo || "/assets/uploads/logo_official.png").trim();
 const insertionMarker = "collections:\n";
 
-if (!config.includes("name: divine_chapter_resources")) {
-  if (!config.includes(insertionMarker)) {
-    throw new Error("Could not locate the CMS collection insertion point.");
-  }
-  config = config.replace(insertionMarker, `${insertionMarker}${fragment}\n\n`);
+if (!config.includes(insertionMarker)) {
+  throw new Error("Could not locate the CMS collection insertion point.");
+}
+
+const fragments = [];
+if (!config.includes("name: site_branding")) fragments.push(brandingContent);
+if (!config.includes("name: divine_chapter_resources")) fragments.push(editorContent);
+if (fragments.length) {
+  config = config.replace(insertionMarker, `${insertionMarker}${fragments.join("\n\n")}\n\n`);
 }
 
 config = config
+  .replace(/^logo_url:.*$/m, `logo_url: https://gleaningground.com${logoPath}`)
   .replace("    label: The Divine Blueprint\n", '    label: "4. Homepage & Book Cover"\n')
   .replace("    label: Divine Blueprint Pages\n", '    label: "Advanced — Divine Blueprint Pages"\n')
   .replace(
     '    description: "Edit the homepage, Start Here, all nine chapters, studies, teachings, podcast, companion, and ministry pages."',
-    '    description: "Advanced section-by-section editor. Use Edit Chapter Resources, Teaching Series, and Additional Teachings for normal Divine Blueprint updates."'
+    '    description: "Advanced section-by-section editor. Use Site Logo & Branding, Edit Chapter Resources, Teaching Series, and Additional Teachings for normal updates."'
   );
 
 let parsedConfig;
@@ -47,6 +54,7 @@ if (!parsedConfig || typeof parsedConfig !== "object" || !Array.isArray(parsedCo
   throw new Error("Generated CMS configuration is missing its collections array.");
 }
 
+parsedConfig.logo_url = `https://gleaningground.com${logoPath}`;
 parsedConfig.load_config_file = false;
 const inlineConfig = JSON.stringify(parsedConfig).replaceAll("<", "\\u003c");
 
@@ -79,6 +87,7 @@ const adminHtml = `<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Gleaning Ground Content Manager</title>
+  <link rel="icon" href="${logoPath}">
   <style>
     :root{color-scheme:light}
     body{margin:0;background:#f4f1e9}
@@ -104,14 +113,15 @@ const adminHtml = `<!doctype html>
 </head>
 <body>
   <details class="admin-help">
-    <summary>Divine Blueprint quick guide</summary>
+    <summary>Gleaning Ground quick guide</summary>
     <div>
       <ol>
+        <li><strong>Site Logo & Branding</strong> lets you upload the official logo yourself. The uploaded file is used exactly as supplied.</li>
         <li><strong>Edit Chapter Resources</strong> changes the Central Truth, studies, questions, journal prompts, declarations, and prayers.</li>
-        <li><strong>Teaching Series</strong> contains the five teachings already listed under every chapter. Each teaching is a separate editable entry.</li>
+        <li><strong>Teaching Series</strong> contains the five teachings listed under every chapter. Each teaching is a separate editable entry.</li>
         <li><strong>Additional Teachings</strong> is only for material outside a chapter’s Teaching Series.</li>
-        <li>Keep a teaching as <strong>Draft</strong> while working. Change it to <strong>Published</strong> when it is ready for the website.</li>
       </ol>
+      <p><a href="#/collections/site_branding/entries/site">Open Site Logo & Branding →</a></p>
       <h3>Edit a Teaching Series item directly</h3>
       <div class="series-shortcuts">${seriesLinks}</div>
       <p><a href="https://divineblueprint.gleaningground.com/teachings" target="_blank" rel="noopener">Open the public teachings page ↗</a></p>
@@ -122,17 +132,13 @@ const adminHtml = `<!doctype html>
     (() => {
       try {
         const init = window.initCMS || window.CMS?.init;
-        if (typeof init !== "function") {
-          throw new Error("The Decap CMS application did not finish loading.");
-        }
+        if (typeof init !== "function") throw new Error("The Decap CMS application did not finish loading.");
         init({ config: ${inlineConfig} });
       } catch (error) {
         console.error("CMS startup failed", error);
         const message = document.createElement("div");
         message.className = "cms-startup-error";
-        message.innerHTML = "<strong>The content manager could not start.</strong><br>" +
-          String(error?.message || error) +
-          "<br><br>Reload the page once. If the problem remains, check the latest Netlify deployment log.";
+        message.innerHTML = "<strong>The content manager could not start.</strong><br>" + String(error?.message || error) + "<br><br>Reload the page once. If the problem remains, check the latest Netlify deployment log.";
         document.body.prepend(message);
       }
     })();
@@ -142,6 +148,4 @@ const adminHtml = `<!doctype html>
 `;
 
 await writeFile(outputIndex, adminHtml, "utf8");
-console.log(
-  `Built the Divine Blueprint CMS with ${parsedConfig.collections.length} collections and 45 direct Teaching Series links.`
-);
+console.log(`Built the CMS with ${parsedConfig.collections.length} collections, an editable official-logo setting, and 45 direct Teaching Series links.`);
