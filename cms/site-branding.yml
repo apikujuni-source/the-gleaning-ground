@@ -18,9 +18,6 @@
             name: logo
             widget: image
             choose_url: false
-            media_library:
-              config:
-                multiple: false
             hint: "Upload the exact official PNG, JPG, or WebP logo. It will be used without redrawing, recoloring, cropping, or separating the symbol from the text."
           - {label: Logo Alternative Text, name: logoAlt, widget: string, default: "The Gleaning Ground official logo"}
           - label: Social Links
