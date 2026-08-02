@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const seriesRoot = "content/divine-blueprint/teaching-series";
+const chapterRoot = "content/divine-blueprint/chapters";
 const teachingRoot = "content/divine-blueprint/teachings";
 const generatedPrefix = "_series-";
 
@@ -17,6 +18,9 @@ for (const name of await readdir(teachingRoot)) {
 if (!existsSync(seriesRoot)) {
   throw new Error(`Missing consolidated Divine Blueprint teaching series directory: ${seriesRoot}`);
 }
+if (!existsSync(chapterRoot)) {
+  throw new Error(`Missing Divine Blueprint chapter directory: ${chapterRoot}`);
+}
 
 const sourceFiles = (await readdir(seriesRoot))
   .filter((name) => /^chapter-[1-9]-part-[1-5]\.json$/.test(name))
@@ -27,6 +31,7 @@ if (sourceFiles.length !== 45) {
 }
 
 const seen = new Set();
+const outlines = new Map();
 let copied = 0;
 let published = 0;
 
@@ -56,10 +61,25 @@ for (const name of sourceFiles) {
     seriesTitle: teaching.seriesTitle || `${teaching.chapterTitle || `Chapter ${chapter}`} Teaching Series`
   };
 
+  if (!outlines.has(chapter)) outlines.set(chapter, []);
+  outlines.get(chapter)[episodeNumber - 1] = title;
+
   const outputName = `${generatedPrefix}chapter-${chapter}-part-${episodeNumber}.json`;
   await writeFile(join(teachingRoot, outputName), `${JSON.stringify(normalized, null, 2)}\n`, "utf8");
   copied += 1;
   if (normalized.status === "published") published += 1;
 }
 
-console.log(`Synchronized ${copied} consolidated chapter-series teachings; ${published} currently published.`);
+for (let chapter = 1; chapter <= 9; chapter += 1) {
+  const titles = outlines.get(chapter) || [];
+  if (titles.length !== 5 || titles.some((title) => !title)) {
+    throw new Error(`Chapter ${chapter} does not contain exactly five named teachings.`);
+  }
+
+  const chapterPath = join(chapterRoot, `chapter-${chapter}.json`);
+  const chapterData = JSON.parse(await readFile(chapterPath, "utf8"));
+  chapterData.teachingOutline = titles;
+  await writeFile(chapterPath, `${JSON.stringify(chapterData, null, 2)}\n`, "utf8");
+}
+
+console.log(`Synchronized ${copied} consolidated chapter-series teachings; ${published} currently published. Chapter outlines now derive from the same 45 entries.`);
