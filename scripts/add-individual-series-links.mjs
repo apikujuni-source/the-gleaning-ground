@@ -56,20 +56,23 @@ function teachingHref(teaching) {
   return `/teaching/${teaching._slug}/`;
 }
 
-async function readPublishedTeachings() {
+async function readTeachings() {
   if (!existsSync(teachingRoot)) return [];
   const names = (await readdir(teachingRoot)).filter((name) => name.endsWith(".json"));
   const values = [];
   for (const name of names) {
     const teaching = JSON.parse(await readFile(join(teachingRoot, name), "utf8"));
-    if (String(teaching.status || "draft").toLowerCase() !== "published") continue;
-    values.push({ ...teaching, _slug: slugFromFile(name) });
+    values.push({
+      ...teaching,
+      _slug: slugFromFile(name),
+      _published: String(teaching.status || "draft").toLowerCase() === "published"
+    });
   }
   return values;
 }
 
-function isFivePartSeriesEntry(teaching) {
-  return teaching._slug.startsWith("series-chapter-") || /5[- ]part/i.test(String(teaching.seriesTitle || ""));
+function isChapterSeriesEntry(teaching) {
+  return teaching._slug.startsWith("series-chapter-");
 }
 
 function chapterParts(chapter, teachings) {
@@ -80,19 +83,20 @@ function chapterParts(chapter, teachings) {
   return Array.from({ length: 5 }, (_, index) => {
     const part = index + 1;
     const candidates = chapterTeachings.filter((item) => Number(item.episodeNumber) === part);
-    const teaching = candidates.find(isFivePartSeriesEntry) || candidates[0];
+    const teaching = candidates.find(isChapterSeriesEntry) || candidates[0];
     return { part, teaching };
   });
 }
 
 function renderParts(chapter, teachings, currentSlug = "") {
   return `<div class="series-part-links">${chapterParts(chapter, teachings).map(({ part, teaching }) => {
-    if (!teaching) {
-      return `<div class="series-part-coming"><span class="series-part-number">${part}</span><span class="series-part-title">Part ${part}</span><span class="series-part-action">Coming soon</span></div>`;
+    const title = teaching?.title || `Teaching ${part}`;
+    if (!teaching?._published) {
+      return `<div class="series-part-coming"><span class="series-part-number">${part}</span><span class="series-part-title">${escapeHtml(title)}</span><span class="series-part-action">Coming soon</span></div>`;
     }
     const current = teaching._slug === currentSlug ? ' aria-current="page"' : "";
     const action = teaching._slug === currentSlug ? "You are here" : "Open teaching →";
-    return `<a class="series-part-link" href="${teachingHref(teaching)}"${current}><span class="series-part-number">${part}</span><span class="series-part-title">${escapeHtml(teaching.title || `Part ${part}`)}</span><span class="series-part-action">${action}</span></a>`;
+    return `<a class="series-part-link" href="${teachingHref(teaching)}"${current}><span class="series-part-number">${part}</span><span class="series-part-title">${escapeHtml(title)}</span><span class="series-part-action">${action}</span></a>`;
   }).join("")}</div>`;
 }
 
@@ -120,9 +124,16 @@ async function updateTeachingsOverview(path, teachings) {
 async function updateChapterPage(path, chapter, teachings) {
   if (!existsSync(path)) return false;
   let html = addStyles(await readFile(path, "utf8"));
+
+  // Remove the previously added duplicate block, then replace the original
+  // Teaching Series content with one unified five-teaching list.
   html = html.replace(/<!-- chapter-individual-series:start -->[\s\S]*?<!-- chapter-individual-series:end -->/g, "");
-  const links = `<!-- chapter-individual-series:start --><div class="series-navigation"><h3>Five-Part Teaching Series</h3><p>Open each teaching separately.</p>${renderParts(chapter, teachings)}</div><!-- chapter-individual-series:end -->`;
-  html = html.replace(/(<h2 id="teaching-series">Teaching Series<\/h2>)([\s\S]*?)(<h2 id="journal-prompts">)/, `$1$2${links}$3`);
+  const unifiedSection = `<h2 id="teaching-series">Teaching Series</h2><p>Open each teaching separately as it becomes available.</p>${renderParts(chapter, teachings)}`;
+  html = html.replace(
+    /<h2 id="teaching-series">Teaching Series<\/h2>[\s\S]*?(?=<h2 id="journal-prompts">)/,
+    unifiedSection
+  );
+
   await writeFile(path, html, "utf8");
   return true;
 }
@@ -132,13 +143,14 @@ async function updateTeachingDetail(teaching, teachings) {
   if (!existsSync(path)) return false;
   let html = addStyles(await readFile(path, "utf8"));
   html = html.replace(/<!-- teaching-series-navigation:start -->[\s\S]*?<!-- teaching-series-navigation:end -->/g, "");
-  const navigation = `<!-- teaching-series-navigation:start --><section class="series-navigation"><h2>Continue the Five-Part Series</h2><p>Each part has its own page and can be opened separately.</p>${renderParts(teaching.chapter, teachings, teaching._slug)}</section><!-- teaching-series-navigation:end -->`;
+  const navigation = `<!-- teaching-series-navigation:start --><section class="series-navigation"><h2>Continue the Teaching Series</h2><p>Open each teaching in this chapter’s series separately.</p>${renderParts(teaching.chapter, teachings, teaching._slug)}</section><!-- teaching-series-navigation:end -->`;
   html = html.replace(/(<div class="teaching-actions"><a class="btn btn-secondary" href="\/teachings">)/, `${navigation}$1`);
   await writeFile(path, html, "utf8");
   return true;
 }
 
-const teachings = await readPublishedTeachings();
+const teachings = await readTeachings();
+const publishedTeachings = teachings.filter((teaching) => teaching._published);
 let updated = 0;
 
 for (const path of [join(siteRoot, "teachings.html"), join(siteRoot, "teachings", "index.html")]) {
@@ -151,8 +163,8 @@ for (const [chapter] of chapters) {
   }
 }
 
-for (const teaching of teachings) {
+for (const teaching of publishedTeachings) {
   if (await updateTeachingDetail(teaching, teachings)) updated += 1;
 }
 
-console.log(`Added separate Part 1–5 links to ${updated} Divine Blueprint page(s).`);
+console.log(`Consolidated each chapter into one Teaching Series section across ${updated} Divine Blueprint page(s).`);
