@@ -201,6 +201,10 @@ await mkdir(outputDirectory, { recursive: true });
 const romansTitles = new Set(
   romansDevotionals.map((entry) => String(entry.title || "").trim()).filter(Boolean)
 );
+const originalRomansStartDate = addDays(
+  romansSource.dateRange?.start || romansDevotionals[0]?.date,
+  -1
+);
 
 // Remove generated legacy entries and any older Romans-series files. Shift every
 // remaining manually maintained devotional by one day in the build workspace.
@@ -223,7 +227,11 @@ for (const name of await readdir(outputDirectory)) {
 }
 
 const shiftedLegacyDevotionals = originalLegacyDevotionals
-  .filter((entry) => !romansTitles.has(String(entry.title || "").trim()))
+  .filter((entry) => {
+    const title = String(entry.title || "").trim();
+    const date = String(entry.date || "").trim();
+    return !romansTitles.has(title) && date < originalRomansStartDate;
+  })
   .map((entry) => ({ ...entry, date: addDays(entry.date, 1) }));
 
 const seenDates = new Set();
