@@ -37,13 +37,34 @@ const expectedPhilippiansEphesiansCount = 33;
 const expectedPhilippiansEphesiansStart = "2025-12-19";
 const expectedPhilippiansEphesiansEnd = "2026-01-20";
 
+const hebrewsCorinthiansParts = [
+  "content/imports/devotionals/hebrews-corinthians-00.json",
+  "content/imports/devotionals/hebrews-corinthians-01.json",
+  "content/imports/devotionals/hebrews-corinthians-02.json",
+  "content/imports/devotionals/hebrews-corinthians-03.json",
+  "content/imports/devotionals/hebrews-corinthians-04.json",
+  "content/imports/devotionals/hebrews-corinthians-05.json",
+  "content/imports/devotionals/hebrews-corinthians-06.json",
+  "content/imports/devotionals/hebrews-corinthians-07.json",
+  "content/imports/devotionals/hebrews-corinthians-08.json"
+];
+const expectedHebrewsCorinthiansCount = 69;
+const expectedHebrewsCorinthiansStart = "2026-01-21";
+const expectedHebrewsCorinthiansEnd = "2026-03-30";
+
 const outputDirectory = "content/devotionals";
 const legacyMarker = "legacyImport: gleaning-ground-old-website-2025";
 const romansMarker = "romansImport: updated-romans-2026-08";
 const philippiansEphesiansMarker = "philippiansEphesiansImport: 2026-08";
+const hebrewsCorinthiansMarker = "hebrewsCorinthiansImport: 2026-08";
 const dateShiftMarker = "dateShift: one-day-later-2026-08";
 
-for (const part of [...legacyParts, ...romansParts, ...philippiansEphesiansParts]) {
+for (const part of [
+  ...legacyParts,
+  ...romansParts,
+  ...philippiansEphesiansParts,
+  ...hebrewsCorinthiansParts
+]) {
   if (!existsSync(part)) throw new Error(`Missing devotional source: ${part}`);
 }
 
@@ -63,6 +84,7 @@ async function loadPlainParts(paths) {
 
 const romansDevotionals = await loadPlainParts(romansParts);
 const philippiansEphesiansDevotionals = await loadPlainParts(philippiansEphesiansParts);
+const hebrewsCorinthiansDevotionals = await loadPlainParts(hebrewsCorinthiansParts);
 
 function addDays(value, days = 1) {
   const parsed = new Date(`${String(value).trim()}T00:00:00Z`);
@@ -109,7 +131,7 @@ function render(entry, marker, extra = []) {
   const specialLabel = String(entry.specialLabel || "").replace(/\r/g, "").trim();
   const afterPrayer = String(entry.afterPrayer || "").replace(/\r/g, "").trim();
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !title || !scripture || !scriptureText || !body) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !title || !scripture || !body) {
     throw new Error(`Incomplete devotional: ${title || date || "unknown"}`);
   }
 
@@ -119,13 +141,9 @@ function render(entry, marker, extra = []) {
   const sections = [];
 
   if (specialLabel) sections.push(`**${specialLabel}**`, "");
-  sections.push(
-    `**Scripture Reading:** ${scripture}`,
-    "",
-    `> ${scriptureText.replace(/\n+/g, " ").trim()}`,
-    "",
-    body
-  );
+  sections.push(`**Scripture Reading:** ${scripture}`);
+  if (scriptureText) sections.push("", `> ${scriptureText.replace(/\n+/g, " ").trim()}`);
+  sections.push("", body);
   if (prayer) sections.push("", `**Pray with me:** ${prayer}`);
   if (afterPrayer) sections.push("", `**${afterPrayer}**`);
 
@@ -136,7 +154,7 @@ function render(entry, marker, extra = []) {
     `description: ${yamlString(descriptionFromBody(body, scripture))}`,
     `date: ${date}`,
     "category: Faith",
-    `keyScripture: ${yamlString(scriptureText)}`,
+    `keyScripture: ${yamlString(scriptureText || scripture)}`,
     "collectionName: devotionals",
     "collectionLabel: Devotionals",
     `permalink: ${yamlString(permalink)}`,
@@ -178,13 +196,7 @@ function validateSeries(entries, expectedCount, expectedStart, expectedEnd, labe
   }
 }
 
-validateSeries(
-  romansDevotionals,
-  expectedRomansCount,
-  expectedRomansStart,
-  expectedRomansEnd,
-  "Romans"
-);
+validateSeries(romansDevotionals, expectedRomansCount, expectedRomansStart, expectedRomansEnd, "Romans");
 validateSeries(
   philippiansEphesiansDevotionals,
   expectedPhilippiansEphesiansCount,
@@ -192,8 +204,19 @@ validateSeries(
   expectedPhilippiansEphesiansEnd,
   "Philippians and Ephesians"
 );
+validateSeries(
+  hebrewsCorinthiansDevotionals,
+  expectedHebrewsCorinthiansCount,
+  expectedHebrewsCorinthiansStart,
+  expectedHebrewsCorinthiansEnd,
+  "Hebrews and 1 Corinthians"
+);
+
 if (addDays(expectedRomansEnd, 1) !== expectedPhilippiansEphesiansStart) {
   throw new Error("The Philippians and Ephesians series must begin the day after Romans ends.");
+}
+if (addDays(expectedPhilippiansEphesiansEnd, 1) !== expectedHebrewsCorinthiansStart) {
+  throw new Error("The Hebrews and 1 Corinthians series must begin the day after Philippians and Ephesians ends.");
 }
 
 await mkdir(outputDirectory, { recursive: true });
@@ -206,6 +229,7 @@ for (const name of await readdir(outputDirectory)) {
     content.includes(legacyMarker) ||
     content.includes(romansMarker) ||
     content.includes(philippiansEphesiansMarker) ||
+    content.includes(hebrewsCorinthiansMarker) ||
     content.includes("series: Romans")
   ) {
     await rm(path, { force: true });
@@ -247,10 +271,19 @@ for (const entry of philippiansEphesiansDevotionals) {
     ])
   );
 }
+for (const entry of hebrewsCorinthiansDevotionals) {
+  await writeEntry(
+    render(entry, hebrewsCorinthiansMarker, [
+      `series: ${yamlString(entry.series || "Hebrews and 1 Corinthians")}`
+    ])
+  );
+}
 
 console.log(
   `Imported ${shiftedLegacy.length} shifted legacy devotionals, ` +
-    `${romansDevotionals.length} Romans devotionals (${expectedRomansStart} to ${expectedRomansEnd}), and ` +
+    `${romansDevotionals.length} Romans devotionals (${expectedRomansStart} to ${expectedRomansEnd}), ` +
     `${philippiansEphesiansDevotionals.length} Philippians/Ephesians devotionals ` +
-    `(${expectedPhilippiansEphesiansStart} to ${expectedPhilippiansEphesiansEnd}).`
+    `(${expectedPhilippiansEphesiansStart} to ${expectedPhilippiansEphesiansEnd}), and ` +
+    `${hebrewsCorinthiansDevotionals.length} Hebrews/1 Corinthians devotionals ` +
+    `(${expectedHebrewsCorinthiansStart} to ${expectedHebrewsCorinthiansEnd}).`
 );
