@@ -68,6 +68,10 @@ async function readPublishedTeachings() {
   return values;
 }
 
+function isFivePartSeriesEntry(teaching) {
+  return teaching._slug.startsWith("series-chapter-") || /5[- ]part/i.test(String(teaching.seriesTitle || ""));
+}
+
 function chapterParts(chapter, teachings) {
   const chapterTeachings = teachings
     .filter((item) => Number(item.chapter) === Number(chapter))
@@ -75,7 +79,8 @@ function chapterParts(chapter, teachings) {
 
   return Array.from({ length: 5 }, (_, index) => {
     const part = index + 1;
-    const teaching = chapterTeachings.find((item) => Number(item.episodeNumber) === part);
+    const candidates = chapterTeachings.filter((item) => Number(item.episodeNumber) === part);
+    const teaching = candidates.find(isFivePartSeriesEntry) || candidates[0];
     return { part, teaching };
   });
 }
