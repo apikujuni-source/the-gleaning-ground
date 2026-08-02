@@ -47,9 +47,9 @@
       - {label: Closing Prayer, name: prayer, widget: text}
 
   - name: divine_series_teachings
-    label: "2. Chapter Teaching Series"
-    label_singular: "Series Teaching"
-    description: "The original five teachings already assigned to each chapter. Every teaching is a separate entry, so it can be opened, updated, uploaded, drafted, and published independently."
+    label: "2. Teaching Series"
+    label_singular: "Teaching"
+    description: "The five teachings already assigned to each chapter form one Teaching Series. Every teaching is a separate entry, so it can be opened, updated, uploaded, drafted, and published independently."
     folder: content/divine-blueprint/teaching-series
     create: false
     extension: json
@@ -103,7 +103,7 @@
   - name: divine_teachings
     label: "3. Additional Teachings"
     label_singular: "Additional Divine Blueprint Teaching"
-    description: "Create a teaching that is not one of the original five teachings assigned to a chapter."
+    description: "Create a teaching that is not one of the five teachings assigned to a chapter’s Teaching Series."
     folder: content/divine-blueprint/teachings
     create: true
     extension: json
