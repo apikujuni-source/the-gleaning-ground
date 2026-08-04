@@ -38,8 +38,8 @@ replaceRequired(
     text(cmd, "LET THE CHAPTER SEARCH YOUR HEART", 48, 392, 7.8, "F2", GOLD);
     ch.prompts.forEach((p, i) => {
       const y = 338 - i * 82;
-      paragraph(cmd, `${i + 1}. ${p}`, 52, y + 28, 65, 9.1, 13, "F2", INK, 2);
-      fieldArea(cmd, fields, fillable, `${prefix}_reflection_${i + 1}`, 52, y - 34, 400, 48, true);
+      paragraph(cmd, String(i + 1) + ". " + p, 52, y + 28, 65, 9.1, 13, "F2", INK, 2);
+      fieldArea(cmd, fields, fillable, prefix + "_reflection_" + String(i + 1), 52, y - 34, 400, 48, true);
     });
   } else if (pageIndex === 4) {`,
   "duplicate Personal Inventory and Guided Reflection pages"
