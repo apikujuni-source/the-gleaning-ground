@@ -38,8 +38,8 @@ replaceRequired(
     text(cmd, "LET THE CHAPTER SEARCH YOUR HEART", 48, 392, 7.8, "F2", GOLD);
     ch.prompts.forEach((p, i) => {
       const y = 338 - i * 82;
-      paragraph(cmd, \`\${i + 1}. \${p}\`, 52, y + 28, 65, 9.1, 13, "F2", INK, 2);
-      fieldArea(cmd, fields, fillable, \`\${prefix}_reflection_\${i + 1}\`, 52, y - 34, 400, 48, true);
+      paragraph(cmd, String(i + 1) + ". " + p, 52, y + 28, 65, 9.1, 13, "F2", INK, 2);
+      fieldArea(cmd, fields, fillable, prefix + "_reflection_" + String(i + 1), 52, y - 34, 400, 48, true);
     });
   } else if (pageIndex === 4) {`,
   "duplicate Personal Inventory and Guided Reflection pages"
@@ -55,6 +55,12 @@ replaceRequired(
   'text(cmd, String(9 + i * 10), 438, y, 8, "F1", MUTED);',
   'text(cmd, String(9 + i * 9), 438, y, 8, "F1", MUTED);',
   "contents page numbers"
+);
+
+replaceRequired(
+  'paragraph(cmd, "For church, ministry, classroom, or small-group licensing, contact The Gleaning Ground.", 48, 265, 68, 10, 15, "F1");',
+  'paragraph(cmd, "For church, ministry, classroom, or small-group licensing, contact The Gleaning Ground at www.gleaningground.com.", 48, 265, 68, 10, 15, "F1");',
+  "ministry website in Copyright & Personal-Use License"
 );
 
 source = source
@@ -99,6 +105,9 @@ for (const path of [fillablePath, printPath]) {
   if (!pdf.includes("/Count 89")) {
     throw new Error(`${path} does not contain the expected 89 pages.`);
   }
+  if (!pdf.includes("www.gleaningground.com")) {
+    throw new Error(`${path} does not contain the ministry website on the license page.`);
+  }
   if (pdf.includes("PERSONAL INVENTORY") || pdf.includes("Guided Reflection")) {
     throw new Error(`${path} still contains a retired duplicate reflection heading.`);
   }
@@ -108,4 +117,4 @@ for (const path of [fillablePath, printPath]) {
   }
 }
 
-console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter.");
+console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter and the ministry website on the license page.");
