@@ -6,11 +6,12 @@ const siteRoot = resolve("_site");
 
 const adminOnlyPatterns = [
   /\bteachings?\s+(?:are|is)\s+(?:(?:currently|still)\s+)?(?:being\s+)?prepared\b/i,
-  /\b(?:published|new|future)\s+(?:teaching|devotional|article|blog|resource|podcast|video|sermon|entry|entries|item|items|post|posts)s?\b[\s\S]{0,180}\b(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b[\s\S]{0,180}\b(?:appear|display|show)(?:\s+here)?(?:\s+automatically)?\b/i,
-  /\b(?:add|publish|manage|edit|create)(?:ed|ing)?\b[\s\S]{0,120}\b(?:through|from|using|via)\b[\s\S]{0,40}\b(?:the\s+)?(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b/i,
-  /\b(?:entries|items|posts|resources|teachings|content)\b[\s\S]{0,120}\b(?:will|would)\b[\s\S]{0,80}\b(?:appear|display|show)\b[\s\S]{0,80}\b(?:automatically|when\s+published|once\s+published|after\s+publication)\b/i,
-  /\b(?:placeholder|sample)\s+(?:content|copy|text)\b[\s\S]{0,120}\b(?:admin|cms)\b/i,
-  /\b(?:visible|shown|displayed)\s+(?:after|once|when)\b[\s\S]{0,80}\b(?:added|published|created)\b[\s\S]{0,80}\b(?:admin|cms)\b/i
+  /\b(?:published|new|future)\s+(?:teaching|devotional|article|blog|resource|podcast|video|sermon|entry|entries|item|items|post|posts)s?\b[\s\S]{0,220}\b(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b[\s\S]{0,220}\b(?:appear|display|show)(?:\s+here)?(?:\s+automatically)?\b/i,
+  /\b(?:add|publish|manage|edit|create)(?:ed|ing)?\b[\s\S]{0,160}\b(?:through|from|using|via)\b[\s\S]{0,60}\b(?:the\s+)?(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b/i,
+  /\b(?:entries|items|posts|resources|teachings|content)\b[\s\S]{0,160}\b(?:will|would)\b[\s\S]{0,100}\b(?:appear|display|show)\b[\s\S]{0,100}\b(?:automatically|when\s+published|once\s+published|after\s+publication)\b/i,
+  /\b(?:placeholder|sample)\s+(?:content|copy|text)\b[\s\S]{0,160}\b(?:admin|cms)\b/i,
+  /\b(?:visible|shown|displayed)\s+(?:after|once|when)\b[\s\S]{0,100}\b(?:added|published|created)\b[\s\S]{0,100}\b(?:admin|cms)\b/i,
+  /\b(?:content|entries|posts|items|resources|teachings)\s+(?:added|published|created)\s+(?:through|from|using|via)\s+(?:the\s+)?(?:admin|cms)\b/i
 ];
 
 function decodeEntities(value) {
@@ -25,7 +26,7 @@ function decodeEntities(value) {
 
 function visibleText(fragment) {
   return decodeEntities(
-    fragment
+    String(fragment || "")
       .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
       .replace(/<style\b[\s\S]*?<\/style>/gi, " ")
       .replace(/<[^>]+>/g, " ")
@@ -35,21 +36,21 @@ function visibleText(fragment) {
 }
 
 function isAdminOnlyText(text) {
-  if (!text || text.length > 700) return false;
+  if (!text || text.length > 900) return false;
   return adminOnlyPatterns.some((pattern) => pattern.test(text));
 }
 
 function removeMatchingElements(html) {
   let removed = 0;
 
-  const leafBlockPattern = /<(h[2-6]|p|li|small|figcaption)\b[^>]*>[\s\S]*?<\/\1>/gi;
+  const leafBlockPattern = /<(h[1-6]|p|li|small|figcaption|span)\b[^>]*>[\s\S]*?<\/\1>/gi;
   html = html.replace(leafBlockPattern, (element) => {
     if (!isAdminOnlyText(visibleText(element))) return element;
     removed += 1;
     return "";
   });
 
-  const labelledContainerPattern = /<(div|aside)\b([^>]*)>[\s\S]*?<\/\1>/gi;
+  const labelledContainerPattern = /<(div|aside|section)\b([^>]*)>[\s\S]*?<\/\1>/gi;
   html = html.replace(labelledContainerPattern, (element, _tag, attributes) => {
     const labelledAsPlaceholder = /(?:class|id)\s*=\s*["'][^"']*(?:empty|placeholder|admin-note|cms-note|editor-note|status-message|content-note)[^"']*["']/i.test(
       attributes
@@ -70,6 +71,44 @@ function removeMatchingElements(html) {
   return { html, removed };
 }
 
+function removeAdminFieldsFromPageData(page) {
+  let removed = 0;
+  if (!page || typeof page !== "object") return removed;
+
+  for (const section of page.sections || []) {
+    if (!Array.isArray(section.textFields)) continue;
+    section.textFields = section.textFields.filter((item) => {
+      const text = visibleText(item?.value ?? "");
+      if (!isAdminOnlyText(text)) return true;
+      removed += 1;
+      return false;
+    });
+  }
+
+  return removed;
+}
+
+function scrubCmsPageData(html) {
+  let removed = 0;
+  const pageDataPattern = /<script\b([^>]*\bid=["']cms-page-data["'][^>]*)>([\s\S]*?)<\/script>/gi;
+
+  const cleaned = html.replace(pageDataPattern, (element, attributes, body) => {
+    try {
+      const page = JSON.parse(body);
+      const count = removeAdminFieldsFromPageData(page);
+      if (!count) return element;
+      removed += count;
+      const safeJson = JSON.stringify(page).replace(/</g, "\\u003c");
+      return `<script${attributes}>${safeJson}</script>`;
+    } catch (error) {
+      console.warn("Could not inspect cms-page-data while removing public admin notes:", error);
+      return element;
+    }
+  });
+
+  return { html: cleaned, removed };
+}
+
 async function listHtml(directory) {
   const paths = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -88,17 +127,22 @@ if (!existsSync(siteRoot)) {
 
 let filesChanged = 0;
 let elementsRemoved = 0;
+let runtimeFieldsRemoved = 0;
 
 for (const path of await listHtml(siteRoot)) {
   const original = await readFile(path, "utf8");
-  const result = removeMatchingElements(original);
-  if (result.html === original) continue;
-  await writeFile(path, result.html, "utf8");
+  const pageDataResult = scrubCmsPageData(original);
+  const elementResult = removeMatchingElements(pageDataResult.html);
+  if (elementResult.html === original) continue;
+  await writeFile(path, elementResult.html, "utf8");
   filesChanged += 1;
-  elementsRemoved += result.removed;
-  console.log(`Removed ${result.removed} public admin note(s) from ${relative(siteRoot, path)}.`);
+  elementsRemoved += elementResult.removed;
+  runtimeFieldsRemoved += pageDataResult.removed;
+  console.log(
+    `Removed ${elementResult.removed} rendered admin note(s) and ${pageDataResult.removed} CMS runtime field(s) from ${relative(siteRoot, path)}.`
+  );
 }
 
 console.log(
-  `Removed ${elementsRemoved} public admin-only note(s) from ${filesChanged} HTML file(s).`
+  `Removed ${elementsRemoved} rendered public admin note(s) and ${runtimeFieldsRemoved} CMS runtime field(s) from ${filesChanged} HTML file(s).`
 );
