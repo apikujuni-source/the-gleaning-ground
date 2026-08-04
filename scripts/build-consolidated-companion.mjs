@@ -65,8 +65,8 @@ replaceRequired(
 
 replaceRequired(
   'paragraph(cmd, ch.prayer, 76, 252, 58, 10, 16, "F3", INK, 5);',
-  'paragraph(cmd, ch.prayer, 68, 252, 64, 10, 16, "F3", INK, 3);',
-  "wider Prepare Your Heart prayer text"
+  'paragraph(cmd, ch.prayer, 68, 252, 92, 10, 16, "F3", INK, 2);',
+  "full-width Prepare Your Heart prayer text"
 );
 
 source = source
@@ -123,4 +123,4 @@ for (const path of [fillablePath, printPath]) {
   }
 }
 
-console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter, the ministry website on the license page, and improved Prepare Your Heart text wrapping.");
+console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter, the ministry website on the license page, and full-width Prepare Your Heart prayer text.");
