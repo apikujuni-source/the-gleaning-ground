@@ -1,112 +1,188 @@
 import { existsSync } from "node:fs";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
+import {
+  adminOnlyRegexSources,
+  exactAdminFragments,
+  isAdminOnlyText,
+  normalizeText,
+  visibleText
+} from "./admin-note-policy.mjs";
 
 const siteRoot = resolve("_site");
+const guardId = "public-admin-note-guard";
 
-const adminOnlyPatterns = [
-  /\bteachings?\s+(?:are|is)\s+(?:(?:currently|still)\s+)?(?:being\s+)?prepared\b/i,
-  /\b(?:published|new|future)\s+(?:teaching|devotional|article|blog|resource|podcast|video|sermon|entry|entries|item|items|post|posts)s?\b[\s\S]{0,220}\b(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b[\s\S]{0,220}\b(?:appear|display|show)(?:\s+here)?(?:\s+automatically)?\b/i,
-  /\b(?:add|publish|manage|edit|create)(?:ed|ing)?\b[\s\S]{0,160}\b(?:through|from|using|via)\b[\s\S]{0,60}\b(?:the\s+)?(?:admin|cms)(?:\s+(?:page|panel|dashboard))?\b/i,
-  /\b(?:entries|items|posts|resources|teachings|content)\b[\s\S]{0,160}\b(?:will|would)\b[\s\S]{0,100}\b(?:appear|display|show)\b[\s\S]{0,100}\b(?:automatically|when\s+published|once\s+published|after\s+publication)\b/i,
-  /\b(?:placeholder|sample)\s+(?:content|copy|text)\b[\s\S]{0,160}\b(?:admin|cms)\b/i,
-  /\b(?:visible|shown|displayed)\s+(?:after|once|when)\b[\s\S]{0,100}\b(?:added|published|created)\b[\s\S]{0,100}\b(?:admin|cms)\b/i,
-  /\b(?:content|entries|posts|items|resources|teachings)\s+(?:added|published|created)\s+(?:through|from|using|via)\s+(?:the\s+)?(?:admin|cms)\b/i
-];
-
-function decodeEntities(value) {
-  return value
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">");
+function scrubValue(value, stats) {
+  if (typeof value === "string") {
+    if (!isAdminOnlyText(value)) return value;
+    stats.stringsRemoved += 1;
+    return "";
+  }
+  if (Array.isArray(value)) {
+    return value
+      .filter((item) => {
+        if (!item || typeof item !== "object" || Array.isArray(item)) return true;
+        const candidate = item.value ?? item.text ?? item.title ?? item.description ?? item.message;
+        if (typeof candidate !== "string" || !isAdminOnlyText(candidate)) return true;
+        stats.fieldsRemoved += 1;
+        return false;
+      })
+      .map((item) => scrubValue(item, stats));
+  }
+  if (value && typeof value === "object") {
+    const cleaned = {};
+    for (const [key, child] of Object.entries(value)) cleaned[key] = scrubValue(child, stats);
+    return cleaned;
+  }
+  return value;
 }
 
-function visibleText(fragment) {
-  return decodeEntities(
-    String(fragment || "")
-      .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style\b[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-  )
-    .replace(/\s+/g, " ")
-    .trim();
+function scrubCmsPageData(html) {
+  const stats = { fieldsRemoved: 0, stringsRemoved: 0 };
+  const pattern = /<script\b([^>]*\bid=["']cms-page-data["'][^>]*)>([\s\S]*?)<\/script>/gi;
+  const cleaned = html.replace(pattern, (element, attributes, body) => {
+    try {
+      const page = JSON.parse(body);
+      const scrubbed = scrubValue(page, stats);
+      const safeJson = JSON.stringify(scrubbed).replace(/</g, "\\u003c");
+      return `<script${attributes}>${safeJson}</script>`;
+    } catch (error) {
+      throw new Error(`Could not inspect cms-page-data: ${error.message}`);
+    }
+  });
+  return { html: cleaned, ...stats };
 }
 
-function isAdminOnlyText(text) {
-  if (!text || text.length > 900) return false;
-  return adminOnlyPatterns.some((pattern) => pattern.test(text));
-}
-
-function removeMatchingElements(html) {
+function removeAdminElements(html) {
   let removed = 0;
+  const tags = ["h1", "h2", "h3", "h4", "h5", "h6", "p", "small", "figcaption", "li", "span", "div", "aside", "section"];
 
-  const leafBlockPattern = /<(h[1-6]|p|li|small|figcaption|span)\b[^>]*>[\s\S]*?<\/\1>/gi;
-  html = html.replace(leafBlockPattern, (element) => {
-    if (!isAdminOnlyText(visibleText(element))) return element;
-    removed += 1;
-    return "";
-  });
-
-  const labelledContainerPattern = /<(div|aside|section)\b([^>]*)>[\s\S]*?<\/\1>/gi;
-  html = html.replace(labelledContainerPattern, (element, _tag, attributes) => {
-    const labelledAsPlaceholder = /(?:class|id)\s*=\s*["'][^"']*(?:empty|placeholder|admin-note|cms-note|editor-note|status-message|content-note)[^"']*["']/i.test(
-      attributes
-    );
-    if (!labelledAsPlaceholder || !isAdminOnlyText(visibleText(element))) return element;
-    removed += 1;
-    return "";
-  });
-
-  const emptyPlaceholderPattern = /<(div|aside|section)\b([^>]*)>\s*<\/\1>/gi;
-  html = html.replace(emptyPlaceholderPattern, (element, _tag, attributes) => {
-    const labelledAsPlaceholder = /(?:class|id)\s*=\s*["'][^"']*(?:empty|placeholder|admin-note|cms-note|editor-note|status-message|content-note)[^"']*["']/i.test(
-      attributes
-    );
-    return labelledAsPlaceholder ? "" : element;
-  });
+  for (const tag of tags) {
+    const pattern = new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, "gi");
+    let previous;
+    do {
+      previous = html;
+      html = html.replace(pattern, (element) => {
+        const text = visibleText(element);
+        if (!isAdminOnlyText(text)) return element;
+        if (["div", "aside", "section"].includes(tag) && text.length > 1200) return element;
+        removed += 1;
+        return "";
+      });
+    } while (html !== previous);
+  }
 
   return { html, removed };
 }
 
-function removeAdminFieldsFromPageData(page) {
+function removeLooseText(html) {
   let removed = 0;
-  if (!page || typeof page !== "object") return removed;
-
-  for (const section of page.sections || []) {
-    if (!Array.isArray(section.textFields)) continue;
-    section.textFields = section.textFields.filter((item) => {
-      const text = visibleText(item?.value ?? "");
-      if (!isAdminOnlyText(text)) return true;
-      removed += 1;
-      return false;
-    });
-  }
-
-  return removed;
+  const cleaned = html.replace(/>([^<>]+)</g, (match, text) => {
+    if (!isAdminOnlyText(text)) return match;
+    removed += 1;
+    return "><";
+  });
+  return { html: cleaned, removed };
 }
 
-function scrubCmsPageData(html) {
-  let removed = 0;
-  const pageDataPattern = /<script\b([^>]*\bid=["']cms-page-data["'][^>]*)>([\s\S]*?)<\/script>/gi;
-
-  const cleaned = html.replace(pageDataPattern, (element, attributes, body) => {
+function buildGuardScript() {
+  const fragments = JSON.stringify(exactAdminFragments);
+  const regexSources = JSON.stringify(adminOnlyRegexSources);
+  return `<script id="${guardId}">(() => {
+  const fragments = ${fragments};
+  const patterns = ${regexSources}.map((source) => new RegExp(source, "i"));
+  const normalize = (value) => String(value || "")
+    .toLowerCase()
+    .replace(/[\\u2018\\u2019]/g, "'")
+    .replace(/[\\u2013\\u2014]/g, "-")
+    .replace(/[^a-z0-9@._'/-]+/g, " ")
+    .replace(/\\s+/g, " ")
+    .trim();
+  const isAdminNote = (value) => {
+    const text = String(value || "").replace(/\\s+/g, " ").trim();
+    if (!text) return false;
+    const normalized = normalize(text);
+    if (fragments.some((fragment) => normalized.includes(fragment))) return true;
+    if (text.length > 1200) return false;
+    return patterns.some((pattern) => pattern.test(text));
+  };
+  const selectors = "h1,h2,h3,h4,h5,h6,p,small,figcaption,li,span,div,aside,section";
+  let cleaning = false;
+  const clean = (root = document) => {
+    if (cleaning) return;
+    cleaning = true;
     try {
-      const page = JSON.parse(body);
-      const count = removeAdminFieldsFromPageData(page);
-      if (!count) return element;
-      removed += count;
-      const safeJson = JSON.stringify(page).replace(/</g, "\\u003c");
-      return `<script${attributes}>${safeJson}</script>`;
-    } catch (error) {
-      console.warn("Could not inspect cms-page-data while removing public admin notes:", error);
-      return element;
+      const elements = Array.from(root.querySelectorAll ? root.querySelectorAll(selectors) : []);
+      elements.sort((a, b) => b.querySelectorAll("*").length - a.querySelectorAll("*").length);
+      for (const element of elements) {
+        if (!element.isConnected || element.closest("#${guardId}")) continue;
+        const text = element.textContent || "";
+        if (!isAdminNote(text)) continue;
+        if (["DIV", "ASIDE", "SECTION"].includes(element.tagName) && text.length > 1200) continue;
+        element.remove();
+      }
+      const walker = document.createTreeWalker(document.body || document.documentElement, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      for (const node of nodes) {
+        if (!node.parentElement || node.parentElement.closest("#${guardId},script,style,noscript")) continue;
+        if (isAdminNote(node.nodeValue)) node.remove();
+      }
+    } finally {
+      cleaning = false;
     }
-  });
+  };
+  const start = () => {
+    clean(document);
+    const target = document.body || document.documentElement;
+    new MutationObserver(() => clean(document)).observe(target, {
+      subtree: true,
+      childList: true,
+      characterData: true
+    });
+    requestAnimationFrame(() => clean(document));
+    setTimeout(() => clean(document), 0);
+    setTimeout(() => clean(document), 250);
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
+})();</script>`;
+}
 
-  return { html: cleaned, removed };
+function injectGuard(html) {
+  const existing = new RegExp(`<script\\b[^>]*\\bid=["']${guardId}["'][^>]*>[\\s\\S]*?<\\/script>`, "gi");
+  html = html.replace(existing, "");
+  const guard = buildGuardScript();
+  const bodyOpen = /<body\b[^>]*>/i;
+  if (bodyOpen.test(html)) return html.replace(bodyOpen, (tag) => `${tag}\n${guard}`);
+  return `${guard}\n${html}`;
+}
+
+function assertClean(path, html) {
+  const withoutGuard = html.replace(
+    new RegExp(`<script\\b[^>]*\\bid=["']${guardId}["'][^>]*>[\\s\\S]*?<\\/script>`, "gi"),
+    ""
+  );
+  const pageData = withoutGuard.match(/<script\b[^>]*\bid=["']cms-page-data["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (pageData) {
+    const parsed = JSON.parse(pageData[1]);
+    const inspect = JSON.stringify(parsed);
+    if (isAdminOnlyText(inspect) || exactAdminFragments.some((fragment) => normalizeText(inspect).includes(fragment))) {
+      throw new Error(`Admin-only text remains in cms-page-data for ${relative(siteRoot, path)}.`);
+    }
+  }
+
+  const textSegments = [];
+  withoutGuard.replace(/>([^<>]+)</g, (_match, text) => {
+    if (text.trim()) textSegments.push(text);
+    return _match;
+  });
+  const offending = textSegments.find((text) => isAdminOnlyText(text));
+  if (offending) {
+    throw new Error(
+      `Admin-only text remains in ${relative(siteRoot, path)}: ${visibleText(offending).slice(0, 180)}`
+    );
+  }
 }
 
 async function listHtml(directory) {
@@ -121,28 +197,31 @@ async function listHtml(directory) {
   return paths;
 }
 
-if (!existsSync(siteRoot)) {
-  throw new Error("The built site was not found. Run this script after the site build.");
-}
+if (!existsSync(siteRoot)) throw new Error("The built site was not found. Run this script after the site build.");
 
 let filesChanged = 0;
-let elementsRemoved = 0;
+let renderedRemoved = 0;
 let runtimeFieldsRemoved = 0;
+let runtimeStringsRemoved = 0;
 
 for (const path of await listHtml(siteRoot)) {
   const original = await readFile(path, "utf8");
-  const pageDataResult = scrubCmsPageData(original);
-  const elementResult = removeMatchingElements(pageDataResult.html);
-  if (elementResult.html === original) continue;
-  await writeFile(path, elementResult.html, "utf8");
+  const pageData = scrubCmsPageData(original);
+  const elements = removeAdminElements(pageData.html);
+  const loose = removeLooseText(elements.html);
+  const output = injectGuard(loose.html);
+  assertClean(path, output);
+  if (output === original) continue;
+  await writeFile(path, output, "utf8");
   filesChanged += 1;
-  elementsRemoved += elementResult.removed;
-  runtimeFieldsRemoved += pageDataResult.removed;
+  renderedRemoved += elements.removed + loose.removed;
+  runtimeFieldsRemoved += pageData.fieldsRemoved;
+  runtimeStringsRemoved += pageData.stringsRemoved;
   console.log(
-    `Removed ${elementResult.removed} rendered admin note(s) and ${pageDataResult.removed} CMS runtime field(s) from ${relative(siteRoot, path)}.`
+    `Hardened ${relative(siteRoot, path)}: removed ${elements.removed + loose.removed} rendered note(s), ${pageData.fieldsRemoved} CMS field(s), and ${pageData.stringsRemoved} CMS string(s).`
   );
 }
 
 console.log(
-  `Removed ${elementsRemoved} rendered public admin note(s) and ${runtimeFieldsRemoved} CMS runtime field(s) from ${filesChanged} HTML file(s).`
+  `Admin-note hardening complete across ${filesChanged} public HTML file(s): ${renderedRemoved} rendered note(s), ${runtimeFieldsRemoved} CMS field(s), ${runtimeStringsRemoved} CMS string(s). Runtime re-insertion guard installed and static verification passed.`
 );
