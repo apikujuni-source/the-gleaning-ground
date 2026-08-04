@@ -63,6 +63,12 @@ replaceRequired(
   "ministry website in Copyright & Personal-Use License"
 );
 
+replaceRequired(
+  'paragraph(cmd, ch.prayer, 76, 252, 58, 10, 16, "F3", INK, 5);',
+  'paragraph(cmd, ch.prayer, 68, 252, 64, 10, 16, "F3", INK, 3);',
+  "wider Prepare Your Heart prayer text"
+);
+
 source = source
   .replaceAll("A 98-page, 90-day", "An 89-page, 90-day")
   .replaceAll("98 pages in a 7 × 10-inch", "89 pages in a 7 × 10-inch")
@@ -117,4 +123,4 @@ for (const path of [fillablePath, printPath]) {
   }
 }
 
-console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter and the ministry website on the license page.");
+console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter, the ministry website on the license page, and improved Prepare Your Heart text wrapping.");
