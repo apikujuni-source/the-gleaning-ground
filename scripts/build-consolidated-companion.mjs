@@ -69,6 +69,12 @@ replaceRequired(
   "full-width Prepare Your Heart prayer text"
 );
 
+replaceRequired(
+  'paragraph(cmd, ch.summary, 68, 475, 58, 10.5, 17, "F3", NAVY, 7);',
+  'paragraph(cmd, ch.summary, 60, 475, 72, 10.5, 17, "F3", NAVY, 3);',
+  "full-width Message in One View summary text"
+);
+
 source = source
   .replaceAll("A 98-page, 90-day", "An 89-page, 90-day")
   .replaceAll("98 pages in a 7 × 10-inch", "89 pages in a 7 × 10-inch")
@@ -123,4 +129,4 @@ for (const path of [fillablePath, printPath]) {
   }
 }
 
-console.log("Built and verified an 89-page Companion with one Personal Reflection section in each chapter, the ministry website on the license page, and full-width Prepare Your Heart prayer text.");
+console.log("Built and verified an 89-page Companion with improved Prepare Your Heart and Message in One View text wrapping.");
