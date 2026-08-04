@@ -1,0 +1,38 @@
+name: Clean Up Companion Cover Installation
+
+on:
+  push:
+    paths:
+      - .github/workflows/cleanup-companion-cover-install.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore retired cover-source fragments
+        run: |
+          git checkout c797b16e7f8344ddea4e460436a8061b5c7ca1df -- \
+            .source/divine-blueprint/companion-journal-cover/part00 \
+            .source/divine-blueprint/companion-journal-cover/part01
+
+      - name: Remove one-time workflows and commit cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f \
+            .github/workflows/install-companion-cover-v2.yml \
+            .github/workflows/cleanup-companion-cover-install.yml
+          git add \
+            .source/divine-blueprint/companion-journal-cover/part00 \
+            .source/divine-blueprint/companion-journal-cover/part01
+          git commit -m 'Clean up Companion cover installation'
+          git push
