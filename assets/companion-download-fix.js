@@ -2,6 +2,7 @@
   'use strict';
 
   var COMPANION_URL = '/companion#companion-access';
+  var NETLIFY_FORM_ENDPOINT = '/';
   var ACCESS_STORAGE_KEY = 'divineBlueprintCompanionAccess.v1';
   var ACCESS_QUERY = 'journal-access';
 
@@ -156,6 +157,18 @@
     return new URLSearchParams(new FormData(form)).toString();
   }
 
+  function submitRegistration(form) {
+    return window.fetch(NETLIFY_FORM_ENDPOINT, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'text/html,application/xhtml+xml'
+      },
+      body: encodeForm(form)
+    });
+  }
+
   function handleAccessForm() {
     var form = document.getElementById('companion-access-form');
     if (!form) return;
@@ -165,20 +178,16 @@
       setSubmitting(form, true);
       setFormStatus('Submitting your access request…', 'loading');
 
-      window.fetch(form.action || window.location.pathname, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encodeForm(form)
-      }).then(function (response) {
-        if (!response.ok) throw new Error('Submission failed');
+      submitRegistration(form).then(function (response) {
+        if (!response.ok) throw new Error('Submission failed with status ' + response.status);
         setFormStatus('Access confirmed. Your journal editions are ready below.', 'success');
         grantAccess({ scroll: true });
       }).catch(function () {
-        setFormStatus('We could not confirm access automatically. Retrying with the secure form submission…', 'error');
         setSubmitting(form, false);
-        window.setTimeout(function () {
-          form.submit();
-        }, 350);
+        setFormStatus(
+          'We could not submit your registration. Please check your connection and try again. You will remain on this page.',
+          'error'
+        );
       });
     });
   }
