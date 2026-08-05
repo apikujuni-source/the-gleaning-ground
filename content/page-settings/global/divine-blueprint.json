@@ -82,6 +82,13 @@
           "textEditable": true,
           "text": "About",
           "url": "/about"
+        },
+        {
+          "label": "Link — Church Partners",
+          "xpath": "/html/body/header/div/nav/a[9]",
+          "textEditable": true,
+          "text": "Church Partners",
+          "url": "/church-partners"
         }
       ],
       "imageFields": [
@@ -198,6 +205,13 @@
           "textEditable": true,
           "text": "Gleaning Ground",
           "url": "https://gleaningground.com"
+        },
+        {
+          "label": "Link — Church Partners",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/a[4]",
+          "textEditable": true,
+          "text": "Church Partners",
+          "url": "/church-partners"
         }
       ],
       "imageFields": [
