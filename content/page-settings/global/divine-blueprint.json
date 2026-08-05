@@ -17,6 +17,18 @@
           "xpath": "/html/body/header/div/div/button[2]",
           "mode": "text",
           "value": "☰"
+        },
+        {
+          "label": "Dropdown button — Journey",
+          "xpath": "/html/body/header/div/nav/div[1]/button",
+          "mode": "text",
+          "value": "Journey ▾"
+        },
+        {
+          "label": "Dropdown button — Resources",
+          "xpath": "/html/body/header/div/nav/div[2]/button",
+          "mode": "text",
+          "value": "Resources ▾"
         }
       ],
       "linkFields": [
@@ -35,64 +47,64 @@
           "url": "/"
         },
         {
-          "label": "Link — Start Here",
-          "xpath": "/html/body/header/div/nav/a[2]",
+          "label": "Journey dropdown — Start Here",
+          "xpath": "/html/body/header/div/nav/div[1]/div/a[1]",
           "textEditable": true,
           "text": "Start Here",
           "url": "/start-here"
         },
         {
-          "label": "Link — The Journey",
-          "xpath": "/html/body/header/div/nav/a[3]",
+          "label": "Journey dropdown — All Chapters",
+          "xpath": "/html/body/header/div/nav/div[1]/div/a[2]",
           "textEditable": true,
-          "text": "The Journey",
+          "text": "All Chapters",
           "url": "/journey"
         },
         {
-          "label": "Dropdown link — Bible Studies",
-          "xpath": "/html/body/header/div/nav/div[1]/div/a[1]",
+          "label": "Resources dropdown — Bible Studies",
+          "xpath": "/html/body/header/div/nav/div[2]/div/a[1]",
           "textEditable": true,
           "text": "Bible Studies",
           "url": "/bible-studies"
         },
         {
-          "label": "Dropdown link — Teachings",
-          "xpath": "/html/body/header/div/nav/div[1]/div/a[2]",
+          "label": "Resources dropdown — Teachings",
+          "xpath": "/html/body/header/div/nav/div[2]/div/a[2]",
           "textEditable": true,
           "text": "Teachings",
           "url": "/teachings"
         },
         {
-          "label": "Dropdown link — Podcast",
-          "xpath": "/html/body/header/div/nav/div[1]/div/a[3]",
+          "label": "Resources dropdown — Podcast",
+          "xpath": "/html/body/header/div/nav/div[2]/div/a[3]",
           "textEditable": true,
           "text": "Podcast",
           "url": "/podcast"
         },
         {
           "label": "Link — The Companion",
-          "xpath": "/html/body/header/div/nav/a[4]",
+          "xpath": "/html/body/header/div/nav/a[2]",
           "textEditable": true,
           "text": "The Companion",
           "url": "/companion"
         },
         {
           "label": "Link — About",
-          "xpath": "/html/body/header/div/nav/a[5]",
+          "xpath": "/html/body/header/div/nav/a[3]",
           "textEditable": true,
           "text": "About",
           "url": "/about"
         },
         {
           "label": "Link — Church Partners",
-          "xpath": "/html/body/header/div/nav/a[6]",
+          "xpath": "/html/body/header/div/nav/a[4]",
           "textEditable": true,
           "text": "Church Partners",
           "url": "/church-partners"
         },
         {
           "label": "Link — Give a Copy",
-          "xpath": "/html/body/header/div/nav/a[7]",
+          "xpath": "/html/body/header/div/nav/a[5]",
           "textEditable": true,
           "text": "Give a Copy",
           "url": "/give-a-copy"
