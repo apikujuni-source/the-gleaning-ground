@@ -10,29 +10,37 @@ if (!fs.existsSync(siteDir)) {
 const anchorPattern = /<a\b[^>]*>[\s\S]*?<\/a>/gi;
 const textOf = (anchor) => anchor.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const hrefOf = (anchor) => anchor.match(/\bhref=["']([^"']+)["']/i)?.[1] || '';
-const isPartnerAnchor = (anchor) => {
-  const href = hrefOf(anchor).replace(/\/+$/, '');
-  return href === '/church-partners' || /church partners/i.test(textOf(anchor));
+const cleanHref = (href) => {
+  let value = String(href || '').trim().replace(/^https?:\/\/[^/]+/i, '');
+  value = value.replace(/[?#].*$/, '').replace(/index\.html$/i, '').replace(/\.html$/i, '');
+  value = value.replace(/\/+$/, '');
+  if (!value) return '/';
+  return value.startsWith('/') ? value : `/${value.replace(/^(?:\.\.\/|\.\/)+/, '')}`;
 };
+const isPartnerAnchor = (anchor) => cleanHref(hrefOf(anchor)) === '/church-partners' || /^Church Partners$/i.test(textOf(anchor));
+const isGiveAnchor = (anchor) => cleanHref(hrefOf(anchor)) === '/give-a-copy' || /^(Give a Copy|Sponsor Copies)$/i.test(textOf(anchor));
 
-function normalizeHeader(html, isPartnerPage) {
+function removeAnchorAndAdjacentBreaks(body, predicate) {
+  return body
+    .replace(/\s*<br\s*\/?>\s*(<a\b[^>]*>[\s\S]*?<\/a>)/gi, (match, anchor) => predicate(anchor) ? '' : match)
+    .replace(/(<a\b[^>]*>[\s\S]*?<\/a>)\s*<br\s*\/?>/gi, (match, anchor) => predicate(anchor) ? '' : match)
+    .replace(anchorPattern, (anchor) => predicate(anchor) ? '' : anchor);
+}
+
+function normalizeHeader(html, isPartnerPage, isGivePage) {
   const navPattern = /(<nav\b[^>]*class=["'][^"']*nav-links[^"']*["'][^>]*>)([\s\S]*?)(<\/nav>)/i;
 
   return html.replace(navPattern, (_match, open, body, close) => {
-    const anchors = body.match(anchorPattern) || [];
-    const existingPartner = anchors.find(isPartnerAnchor);
-    const current = isPartnerPage || /aria-current=["']page["']/i.test(existingPartner || '');
+    body = body.replace(anchorPattern, (anchor) => (isPartnerAnchor(anchor) || isGiveAnchor(anchor)) ? '' : anchor);
 
-    // Remove every existing Church Partners item first so its position is deterministic.
-    body = body.replace(anchorPattern, (anchor) => isPartnerAnchor(anchor) ? '' : anchor);
-
-    const partner = `<a href="/church-partners"${current ? ' aria-current="page"' : ''}>Church Partners</a>`;
+    const partner = `<a href="/church-partners"${isPartnerPage ? ' aria-current="page"' : ''}>Church Partners</a>`;
+    const give = `<a href="/give-a-copy"${isGivePage ? ' aria-current="page"' : ''}>Give a Copy</a>`;
     const aboutPattern = /(<a\b[^>]*>\s*About\s*<\/a>)/i;
 
     if (aboutPattern.test(body)) {
-      body = body.replace(aboutPattern, `$1\n${partner}`);
+      body = body.replace(aboutPattern, `$1\n${partner}\n${give}`);
     } else {
-      body = `${body}\n${partner}`;
+      body = `${body}\n${partner}\n${give}`;
     }
 
     return `${open}${body}${close}`;
@@ -43,19 +51,16 @@ function normalizeFooter(html) {
   const connectPattern = /(<div[^>]*>\s*<h3>\s*Connect\s*<\/h3>)([\s\S]*?)(<\/div>)/i;
 
   return html.replace(connectPattern, (_match, open, body, close) => {
-    // Remove an existing partner link and one adjacent line break.
-    body = body
-      .replace(/\s*<br\s*\/?>\s*(<a\b[^>]*>[\s\S]*?<\/a>)/gi, (match, anchor) => isPartnerAnchor(anchor) ? '' : match)
-      .replace(/(<a\b[^>]*>[\s\S]*?<\/a>)\s*<br\s*\/?>/gi, (match, anchor) => isPartnerAnchor(anchor) ? '' : match)
-      .replace(anchorPattern, (anchor) => isPartnerAnchor(anchor) ? '' : anchor);
+    body = removeAnchorAndAdjacentBreaks(body, (anchor) => isPartnerAnchor(anchor) || isGiveAnchor(anchor));
 
     const partner = '<a href="/church-partners" data-church-partner-footer-link>Church Partners</a>';
+    const give = '<a href="/give-a-copy" data-give-a-copy-footer-link>Give a Copy</a>';
     const gleaningPattern = /(<a\b[^>]*>\s*Gleaning Ground\s*<\/a>)/i;
 
     if (gleaningPattern.test(body)) {
-      body = body.replace(gleaningPattern, `$1<br>${partner}`);
+      body = body.replace(gleaningPattern, `$1<br>${partner}<br>${give}`);
     } else {
-      body = `${body}<br>${partner}`;
+      body = `${body}<br>${partner}<br>${give}`;
     }
 
     return `${open}${body}${close}`;
@@ -65,35 +70,31 @@ function normalizeFooter(html) {
 function validate(filePath, html) {
   const nav = html.match(/<nav\b[^>]*class=["'][^"']*nav-links[^"']*["'][^>]*>([\s\S]*?)<\/nav>/i)?.[1] || '';
   const navAnchors = nav.match(anchorPattern) || [];
-  const aboutIndexes = navAnchors
-    .map((anchor, index) => /^About$/i.test(textOf(anchor)) ? index : -1)
-    .filter((index) => index >= 0);
-  const partnerIndexes = navAnchors
-    .map((anchor, index) => hrefOf(anchor).replace(/\/+$/, '') === '/church-partners' ? index : -1)
-    .filter((index) => index >= 0);
+  const indexes = {
+    about: navAnchors.map((a, i) => /^About$/i.test(textOf(a)) ? i : -1).filter((i) => i >= 0),
+    partner: navAnchors.map((a, i) => cleanHref(hrefOf(a)) === '/church-partners' ? i : -1).filter((i) => i >= 0),
+    give: navAnchors.map((a, i) => cleanHref(hrefOf(a)) === '/give-a-copy' ? i : -1).filter((i) => i >= 0)
+  };
 
-  if (aboutIndexes.length !== 1) {
-    throw new Error(`${filePath}: expected exactly one About link, found ${aboutIndexes.length}`);
+  for (const [name, values] of Object.entries(indexes)) {
+    if (values.length !== 1) throw new Error(`${filePath}: expected exactly one ${name} navigation link, found ${values.length}`);
   }
-  if (partnerIndexes.length !== 1) {
-    throw new Error(`${filePath}: expected exactly one Church Partners link, found ${partnerIndexes.length}`);
-  }
-  if (partnerIndexes[0] <= aboutIndexes[0]) {
-    throw new Error(`${filePath}: Church Partners must follow About so CMS positional selectors remain stable`);
+  if (!(indexes.about[0] < indexes.partner[0] && indexes.partner[0] < indexes.give[0])) {
+    throw new Error(`${filePath}: CMS-safe header order must be About, Church Partners, Give a Copy`);
   }
 
   const connect = html.match(/<div[^>]*>\s*<h3>\s*Connect\s*<\/h3>([\s\S]*?)<\/div>/i)?.[1] || '';
   const footerAnchors = connect.match(anchorPattern) || [];
-  const gleaningIndex = footerAnchors.findIndex((anchor) => /^Gleaning Ground$/i.test(textOf(anchor)));
-  const footerPartnerIndexes = footerAnchors
-    .map((anchor, index) => hrefOf(anchor).replace(/\/+$/, '') === '/church-partners' ? index : -1)
-    .filter((index) => index >= 0);
-
-  if (footerPartnerIndexes.length !== 1) {
-    throw new Error(`${filePath}: expected exactly one Church Partners footer link, found ${footerPartnerIndexes.length}`);
+  const footerIndexes = {
+    gleaning: footerAnchors.findIndex((anchor) => /^Gleaning Ground$/i.test(textOf(anchor))),
+    partner: footerAnchors.map((a, i) => cleanHref(hrefOf(a)) === '/church-partners' ? i : -1).filter((i) => i >= 0),
+    give: footerAnchors.map((a, i) => cleanHref(hrefOf(a)) === '/give-a-copy' ? i : -1).filter((i) => i >= 0)
+  };
+  if (footerIndexes.partner.length !== 1 || footerIndexes.give.length !== 1) {
+    throw new Error(`${filePath}: expected one Church Partners and one Give a Copy footer link`);
   }
-  if (gleaningIndex >= 0 && footerPartnerIndexes[0] <= gleaningIndex) {
-    throw new Error(`${filePath}: Church Partners footer link must follow Gleaning Ground`);
+  if (footerIndexes.gleaning >= 0 && !(footerIndexes.gleaning < footerIndexes.partner[0] && footerIndexes.partner[0] < footerIndexes.give[0])) {
+    throw new Error(`${filePath}: CMS-safe footer order must be Gleaning Ground, Church Partners, Give a Copy`);
   }
 }
 
@@ -108,7 +109,8 @@ function walk(dir) {
 
     let html = fs.readFileSync(fullPath, 'utf8');
     const isPartnerPage = /(?:^|\/)church-partners(?:\/index)?\.html$/i.test(fullPath);
-    html = normalizeHeader(html, isPartnerPage);
+    const isGivePage = /(?:^|\/)give-a-copy(?:\/index)?\.html$/i.test(fullPath);
+    html = normalizeHeader(html, isPartnerPage, isGivePage);
     html = normalizeFooter(html);
     validate(fullPath, html);
     fs.writeFileSync(fullPath, html);
