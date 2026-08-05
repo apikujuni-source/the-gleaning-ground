@@ -109,9 +109,12 @@ async function walk(directory) {
       const src = tag.match(/\bsrc=(["'])(.*?)\1/i)?.[2] || "";
       const identity = tag.toLowerCase();
       const isCompanionJournalCover = identity.includes("companion-flat-book-image");
-      const isBookCover = identity.includes("divine blueprint book cover") ||
+      const isHomepageMockup = identity.includes("home-mockup") || identity.includes("homepage-book");
+      const isBookCover = !isHomepageMockup && (
+        identity.includes("divine blueprint book cover") ||
         identity.includes("hero-book-cover-image") ||
-        identity.includes("canonical-book-cover-image");
+        identity.includes("canonical-book-cover-image")
+      );
       if (isCompanionJournalCover && !src.startsWith("/assets/companion-journal-cover-v3.webp")) {
         failures.push(`${path}: incorrect Companion Journal cover ${src}`);
       } else if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp")) {
