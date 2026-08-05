@@ -49,46 +49,53 @@
           "url": "/journey"
         },
         {
-          "label": "Link — Bible Studies",
-          "xpath": "/html/body/header/div/nav/a[4]",
+          "label": "Dropdown link — Bible Studies",
+          "xpath": "/html/body/header/div/nav/div[1]/div/a[1]",
           "textEditable": true,
           "text": "Bible Studies",
           "url": "/bible-studies"
         },
         {
-          "label": "Link — Teachings",
-          "xpath": "/html/body/header/div/nav/a[5]",
+          "label": "Dropdown link — Teachings",
+          "xpath": "/html/body/header/div/nav/div[1]/div/a[2]",
           "textEditable": true,
           "text": "Teachings",
           "url": "/teachings"
         },
         {
-          "label": "Link — Podcast",
-          "xpath": "/html/body/header/div/nav/a[6]",
+          "label": "Dropdown link — Podcast",
+          "xpath": "/html/body/header/div/nav/div[1]/div/a[3]",
           "textEditable": true,
           "text": "Podcast",
           "url": "/podcast"
         },
         {
           "label": "Link — The Companion",
-          "xpath": "/html/body/header/div/nav/a[7]",
+          "xpath": "/html/body/header/div/nav/a[4]",
           "textEditable": true,
           "text": "The Companion",
           "url": "/companion"
         },
         {
           "label": "Link — About",
-          "xpath": "/html/body/header/div/nav/a[8]",
+          "xpath": "/html/body/header/div/nav/a[5]",
           "textEditable": true,
           "text": "About",
           "url": "/about"
         },
         {
           "label": "Link — Church Partners",
-          "xpath": "/html/body/header/div/nav/a[9]",
+          "xpath": "/html/body/header/div/nav/a[6]",
           "textEditable": true,
           "text": "Church Partners",
           "url": "/church-partners"
+        },
+        {
+          "label": "Link — Give a Copy",
+          "xpath": "/html/body/header/div/nav/a[7]",
+          "textEditable": true,
+          "text": "Give a Copy",
+          "url": "/give-a-copy"
         }
       ],
       "imageFields": [
@@ -212,6 +219,13 @@
           "textEditable": true,
           "text": "Church Partners",
           "url": "/church-partners"
+        },
+        {
+          "label": "Link — Give a Copy",
+          "xpath": "/html/body/footer/div/div[1]/div[4]/a[5]",
+          "textEditable": true,
+          "text": "Give a Copy",
+          "url": "/give-a-copy"
         }
       ],
       "imageFields": [
