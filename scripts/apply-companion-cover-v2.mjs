@@ -1,14 +1,18 @@
-import { copyFile, readFile, stat, writeFile } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
-const sourceCover = ".source/divine-blueprint/companion-journal-cover-v3.webp";
+const sourceDirectory = ".source/divine-blueprint/companion-journal-cover-v3-base64";
+const sourceChunkPaths = ["00.txt", "01.txt", "02.txt", "03.txt"].map(
+  (name) => join(sourceDirectory, name)
+);
 const outputCover = join(siteRoot, "assets", "companion-journal-cover-v3.webp");
 const settingsPath = "content/page-settings/divine/companion.json";
 const publicCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const coverWidth = 512;
 const coverHeight = 768;
+const expectedBase64Length = 58068;
 const expectedFileSize = 43550;
 const expectedSha256 = "751330a42b1b27a86b31a4cd28cf4d0f5c3aed2e4acc1a43612949048e12196f";
 const pagePaths = [
@@ -16,7 +20,17 @@ const pagePaths = [
   join(siteRoot, "companion", "index.html")
 ];
 
-const source = await readFile(sourceCover);
+const encodedChunks = await Promise.all(
+  sourceChunkPaths.map(async (path) => (await readFile(path, "utf8")).trim())
+);
+const encoded = encodedChunks.join("");
+if (encoded.length !== expectedBase64Length) {
+  throw new Error(
+    `Unexpected Companion cover source length: ${encoded.length}; expected ${expectedBase64Length}.`
+  );
+}
+
+const source = Buffer.from(encoded, "base64");
 const signature = source.subarray(0, 12).toString("ascii");
 const sha256 = createHash("sha256").update(source).digest("hex");
 
@@ -30,7 +44,7 @@ if (sha256 !== expectedSha256) {
   throw new Error(`Unexpected Companion cover checksum: ${sha256}`);
 }
 
-await copyFile(sourceCover, outputCover);
+await writeFile(outputCover, source);
 const installed = await stat(outputCover);
 if (installed.size !== expectedFileSize) {
   throw new Error(`Installed Companion cover size mismatch: ${installed.size}.`);
@@ -101,8 +115,8 @@ await writeFile(
   join(siteRoot, "companion-cover-status.txt"),
   [
     "COMPANION_COVER=APPROVED_IVORY_GOLD_JOURNAL",
-    "VERSION=2026-08-05-3",
-    `SOURCE=${sourceCover}`,
+    "VERSION=2026-08-05-4",
+    `SOURCE=${sourceDirectory}`,
     `PUBLIC_ASSET=${publicCoverPath}`,
     `DIMENSIONS=${coverWidth}x${coverHeight}`,
     `SHA256=${expectedSha256}`
