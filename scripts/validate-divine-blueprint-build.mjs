@@ -1,8 +1,10 @@
 import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 const root = "_site/divine-blueprint-site";
+const styleUrl = "/assets/styles.css?v=20260805-responsive-type-v1";
+const typographyVersion = "20260805-responsive-type-v1";
 const companionCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const requiredFiles = [
   "companion.html",
@@ -12,22 +14,24 @@ const requiredFiles = [
   "teachings/index.html",
   "assets/divine-blueprint-cover.webp",
   "assets/companion-journal-cover-v3.webp",
+  "assets/typography-audit.json",
   "assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf",
   "assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
 ];
 
-for (const relative of requiredFiles) {
-  const path = join(root, relative);
+for (const relativePath of requiredFiles) {
+  const path = join(root, relativePath);
   if (!existsSync(path)) throw new Error(`Missing required build output: ${path}`);
 }
 
 const companionPath = join(root, "companion/index.html");
 const companion = await readFile(companionPath, "utf8");
 const styles = await readFile(join(root, "assets/styles.css"), "utf8");
+const typographyAudit = JSON.parse(await readFile(join(root, "assets/typography-audit.json"), "utf8"));
 
 const requiredCompanionFragments = [
   '<base href="/">',
-  'href="/assets/styles.css?v=20260723-cover-final"',
+  `href="${styleUrl}"`,
   'More Than a<br>Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
@@ -87,7 +91,16 @@ if (/<[^>]*data-modal-open[^>]*>[^<]*Get the Companion/i.test(companion)) {
   throw new Error("Get the Companion is still connected to the store modal.");
 }
 
+if (!styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: START") || !styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: END")) {
+  throw new Error("The site-wide responsive typography layer is missing.");
+}
+if (typographyAudit.version !== typographyVersion || !Array.isArray(typographyAudit.pages)) {
+  throw new Error("The typography audit report is missing or has the wrong version.");
+}
+
 const failures = [];
+let htmlPageCount = 0;
+
 async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
@@ -97,19 +110,29 @@ async function walk(directory) {
     }
     if (!entry.isFile() || !entry.name.endsWith(".html")) continue;
 
+    htmlPageCount += 1;
+    const pagePath = relative(root, path).replaceAll("\\", "/");
+    const isHomepage = pagePath === "index.html";
     const html = await readFile(path, "utf8");
+
     if (/href=["']\/?divine-blueprint-site\//i.test(html)) {
       failures.push(`${path}: exposes internal folder in a public link`);
     }
-    if (!html.includes('href="/assets/styles.css?v=20260723-cover-final"')) {
-      failures.push(`${path}: stylesheet reference is not cache-busted`);
+    if (!html.includes(`href="${styleUrl}"`)) {
+      failures.push(`${path}: stylesheet reference is not cache-busted for responsive typography`);
+    }
+    if (!html.includes(`data-typography-audit="${typographyVersion}"`)) {
+      failures.push(`${path}: typography audit marker is missing`);
+    }
+    if (!/<meta\b[^>]*name=(['"])viewport\1/i.test(html)) {
+      failures.push(`${path}: responsive viewport metadata is missing`);
     }
 
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
       const src = tag.match(/\bsrc=(["'])(.*?)\1/i)?.[2] || "";
       const identity = tag.toLowerCase();
       const isCompanionJournalCover = identity.includes("companion-flat-book-image");
-      const isHomepageMockup = identity.includes("home-mockup") || identity.includes("homepage-book");
+      const isHomepageMockup = isHomepage || identity.includes("home-mockup") || identity.includes("homepage-book");
       const isBookCover = !isHomepageMockup && (
         identity.includes("divine blueprint book cover") ||
         identity.includes("hero-book-cover-image") ||
@@ -125,5 +148,10 @@ async function walk(directory) {
 }
 
 await walk(root);
+
+if (typographyAudit.pageCount !== htmlPageCount || typographyAudit.pages.length !== htmlPageCount) {
+  failures.push(`Typography audit covers ${typographyAudit.pages.length} pages, but the build contains ${htmlPageCount} HTML pages.`);
+}
+
 if (failures.length) throw new Error(failures.join("\n"));
-console.log("Validated the approved Companion Journal cover, downloads, and clean Divine Blueprint routes.");
+console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages, the approved Companion Journal cover, and clean public routes.`);
