@@ -3,6 +3,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = "_site/divine-blueprint-site";
+const companionCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const requiredFiles = [
   "companion.html",
   "companion/index.html",
@@ -10,7 +11,7 @@ const requiredFiles = [
   "bible-studies/index.html",
   "teachings/index.html",
   "assets/divine-blueprint-cover.webp",
-  "assets/companion-journal-cover.webp",
+  "assets/companion-journal-cover-v3.webp",
   "assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf",
   "assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
 ];
@@ -30,8 +31,7 @@ const requiredCompanionFragments = [
   'More Than a<br>Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
-  'src="/assets/companion-journal-cover.webp?v=20260722-journal-cover"',
-  'width="512" height="768"',
+  `src="${companionCoverPath}"`,
   'href="#download-editions">Get the Companion</a>',
   'Download Fillable PDF',
   'Download Print Edition',
@@ -44,6 +44,14 @@ const requiredCompanionFragments = [
 
 for (const fragment of requiredCompanionFragments) {
   if (!companion.includes(fragment)) throw new Error(`Companion page is missing: ${fragment}`);
+}
+
+const coverTag = companion.match(
+  /<img\b[^>]*class=["'][^"']*\bcompanion-flat-book-image\b[^"']*["'][^>]*>/i
+)?.[0] || "";
+if (!coverTag) throw new Error("Companion page is missing the flat cover image tag.");
+if (!/\bwidth=["']512["']/.test(coverTag) || !/\bheight=["']768["']/.test(coverTag)) {
+  throw new Error(`Companion cover dimensions are incorrect: ${coverTag}`);
 }
 
 const singleCoverCount = (companion.match(/class="companion-flat-book-image"/g) || []).length;
@@ -104,7 +112,7 @@ async function walk(directory) {
       const isBookCover = identity.includes("divine blueprint book cover") ||
         identity.includes("hero-book-cover-image") ||
         identity.includes("canonical-book-cover-image");
-      if (isCompanionJournalCover && !src.startsWith("/assets/companion-journal-cover.webp")) {
+      if (isCompanionJournalCover && !src.startsWith("/assets/companion-journal-cover-v3.webp")) {
         failures.push(`${path}: incorrect Companion Journal cover ${src}`);
       } else if (isBookCover && !src.startsWith("/assets/divine-blueprint-cover.webp")) {
         failures.push(`${path}: non-canonical book cover ${src}`);
@@ -115,4 +123,4 @@ async function walk(directory) {
 
 await walk(root);
 if (failures.length) throw new Error(failures.join("\n"));
-console.log("Validated the Companion Journal cover, downloads, and clean Divine Blueprint routes.");
+console.log("Validated the approved Companion Journal cover, downloads, and clean Divine Blueprint routes.");
