@@ -23,57 +23,94 @@ const normalizeHref = (href) => {
   return value.startsWith('/') ? value : `/${value.replace(/^(?:\.\.\/|\.\/)+/, '')}`;
 };
 
+const journeyRoutes = new Map([
+  ['/start-here', 'Start Here'],
+  ['/journey', 'All Chapters']
+]);
+
 const resourceRoutes = new Map([
   ['/bible-studies', 'Bible Studies'],
   ['/teachings', 'Teachings'],
   ['/podcast', 'Podcast']
 ]);
 
-function resourceKey(anchor) {
+function routeKey(anchor, routes) {
   const route = normalizeHref(hrefOf(anchor));
-  if (resourceRoutes.has(route)) return route;
+  if (routes.has(route)) return route;
   const text = textOf(anchor).toLowerCase();
-  for (const [candidate, label] of resourceRoutes) {
+  for (const [candidate, label] of routes) {
     if (text === label.toLowerCase()) return candidate;
   }
+  if (routes === journeyRoutes && text === 'the journey') return '/journey';
   return '';
 }
 
-function buildResourceAnchor(route, source = '') {
-  const label = resourceRoutes.get(route);
+function buildAnchor(route, routes, source = '') {
+  const label = routes.get(route);
   const current = /\saria-current=["']page["']/i.test(source);
   return `<a href="${route}"${current ? ' aria-current="page"' : ''}>${label}</a>`;
+}
+
+function removeDropdown(body, attribute) {
+  const pattern = new RegExp(`<div\\b[^>]*${attribute}[^>]*>[\\s\\S]*?<\\/div>\\s*<\\/div>`, 'gi');
+  return body.replace(pattern, '');
+}
+
+function buildDropdown({ attribute, label, routes, found }) {
+  const links = [...routes.keys()]
+    .map((route) => buildAnchor(route, routes, found.get(route) || ''))
+    .join('\n');
+  const hasCurrent = [...found.values()].some((anchor) => /\saria-current=["']page["']/i.test(anchor));
+  return `<div class="nav-dropdown${hasCurrent ? ' is-current' : ''}" ${attribute} data-nav-dropdown>
+<button class="nav-dropdown-toggle" type="button" aria-expanded="false" aria-haspopup="true">${label} <span aria-hidden="true">▾</span></button>
+<div class="nav-dropdown-menu" role="group" aria-label="${label}">
+${links}
+</div>
+</div>`;
 }
 
 function condenseNavigation(html) {
   const navPattern = /(<nav\b[^>]*class=["'][^"']*nav-links[^"']*["'][^>]*>)([\s\S]*?)(<\/nav>)/i;
 
   return html.replace(navPattern, (_match, open, body, close) => {
-    const found = new Map();
+    const journeyFound = new Map();
+    const resourceFound = new Map();
     const allAnchors = body.match(anchorPattern) || [];
+
     for (const anchor of allAnchors) {
-      const key = resourceKey(anchor);
-      if (key && !found.has(key)) found.set(key, anchor);
+      const journey = routeKey(anchor, journeyRoutes);
+      const resource = routeKey(anchor, resourceRoutes);
+      if (journey && !journeyFound.has(journey)) journeyFound.set(journey, anchor);
+      if (resource && !resourceFound.has(resource)) resourceFound.set(resource, anchor);
     }
 
-    body = body.replace(/<div\b[^>]*data-resource-menu[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '');
-    body = body.replace(anchorPattern, (anchor) => resourceKey(anchor) ? '' : anchor);
+    body = removeDropdown(body, 'data-journey-menu');
+    body = removeDropdown(body, 'data-resource-menu');
+    body = body.replace(anchorPattern, (anchor) => {
+      if (routeKey(anchor, journeyRoutes) || routeKey(anchor, resourceRoutes)) return '';
+      return anchor;
+    });
     body = body.replace(/\n{2,}/g, '\n').trim();
 
-    const resourceLinks = [...resourceRoutes.keys()]
-      .map((route) => buildResourceAnchor(route, found.get(route) || ''))
-      .join('\n');
-    const hasCurrent = [...found.values()].some((anchor) => /\saria-current=["']page["']/i.test(anchor));
-    const dropdown = `<div class="nav-dropdown${hasCurrent ? ' is-current' : ''}" data-resource-menu>
-<button class="nav-dropdown-toggle" type="button" aria-expanded="false" aria-haspopup="true">Resources <span aria-hidden="true">▾</span></button>
-<div class="nav-dropdown-menu" role="group" aria-label="Resources">
-${resourceLinks}
-</div>
-</div>`;
+    const journeyDropdown = buildDropdown({
+      attribute: 'data-journey-menu',
+      label: 'Journey',
+      routes: journeyRoutes,
+      found: journeyFound
+    });
+    const resourceDropdown = buildDropdown({
+      attribute: 'data-resource-menu',
+      label: 'Resources',
+      routes: resourceRoutes,
+      found: resourceFound
+    });
 
-    const journeyPattern = /(<a\b[^>]*href=["'](?:\/|(?:\.\.\/)*|\.\/)?journey(?:\.html)?["'][^>]*>[\s\S]*?<\/a>)/i;
-    if (journeyPattern.test(body)) body = body.replace(journeyPattern, `$1\n${dropdown}`);
-    else body = `${body}\n${dropdown}`;
+    const homePattern = /(<a\b[^>]*href=["'](?:\/|index\.html)["'][^>]*>\s*Home\s*<\/a>)/i;
+    if (homePattern.test(body)) {
+      body = body.replace(homePattern, `$1\n${journeyDropdown}\n${resourceDropdown}`);
+    } else {
+      body = `${journeyDropdown}\n${resourceDropdown}\n${body}`;
+    }
 
     return `${open}${body}${close}`;
   });
@@ -81,24 +118,32 @@ ${resourceLinks}
 
 function validate(filePath, html) {
   const nav = html.match(/<nav\b[^>]*class=["'][^"']*nav-links[^"']*["'][^>]*>([\s\S]*?)<\/nav>/i)?.[1] || '';
-  const dropdowns = nav.match(/data-resource-menu/gi) || [];
-  if (dropdowns.length !== 1) throw new Error(`${filePath}: expected one Resources dropdown, found ${dropdowns.length}`);
+  const journeyDropdowns = nav.match(/data-journey-menu/gi) || [];
+  const resourceDropdowns = nav.match(/data-resource-menu/gi) || [];
+  if (journeyDropdowns.length !== 1) throw new Error(`${filePath}: expected one Journey dropdown, found ${journeyDropdowns.length}`);
+  if (resourceDropdowns.length !== 1) throw new Error(`${filePath}: expected one Resources dropdown, found ${resourceDropdowns.length}`);
 
-  const navWithoutDropdown = nav.replace(/<div\b[^>]*data-resource-menu[^>]*>[\s\S]*?<\/div>\s*<\/div>/i, '');
-  const directLegacy = (navWithoutDropdown.match(anchorPattern) || []).filter((anchor) => resourceKey(anchor));
-  for (const route of resourceRoutes.keys()) {
-    const count = (nav.match(anchorPattern) || []).filter((anchor) => resourceKey(anchor) === route).length;
-    if (count !== 1) throw new Error(`${filePath}: expected one ${route} dropdown link, found ${count}`);
-  }
-  if (directLegacy.length) throw new Error(`${filePath}: standalone resource links remain outside the dropdown`);
-
-  const directTopLevel = navWithoutDropdown.match(anchorPattern) || [];
-  const labels = directTopLevel.map(textOf);
-  const expected = ['Home', 'Start Here', 'The Journey', 'The Companion', 'About', 'Church Partners', 'Give a Copy'];
-  for (let index = 0; index < expected.length; index += 1) {
-    if (labels[index] !== expected[index]) {
-      throw new Error(`${filePath}: unexpected top-level navigation order: ${labels.join(' | ')}`);
+  for (const [routes, name] of [[journeyRoutes, 'Journey'], [resourceRoutes, 'Resources']]) {
+    for (const route of routes.keys()) {
+      const count = (nav.match(anchorPattern) || []).filter((anchor) => routeKey(anchor, routes) === route).length;
+      if (count !== 1) throw new Error(`${filePath}: expected one ${route} link in ${name}, found ${count}`);
     }
+  }
+
+  let topLevel = removeDropdown(nav, 'data-journey-menu');
+  topLevel = removeDropdown(topLevel, 'data-resource-menu');
+  const labels = (topLevel.match(anchorPattern) || []).map(textOf);
+  const expected = ['Home', 'The Companion', 'About', 'Church Partners', 'Give a Copy'];
+  if (labels.length !== expected.length || labels.some((label, index) => label !== expected[index])) {
+    throw new Error(`${filePath}: unexpected top-level navigation order: ${labels.join(' | ')}`);
+  }
+
+  const homeIndex = nav.indexOf('>Home<');
+  const journeyIndex = nav.indexOf('data-journey-menu');
+  const resourceIndex = nav.indexOf('data-resource-menu');
+  const companionIndex = nav.indexOf('>The Companion<');
+  if (!(homeIndex >= 0 && homeIndex < journeyIndex && journeyIndex < resourceIndex && resourceIndex < companionIndex)) {
+    throw new Error(`${filePath}: expected Home, Journey, Resources, The Companion order`);
   }
 }
 
@@ -138,7 +183,7 @@ ${styleMarker}
 
 fs.mkdirSync(jsDir, { recursive: true });
 const runtime = `(() => {
-  const menus = [...document.querySelectorAll('[data-resource-menu]')];
+  const menus = [...document.querySelectorAll('[data-nav-dropdown]')];
   if (!menus.length) return;
 
   const close = (menu) => {
@@ -178,4 +223,4 @@ const runtime = `(() => {
 `;
 fs.writeFileSync(jsPath, runtime);
 
-console.log(`Resources dropdown installed across ${updated} Divine Blueprint page(s).`);
+console.log(`Journey and Resources dropdowns installed across ${updated} Divine Blueprint page(s).`);
