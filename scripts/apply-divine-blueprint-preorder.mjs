@@ -10,7 +10,7 @@ if (config.mode !== "preorder") {
 }
 
 const whatsappText = encodeURIComponent(
-  `Hello, I would like to preorder The Divine Blueprint paperback at the special preorder price of ${config.paperbackPriceNigeria} (original price ${config.paperbackOriginalPriceNigeria}). Please send me the payment, delivery, and expected availability details. The digital Companion Journal is included with my copy.`
+  `Hello, I would like to preorder The Divine Blueprint paperback at the special preorder price of ${config.paperbackPriceNigeria} (planned regular price ${config.paperbackRegularPriceNigeria}). Please send me the payment, delivery, and expected availability details. The digital Companion Journal is included with my copy.`
 );
 const primaryWhatsappUrl = `https://wa.me/${config.whatsappPrimary}?text=${whatsappText}`;
 const alternateWhatsappUrl = `https://wa.me/${config.whatsappAlternate}?text=${whatsappText}`;
@@ -24,18 +24,15 @@ ${styleMarker}
 .book-preorder-original{display:flex;align-items:baseline;gap:8px;color:#737b83;font-size:.86rem;font-weight:700}
 .book-preorder-original del{color:#8a3b32;font-size:1.05rem;text-decoration-thickness:2px}
 .book-preorder-save{display:inline-flex;width:max-content;padding:5px 8px;border-radius:7px;background:#e4f2e8;color:#22623f;font-size:.78rem;font-weight:900}
-.book-preorder-future-price{display:block;margin-top:2px;color:#68727c;font-size:.76rem;line-height:1.45}
-.book-preorder-future-price strong{color:#0e2d4d}
 [data-book-purchase-open]{position:relative}
 </style>`;
 
-function priceOffer(originalPrice, preorderPrice, savings, futureNote = "") {
+function priceOffer(regularPrice, preorderPrice, savings) {
   return `<div class="book-preorder-offer">
           <span class="book-preorder-badge">Limited preorder price</span>
-          <div class="book-preorder-original"><span>Original price</span><del>${originalPrice}</del></div>
+          <div class="book-preorder-original"><span>Planned regular price</span><del>${regularPrice}</del></div>
           <div class="book-purchase-price">${preorderPrice}</div>
           <strong class="book-preorder-save">${savings}</strong>
-          ${futureNote}
         </div>`;
 }
 
@@ -68,29 +65,25 @@ function applyPreorder(html) {
 
   updated = updated.replace(
     `<div class="book-purchase-price">${config.paperbackPriceUs}</div>`,
-    priceOffer(config.paperbackOriginalPriceUs, config.paperbackPriceUs, config.paperbackSavingsUs)
+    priceOffer(config.paperbackRegularPriceUs, config.paperbackPriceUs, config.paperbackSavingsUs)
   );
 
   updated = updated.replace(
     `<div class="book-purchase-price">${config.kindleLaunchPrice} <small>launch price</small></div>`,
-    priceOffer(
-      config.kindleOriginalPrice,
-      config.kindleLaunchPrice,
-      config.kindleSavings,
-      `<small class="book-preorder-future-price">Planned regular price listed for later: <strong>${config.kindleRegularPrice}</strong>.</small>`
-    )
+    priceOffer(config.kindleRegularPrice, config.kindleLaunchPrice, config.kindleSavings)
   );
 
   updated = updated.replace(
     `<div class="book-purchase-price">${config.paperbackPriceNigeria}</div>`,
-    priceOffer(config.paperbackOriginalPriceNigeria, config.paperbackPriceNigeria, config.paperbackSavingsNigeria)
+    priceOffer(config.paperbackRegularPriceNigeria, config.paperbackPriceNigeria, config.paperbackSavingsNigeria)
   );
 
   updated = updated
     .replace("Order the printed book through Amazon. Journal access is included.", "Preorder the printed book through Amazon at the reduced preorder price. Journal access is included.")
     .replace("Buy Paperback on Amazon ↗", "Preorder Paperback on Amazon ↗")
-    .replace("Read instantly on Kindle and register for your digital Companion Journal.", "Preorder the Kindle edition and register for your digital Companion Journal.")
+    .replace("Read instantly on Kindle and register for your digital Companion Journal.", "Preorder the Kindle edition at the launch price and register for your digital Companion Journal.")
     .replace("Buy Kindle eBook ↗", "Preorder Kindle eBook ↗")
+    .replace(`<small>Planned regular price: ${config.kindleRegularPrice}.</small>`, "")
     .replace("Order directly for local payment and delivery coordination.", "Preorder directly for local payment and delivery coordination at the reduced preorder price.")
     .replace("Order on WhatsApp ↗", "Preorder on WhatsApp ↗")
     .replace("Already purchased?", "Already purchased or preordered?");
@@ -122,9 +115,13 @@ for (const page of pages) {
 
   if (
     !updated.includes("Preorder <em>The Divine Blueprint</em>") ||
-    !updated.includes(config.paperbackOriginalPriceUs) ||
-    !updated.includes(config.kindleOriginalPrice) ||
-    !updated.includes(config.paperbackOriginalPriceNigeria) ||
+    !updated.includes(config.paperbackRegularPriceUs) ||
+    !updated.includes(config.kindleRegularPrice) ||
+    !updated.includes(config.paperbackRegularPriceNigeria) ||
+    !updated.includes(config.paperbackPriceUs) ||
+    !updated.includes(config.kindleLaunchPrice) ||
+    !updated.includes(config.paperbackPriceNigeria) ||
+    !updated.includes("Planned regular price") ||
     !updated.includes("Preorder the Book")
   ) {
     throw new Error(`Preorder pricing did not verify in ${page}.`);
@@ -142,13 +139,12 @@ await writeFile(
   join(siteRoot, "book-preorder-status.txt"),
   [
     "BOOK_PREORDER_FLOW=ACTIVE",
-    "VERSION=2026-08-04-1",
-    `PAPERBACK_US_ORIGINAL=${config.paperbackOriginalPriceUs}`,
+    "VERSION=2026-08-04-2",
+    `PAPERBACK_US_REGULAR=${config.paperbackRegularPriceUs}`,
     `PAPERBACK_US_PREORDER=${config.paperbackPriceUs}`,
-    `KINDLE_ORIGINAL=${config.kindleOriginalPrice}`,
+    `KINDLE_REGULAR=${config.kindleRegularPrice}`,
     `KINDLE_PREORDER=${config.kindleLaunchPrice}`,
-    `KINDLE_PLANNED_REGULAR=${config.kindleRegularPrice}`,
-    `PAPERBACK_NIGERIA_ORIGINAL=${config.paperbackOriginalPriceNigeria}`,
+    `PAPERBACK_NIGERIA_REGULAR=${config.paperbackRegularPriceNigeria}`,
     `PAPERBACK_NIGERIA_PREORDER=${config.paperbackPriceNigeria}`,
     `PREORDER_BUTTONS=${preorderButtons}`,
     `UPDATED_PAGES=${updatedPages}`
