@@ -1,5 +1,9 @@
 (function () {
-  var DOWNLOAD_URL = '/companion#download-editions';
+  'use strict';
+
+  var COMPANION_URL = '/companion#companion-access';
+  var ACCESS_STORAGE_KEY = 'divineBlueprintCompanionAccess.v1';
+  var ACCESS_QUERY = 'journal-access';
 
   function normalizedText(element) {
     return ((element && element.textContent) || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -14,8 +18,51 @@
     return path === '/companion' || path === '/companion.html';
   }
 
+  function getAccessGate() {
+    return document.getElementById('companion-access-gate');
+  }
+
   function getDownloadSection() {
     return document.getElementById('download-editions') || document.getElementById('companion-downloads');
+  }
+
+  function getDownloadLinks() {
+    return Array.prototype.slice.call(document.querySelectorAll('[data-journal-download]'));
+  }
+
+  function hasStoredAccess() {
+    try {
+      return window.localStorage.getItem(ACCESS_STORAGE_KEY) === 'granted';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function storeAccess() {
+    try {
+      window.localStorage.setItem(ACCESS_STORAGE_KEY, 'granted');
+    } catch (error) {
+      // Access still works for the current visit when storage is unavailable.
+    }
+  }
+
+  function hasAccessQuery() {
+    try {
+      return new URL(window.location.href).searchParams.get(ACCESS_QUERY) === 'granted';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function cleanAccessQuery() {
+    try {
+      var url = new URL(window.location.href);
+      if (!url.searchParams.has(ACCESS_QUERY)) return;
+      url.searchParams.delete(ACCESS_QUERY);
+      window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + '#download-editions');
+    } catch (error) {
+      // The query parameter is harmless if history replacement is unavailable.
+    }
   }
 
   function replaceTrigger() {
@@ -31,17 +78,17 @@
 
       link.className = element.className || 'btn btn-primary';
       link.innerHTML = element.innerHTML;
-      link.href = DOWNLOAD_URL;
+      link.href = COMPANION_URL;
       link.setAttribute('data-companion-cta', 'true');
-      link.setAttribute('aria-label', 'Choose a Companion Journal download');
+      link.setAttribute('aria-label', 'Register to access the Companion Journal');
       element.replaceWith(link);
     });
   }
 
-  function goToDownloads(event, trigger) {
+  function goToAccess(event, trigger) {
     if (!isCompanionTrigger(trigger)) return;
 
-    var section = isCompanionPage() ? getDownloadSection() : null;
+    var gate = isCompanionPage() ? getAccessGate() : null;
 
     event.preventDefault();
     event.stopPropagation();
@@ -53,23 +100,113 @@
     });
     document.body.classList.remove('modal-open', 'no-scroll');
 
-    if (section) {
-      window.history.replaceState(null, '', '#download-editions');
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (gate) {
+      window.history.replaceState(null, '', '#companion-access');
+      gate.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
 
-    window.location.assign(DOWNLOAD_URL);
+    window.location.assign(COMPANION_URL);
+  }
+
+  function setFormStatus(message, state) {
+    var status = document.getElementById('companion-access-status');
+    if (!status) return;
+    status.textContent = message || '';
+    status.setAttribute('data-state', state || '');
+  }
+
+  function setSubmitting(form, submitting) {
+    var button = form && form.querySelector('[type="submit"]');
+    if (!button) return;
+    button.disabled = !!submitting;
+    button.setAttribute('aria-busy', submitting ? 'true' : 'false');
+    button.textContent = submitting ? 'Confirming access…' : 'Unlock the Companion Journal';
+  }
+
+  function grantAccess(options) {
+    var settings = options || {};
+    var formPanel = document.getElementById('companion-access-form-panel');
+    var successPanel = document.getElementById('companion-download-access');
+    var links = getDownloadLinks();
+
+    storeAccess();
+
+    links.forEach(function (link) {
+      link.hidden = false;
+      link.removeAttribute('aria-disabled');
+      link.removeAttribute('tabindex');
+      link.classList.remove('journal-download-locked');
+      if (link.dataset.journalLabel) link.textContent = link.dataset.journalLabel;
+    });
+
+    if (formPanel) formPanel.hidden = true;
+    if (successPanel) successPanel.hidden = false;
+    document.documentElement.classList.add('companion-access-granted');
+
+    if (settings.cleanQuery) cleanAccessQuery();
+
+    if (settings.scroll) {
+      var section = getDownloadSection();
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function encodeForm(form) {
+    return new URLSearchParams(new FormData(form)).toString();
+  }
+
+  function handleAccessForm() {
+    var form = document.getElementById('companion-access-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      setSubmitting(form, true);
+      setFormStatus('Submitting your access request…', 'loading');
+
+      window.fetch(form.action || window.location.pathname, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encodeForm(form)
+      }).then(function (response) {
+        if (!response.ok) throw new Error('Submission failed');
+        setFormStatus('Access confirmed. Your journal editions are ready below.', 'success');
+        grantAccess({ scroll: true });
+      }).catch(function () {
+        setFormStatus('We could not confirm access automatically. Retrying with the secure form submission…', 'error');
+        setSubmitting(form, false);
+        window.setTimeout(function () {
+          form.submit();
+        }, 350);
+      });
+    });
+  }
+
+  function initializeCompanionAccess() {
+    if (!isCompanionPage()) return;
+
+    var shouldGrant = hasStoredAccess() || hasAccessQuery();
+    if (shouldGrant) {
+      grantAccess({ cleanQuery: hasAccessQuery(), scroll: hasAccessQuery() });
+    }
+
+    handleAccessForm();
+  }
+
+  function initialize() {
+    replaceTrigger();
+    initializeCompanionAccess();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', replaceTrigger);
+    document.addEventListener('DOMContentLoaded', initialize);
   } else {
-    replaceTrigger();
+    initialize();
   }
 
   document.addEventListener('click', function (event) {
-    goToDownloads(event, event.target.closest('a, button'));
+    goToAccess(event, event.target.closest('a, button'));
   }, true);
 
   window.addEventListener('load', replaceTrigger);
