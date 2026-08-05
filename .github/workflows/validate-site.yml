@@ -52,11 +52,11 @@ jobs:
           for (const path of paths) {
             const pdf = await readFile(path, 'latin1');
             const pages = (pdf.match(/\/Type \/Page\b/g) || []).length;
-            if (pages !== 98) throw new Error(`${path} has ${pages} pages; expected 98.`);
+            if (pages !== 89) throw new Error(`${path} has ${pages} pages; expected 89.`);
           }
           const fillable = await readFile(paths[0], 'latin1');
           if (!fillable.includes('/AcroForm')) throw new Error('Fillable PDF is missing its AcroForm.');
           const printable = await readFile(paths[1], 'latin1');
           if (printable.includes('/AcroForm')) throw new Error('Print PDF should not contain an AcroForm.');
-          console.log('Companion PDFs validated: 98 pages each; fillable and print editions are distinct.');
+          console.log('Companion PDFs validated: 89 pages each; fillable and print editions are distinct.');
           NODE
