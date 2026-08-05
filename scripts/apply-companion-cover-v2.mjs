@@ -20,6 +20,52 @@ const pagePaths = [
   join(siteRoot, "companion", "index.html")
 ];
 
+function updateCompanionImages(page) {
+  let updated = 0;
+  for (const section of page.sections || []) {
+    for (const image of section.imageFields || []) {
+      if (!String(image.src || "").includes("companion-journal-cover")) continue;
+      image.src = publicCoverPath;
+      image.alt = "The Divine Blueprint Companion Journal cover by Ayo-Paul Ikujuni";
+      updated += 1;
+    }
+  }
+  return updated;
+}
+
+function updateEmbeddedCmsPageData(html, pagePath) {
+  let embeddedImagesUpdated = 0;
+  let embeddedDataFound = false;
+
+  const updatedHtml = html.replace(
+    /<script\b([^>]*\bid=["']cms-page-data["'][^>]*)>([\s\S]*?)<\/script>/i,
+    (match, attributes, jsonText) => {
+      embeddedDataFound = true;
+      let page;
+      try {
+        page = JSON.parse(jsonText);
+      } catch (error) {
+        throw new Error(`Could not parse embedded CMS page data in ${pagePath}: ${error.message}`);
+      }
+
+      embeddedImagesUpdated = updateCompanionImages(page);
+      const safeJson = JSON.stringify(page).replace(/</g, "\\u003c");
+      return `<script${attributes}>${safeJson}</script>`;
+    }
+  );
+
+  if (!embeddedDataFound) {
+    throw new Error(`Embedded CMS page data was not found in ${pagePath}.`);
+  }
+  if (embeddedImagesUpdated !== 1) {
+    throw new Error(
+      `Expected one embedded Companion cover setting in ${pagePath}; updated ${embeddedImagesUpdated}.`
+    );
+  }
+
+  return updatedHtml;
+}
+
 const encodedChunks = await Promise.all(
   sourceChunkPaths.map(async (path) => (await readFile(path, "utf8")).trim())
 );
@@ -51,15 +97,7 @@ if (installed.size !== expectedFileSize) {
 }
 
 const settings = JSON.parse(await readFile(settingsPath, "utf8"));
-let settingsImagesUpdated = 0;
-for (const section of settings.sections || []) {
-  for (const image of section.imageFields || []) {
-    if (!String(image.src || "").includes("companion-journal-cover")) continue;
-    image.src = publicCoverPath;
-    image.alt = "The Divine Blueprint Companion Journal cover by Ayo-Paul Ikujuni";
-    settingsImagesUpdated += 1;
-  }
-}
+const settingsImagesUpdated = updateCompanionImages(settings);
 if (settingsImagesUpdated !== 1) {
   throw new Error(`Expected one Companion cover setting; updated ${settingsImagesUpdated}.`);
 }
@@ -104,8 +142,13 @@ for (const pagePath of pagePaths) {
     }
   );
 
-  if (!replaced || !html.includes(publicCoverPath)) {
-    throw new Error(`Could not replace the Companion cover in ${pagePath}.`);
+  html = updateEmbeddedCmsPageData(html, pagePath);
+
+  const coverReferenceCount = html.split(publicCoverPath).length - 1;
+  if (!replaced || coverReferenceCount < 2) {
+    throw new Error(
+      `Could not fully replace the Companion cover in ${pagePath}; found ${coverReferenceCount} approved references.`
+    );
   }
 
   await writeFile(pagePath, html, "utf8");
@@ -115,13 +158,16 @@ await writeFile(
   join(siteRoot, "companion-cover-status.txt"),
   [
     "COMPANION_COVER=APPROVED_IVORY_GOLD_JOURNAL",
-    "VERSION=2026-08-05-4",
+    "VERSION=2026-08-05-5",
     `SOURCE=${sourceDirectory}`,
     `PUBLIC_ASSET=${publicCoverPath}`,
     `DIMENSIONS=${coverWidth}x${coverHeight}`,
-    `SHA256=${expectedSha256}`
+    `SHA256=${expectedSha256}`,
+    "CMS_RUNTIME_IMAGE=APPROVED_IVORY_GOLD_JOURNAL"
   ].join("\n") + "\n",
   "utf8"
 );
 
-console.log("Installed the approved ivory-and-gold Companion Journal cover on both Companion routes.");
+console.log(
+  "Installed the approved ivory-and-gold Companion Journal cover in both static markup and embedded CMS page data."
+);
