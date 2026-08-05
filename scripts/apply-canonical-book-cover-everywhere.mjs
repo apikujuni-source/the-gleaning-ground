@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { readFile, readdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
 const assetsRoot = join(siteRoot, "assets");
@@ -62,6 +62,13 @@ function replaceKnownBookPlaceholders(html) {
       if (/companion/i.test(match)) return match;
       return `<div ${attrs} class="canonical-book-cover-frame"><img class="canonical-book-cover-image" src="${canonicalCover}" alt="${canonicalAlt}" loading="eager" decoding="async"></div>`;
     }
+  );
+}
+
+function stripCompanionCoverRuntimes(html) {
+  return html.replace(
+    /\s*<script\b[^>]*src=(['"])[^'"]*(?:canonical-book-cover|divine-blueprint-cover-final|companion-cover-display)\.js[^'"]*\1[^>]*><\/script>\s*/gi,
+    "\n"
   );
 }
 
@@ -181,9 +188,15 @@ async function processHtml(directory) {
 
     let html = await readFile(path, "utf8");
     html = replaceKnownBookPlaceholders(normalizeBookImages(html));
-    if (!html.includes("assets/canonical-book-cover.js")) {
+
+    const relativePath = relative(siteRoot, path).replaceAll("\\", "/");
+    const isCompanionPage = relativePath === "companion.html" || relativePath === "companion/index.html";
+    if (isCompanionPage) {
+      html = stripCompanionCoverRuntimes(html);
+    } else if (!html.includes("assets/canonical-book-cover.js")) {
       html = html.replace("</body>", '<script src="/assets/canonical-book-cover.js"></script>\n</body>');
     }
+
     await writeFile(path, html, "utf8");
   }
 }
