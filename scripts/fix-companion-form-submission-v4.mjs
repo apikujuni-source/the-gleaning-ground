@@ -6,9 +6,10 @@ const siteRoot = join(publishRoot, "divine-blueprint-site");
 const runtimeName = "companion-access-v4.js";
 const runtimeSource = join("assets", runtimeName);
 const runtimeOutput = join(siteRoot, "assets", runtimeName);
-const runtimeTag = `<script src="/assets/${runtimeName}?v=20260804-4"></script>`;
+const runtimeTag = `<script src="/assets/${runtimeName}?v=20260804-5"></script>`;
 const confirmationUrl = "https://gleaningground.com/companion-access-confirmed/";
 const inlineUnlock = `(function(){try{localStorage.setItem('divineBlueprintCompanionAccess.v1','granted')}catch(e){}var f=document.getElementById('companion-access-form-panel');var s=document.getElementById('companion-download-access');if(f)f.hidden=true;if(s)s.hidden=false;document.querySelectorAll('[data-journal-download]').forEach(function(a){a.hidden=false;a.removeAttribute('aria-disabled');a.removeAttribute('tabindex');if(a.dataset.journalLabel)a.textContent=a.dataset.journalLabel;});}())`;
+const chooseEditionButton = `<button type="button" class="companion-edition-control" data-choose-companion-edition aria-controls="download-editions" onclick="event.preventDefault();event.stopPropagation();if(event.stopImmediatePropagation)event.stopImmediatePropagation();var s=document.getElementById('download-editions')||document.getElementById('companion-downloads');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});return false;">Choose Your Edition ↓</button>`;
 
 const pagePaths = [
   join(siteRoot, "companion.html"),
@@ -35,10 +36,15 @@ function hardenForm(html, pagePath) {
     );
   }
 
+  if (!updated.includes('data-choose-companion-edition')) {
+    const successControlPattern = /(<div\b[^>]*\bid=["']companion-download-access["'][^>]*>[\s\S]*?)<a\b[^>]*>\s*Choose Your Edition\s*(?:↓|&darr;)?\s*<\/a>/i;
+    updated = updated.replace(successControlPattern, `$1${chooseEditionButton}`);
+  }
+
   if (!updated.includes(".companion-submission-frame{")) {
     updated = updated.replace(
       "</style>",
-      ".companion-submission-frame{position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none}</style>"
+      ".companion-submission-frame{position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none}.companion-edition-control{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:13px 22px;border:0;border-radius:9px;background:#0e2d4d;color:#fff;font:inherit;font-weight:700;line-height:1.2;text-decoration:none;cursor:pointer;box-shadow:0 10px 24px rgba(14,45,77,.16)}.companion-edition-control:hover,.companion-edition-control:focus-visible{background:#173f67;transform:translateY(-1px)}.companion-edition-control:focus-visible{outline:3px solid rgba(185,135,44,.45);outline-offset:3px}</style>"
     );
   }
 
@@ -48,8 +54,13 @@ function hardenForm(html, pagePath) {
   );
   if (!updated.includes(runtimeTag)) updated = updated.replace("</body>", `${runtimeTag}\n</body>`);
 
-  if (!updated.includes(`action="${confirmationUrl}"`) || !updated.includes('target="companion-access-submission"')) {
-    throw new Error(`Companion form hardening did not verify in ${pagePath}.`);
+  if (
+    !updated.includes(`action="${confirmationUrl}"`) ||
+    !updated.includes('target="companion-access-submission"') ||
+    !updated.includes('data-choose-companion-edition') ||
+    /<a\b[^>]*>\s*Choose Your Edition/i.test(updated)
+  ) {
+    throw new Error(`Companion form or edition control hardening did not verify in ${pagePath}.`);
   }
   return updated;
 }
@@ -69,4 +80,4 @@ const confirmationDirectory = join(publishRoot, "companion-access-confirmed");
 await mkdir(confirmationDirectory, { recursive: true });
 await writeFile(join(confirmationDirectory, "index.html"), confirmationPage, "utf8");
 
-console.log("Installed Companion form v4: hidden submission target, static confirmation fallback, and cache-busted runtime.");
+console.log("Installed Companion form v5: hidden submission, isolated edition button, and cache-busted runtime.");

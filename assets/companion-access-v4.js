@@ -85,7 +85,7 @@
   }
 
   function goToAccess(event, trigger) {
-    if (!isCompanionTrigger(trigger)) return;
+    if (!isCompanionTrigger(trigger)) return false;
 
     var gate = isCompanionPage() ? getAccessGate() : null;
     event.preventDefault();
@@ -101,10 +101,30 @@
     if (gate) {
       window.history.replaceState(null, '', '#companion-access');
       gate.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
+      return true;
     }
 
     window.location.assign(COMPANION_URL);
+    return true;
+  }
+
+  function goToEditions(event, trigger) {
+    if (!trigger || !trigger.matches('[data-choose-companion-edition]')) return false;
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+
+    var section = getDownloadSection();
+    if (section) {
+      try {
+        window.history.replaceState(null, '', '#download-editions');
+      } catch (error) {
+        // Scrolling still works when history replacement is unavailable.
+      }
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return true;
   }
 
   function setFormStatus(message, state) {
@@ -171,7 +191,9 @@
   }
 
   document.addEventListener('click', function (event) {
-    goToAccess(event, event.target.closest('a, button'));
+    var trigger = event.target.closest('a, button');
+    if (goToEditions(event, trigger)) return;
+    goToAccess(event, trigger);
   }, true);
 
   window.addEventListener('load', replaceTrigger);
