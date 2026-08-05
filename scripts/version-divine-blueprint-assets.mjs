@@ -2,7 +2,7 @@ import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = "_site/divine-blueprint-site";
-const styleUrl = "/assets/styles.css?v=20260723-cover-final";
+const styleUrl = "/assets/styles.css?v=20260805-responsive-type-v1";
 
 async function processDirectory(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
