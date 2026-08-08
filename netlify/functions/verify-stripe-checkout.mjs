@@ -1,3 +1,5 @@
+export const config = { path: "/api/checkout/stripe/verify" };
+
 const UNIT_PRICE_CENTS = 1099;
 
 function json(status, body) {
@@ -15,7 +17,7 @@ export default async function handler(request) {
     return json(400, { message: "A valid checkout session is required." });
   }
 
-  const secret = Netlify.env.get("STRIPE_SECRET_KEY");
+  const secret = process.env.STRIPE_SECRET_KEY;
   if (!secret) return json(503, { message: "Payment verification is not configured." });
 
   try {
