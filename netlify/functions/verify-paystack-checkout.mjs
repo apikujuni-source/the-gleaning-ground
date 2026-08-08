@@ -1,3 +1,5 @@
+export const config = { path: "/api/checkout/paystack/verify" };
+
 const UNIT_PRICE_KOBO = 800000;
 
 function json(status, body) {
@@ -16,7 +18,7 @@ export default async function handler(request) {
     return json(400, { message: "A valid payment reference is required." });
   }
 
-  const secret = Netlify.env.get("PAYSTACK_SECRET_KEY");
+  const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!secret) return json(503, { message: "Payment verification is not configured." });
 
   try {
