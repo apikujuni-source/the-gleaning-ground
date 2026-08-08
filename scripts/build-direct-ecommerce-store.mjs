@@ -2,7 +2,8 @@ import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-const siteRoot = "_site";
+const publishRoot = "_site";
+const siteRoot = join(publishRoot, "divine-blueprint-site");
 const storeRoot = join(siteRoot, "shop");
 const successRoot = join(storeRoot, "success");
 const assetsRoot = join(siteRoot, "assets");
@@ -29,13 +30,12 @@ for (const key of required) {
   if (!config[key]) throw new Error(`Missing store configuration: ${key}`);
 }
 
-const coverSource = join(siteRoot, "divine-blueprint-site", "assets", "divine-blueprint-cover.webp");
+const coverSource = join(assetsRoot, "divine-blueprint-cover.webp");
 if (!existsSync(coverSource)) throw new Error("The Divine Blueprint cover is unavailable for the store.");
 
 await mkdir(storeRoot, { recursive: true });
 await mkdir(successRoot, { recursive: true });
 await mkdir(assetsRoot, { recursive: true });
-await copyFile(coverSource, join(assetsRoot, "divine-blueprint-cover.webp"));
 await copyFile("storefront/divine-blueprint-store.css", join(assetsRoot, "divine-blueprint-store.css"));
 await copyFile("storefront/divine-blueprint-store.js", join(assetsRoot, "divine-blueprint-store.js"));
 
@@ -49,6 +49,7 @@ const whatsappText = encodeURIComponent(
 const whatsappUrl = `https://wa.me/${config.whatsappPrimary}?text=${whatsappText}`;
 
 const replacements = {
+  "{{STORE_URL}}": config.storeUrl,
   "{{PAPERBACK_REGULAR_US}}": config.paperbackRegularPriceUs,
   "{{PAPERBACK_PREORDER_US}}": config.paperbackPriceUs,
   "{{PAPERBACK_SAVINGS_US}}": config.paperbackSavingsUs,
@@ -96,7 +97,7 @@ for (const expected of [
 await writeFile(join(storeRoot, "index.html"), indexHtml, "utf8");
 await writeFile(join(successRoot, "index.html"), successHtml, "utf8");
 
-const redirectsPath = join(siteRoot, "_redirects");
+const redirectsPath = join(publishRoot, "_redirects");
 let redirects = "";
 try {
   redirects = await readFile(redirectsPath, "utf8");
