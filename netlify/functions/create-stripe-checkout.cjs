@@ -9,8 +9,22 @@ function response(statusCode, body, headers = {}) {
   };
 }
 
+function redirect(location) {
+  return { statusCode: 303, headers: { location, "cache-control": "no-store" }, body: "" };
+}
+
+function isBrowserForm(event) {
+  const type = String(event.headers["content-type"] || event.headers["Content-Type"] || "").toLowerCase();
+  return type.includes("application/x-www-form-urlencoded") || type.includes("multipart/form-data");
+}
+
+function failure(event, statusCode, message, setup = false) {
+  if (isBrowserForm(event)) return redirect(`/shop/?${setup ? "setup=stripe" : "error=stripe"}`);
+  return response(statusCode, { message });
+}
+
 function parseBody(event) {
-  const type = (event.headers["content-type"] || event.headers["Content-Type"] || "").toLowerCase();
+  const type = String(event.headers["content-type"] || event.headers["Content-Type"] || "").toLowerCase();
   if (type.includes("application/json")) return JSON.parse(event.body || "{}");
   return Object.fromEntries(new URLSearchParams(event.body || ""));
 }
@@ -36,16 +50,8 @@ function regionConfig(region) {
     .filter(Boolean);
 
   const regions = {
-    us: {
-      label: "United States shipping",
-      countries: ["US"],
-      shipping: process.env.STRIPE_US_SHIPPING_CENTS
-    },
-    canada: {
-      label: "Canada shipping",
-      countries: ["CA"],
-      shipping: process.env.STRIPE_CANADA_SHIPPING_CENTS
-    },
+    us: { label: "United States shipping", countries: ["US"], shipping: process.env.STRIPE_US_SHIPPING_CENTS },
+    canada: { label: "Canada shipping", countries: ["CA"], shipping: process.env.STRIPE_CANADA_SHIPPING_CENTS },
     "uk-eu": {
       label: "UK and Europe shipping",
       countries: ["GB", "IE", "FR", "DE", "NL", "BE", "ES", "IT", "PT", "AT", "FI", "SE", "DK", "NO", "CH", "PL", "CZ"],
@@ -66,28 +72,29 @@ function regionConfig(region) {
 }
 
 exports.handler = async function handler(event) {
-  if (event.httpMethod !== "POST") {
-    return response(405, { message: "Method not allowed." }, { allow: "POST" });
-  }
+  if (event.httpMethod !== "POST") return response(405, { message: "Method not allowed." }, { allow: "POST" });
 
   try {
     const input = parseBody(event);
-    if (input.website) return response(400, { message: "Invalid submission." });
+    if (input.website) return failure(event, 400, "Invalid submission.");
 
     const email = String(input.email || "").trim();
     const quantity = safeQuantity(input.quantity);
-    const region = regionConfig(String(input.region || ""));
+    const regionKey = String(input.region || "");
+    const region = regionConfig(regionKey);
 
     if (!validEmail(email) || !quantity || !region) {
-      return response(400, { message: "Please provide a valid email, quantity and supported delivery region." });
+      return failure(event, 400, "Please provide a valid email, quantity and configured delivery region.");
     }
 
     const secret = process.env.STRIPE_SECRET_KEY;
     if (!secret) {
-      return response(503, {
-        code: "STRIPE_SETUP_REQUIRED",
-        message: "Direct international checkout is being activated. Please use Amazon or contact info@gleaningground.com."
-      });
+      return failure(
+        event,
+        503,
+        "Direct international checkout is being activated. Please use Amazon or contact info@gleaningground.com.",
+        true
+      );
     }
 
     const base = siteUrl();
@@ -107,7 +114,8 @@ exports.handler = async function handler(event) {
     params.set("metadata[book]", "the-divine-blueprint");
     params.set("metadata[edition]", "paperback");
     params.set("metadata[preorder]", "true");
-    params.set("metadata[region]", String(input.region));
+    params.set("metadata[region]", regionKey);
+    params.set("metadata[quantity]", String(quantity));
 
     region.countries.forEach((country, index) => {
       params.set(`shipping_address_collection[allowed_countries][${index}]`, country);
@@ -123,26 +131,19 @@ exports.handler = async function handler(event) {
 
     const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
-      headers: {
-        authorization: `Bearer ${secret}`,
-        "content-type": "application/x-www-form-urlencoded"
-      },
+      headers: { authorization: `Bearer ${secret}`, "content-type": "application/x-www-form-urlencoded" },
       body: params.toString()
     });
     const session = await stripeResponse.json();
 
     if (!stripeResponse.ok || !session.url) {
       console.error("Stripe checkout error", session.error?.message || session);
-      return response(502, { message: "Stripe could not open checkout. Please try again or use Amazon." });
+      return failure(event, 502, "Stripe could not open checkout. Please try again or use Amazon.");
     }
 
-    return {
-      statusCode: 303,
-      headers: { location: session.url, "cache-control": "no-store" },
-      body: ""
-    };
+    return redirect(session.url);
   } catch (error) {
     console.error("Stripe checkout exception", error);
-    return response(500, { message: "Checkout could not be started. Please try again." });
+    return failure(event, 500, "Checkout could not be started. Please try again.");
   }
 };
