@@ -1,3 +1,5 @@
+export const config = { path: "/api/checkout/paystack" };
+
 const UNIT_PRICE_KOBO = 800000;
 const MAX_DIRECT_QUANTITY = 10;
 
