@@ -3,8 +3,8 @@ import { join } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
 const config = JSON.parse(await readFile("content/divine-blueprint/purchase.json", "utf8"));
-const storeUrl = config.storeUrl || "https://gleaningground.com/shop/";
-const marker = "<!-- Direct Gleaning Ground Store -->";
+const storeUrl = config.storeUrl || "https://divineblueprint.gleaningground.com/shop/";
+const marker = "<!-- Direct Divine Blueprint Store -->";
 
 async function findHtmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -23,12 +23,12 @@ function connectStore(html) {
 
   updated = updated.replace(
     /<a class="book-purchase-action" href="([^"]+)"([^>]*)>Preorder Paperback on Amazon ↗<\/a>/i,
-    `${marker}<a class="book-purchase-action" href="${storeUrl}#international-paperback"$2>Preorder Directly on GleaningGround.com ↗</a>\n        <a class="book-purchase-secondary" href="$1" target="_blank" rel="noopener noreferrer">Or preorder through Amazon ↗</a>`
+    `${marker}<a class="book-purchase-action" href="${storeUrl}#international-paperback"$2>Preorder Directly on the Official Site ↗</a>\n        <a class="book-purchase-secondary" href="$1" target="_blank" rel="noopener noreferrer">Or preorder through Amazon ↗</a>`
   );
 
   updated = updated.replace(
     /<a class="book-purchase-action book-purchase-action-whatsapp" href="([^"]+)"([^>]*)>Preorder on WhatsApp ↗<\/a>/i,
-    `${marker}<a class="book-purchase-action book-purchase-action-whatsapp" href="${storeUrl}#nigeria-paperback">Pay securely on GleaningGround.com ↗</a>\n        <a class="book-purchase-secondary" href="$1" target="_blank" rel="noopener noreferrer">Ask about delivery on WhatsApp ↗</a>`
+    `${marker}<a class="book-purchase-action book-purchase-action-whatsapp" href="${storeUrl}#nigeria-paperback">Pay Securely on the Official Site ↗</a>\n        <a class="book-purchase-secondary" href="$1" target="_blank" rel="noopener noreferrer">Ask about delivery on WhatsApp ↗</a>`
   );
 
   updated = updated.replace(
@@ -38,7 +38,7 @@ function connectStore(html) {
 
   updated = updated.replace(
     "Reserve your copy at the special preorder price. Every copy includes personal access to the digital Companion Journal.",
-    "Reserve your copy directly through GleaningGround.com or choose an alternative retailer. Every copy includes personal access to the digital Companion Journal."
+    "Reserve your copy directly through the official Divine Blueprint store or choose an alternative retailer. Every copy includes personal access to the digital Companion Journal."
   );
 
   return { html: updated, changed: updated !== html };
