@@ -172,6 +172,32 @@
   status = 200
   force = true
 
+# The store is generated as directory indexes. Route these URLs directly to
+# their HTML files before the catch-all rule below.
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/shop"
+  to = "/divine-blueprint-site/shop/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/shop/"
+  to = "/divine-blueprint-site/shop/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/shop/success"
+  to = "/divine-blueprint-site/shop/success/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://divineblueprint.gleaningground.com/shop/success/"
+  to = "/divine-blueprint-site/shop/success/index.html"
+  status = 200
+  force = true
+
 # Remaining clean routes map into the standalone site. The build creates
 # directory index pages for all top-level Divine Blueprint HTML pages.
 [[redirects]]
