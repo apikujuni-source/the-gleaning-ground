@@ -41,7 +41,7 @@ function safeQuantity(value) {
 }
 
 function siteUrl(request) {
-  return String(Netlify.env.get("PUBLIC_SITE_URL") || new URL(request.url).origin).replace(/\/$/, "");
+  return String(process.env.PUBLIC_SITE_URL || process.env.URL || new URL(request.url).origin).replace(/\/$/, "");
 }
 
 export default async function handler(request) {
@@ -61,7 +61,7 @@ export default async function handler(request) {
       return failure(request, 400, "Please complete your name, email, phone, delivery address and quantity.");
     }
 
-    const secret = Netlify.env.get("PAYSTACK_SECRET_KEY");
+    const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) {
       return failure(
         request,
