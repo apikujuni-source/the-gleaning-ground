@@ -44,27 +44,27 @@ function safeQuantity(value) {
 }
 
 function siteUrl(request) {
-  return String(Netlify.env.get("PUBLIC_SITE_URL") || new URL(request.url).origin).replace(/\/$/, "");
+  return String(process.env.PUBLIC_SITE_URL || process.env.URL || new URL(request.url).origin).replace(/\/$/, "");
 }
 
 function regionConfig(region) {
-  const internationalCountries = String(Netlify.env.get("STRIPE_ALLOWED_INTERNATIONAL_COUNTRIES") || "")
+  const internationalCountries = String(process.env.STRIPE_ALLOWED_INTERNATIONAL_COUNTRIES || "")
     .split(",")
     .map((country) => country.trim().toUpperCase())
     .filter(Boolean);
 
   const regions = {
-    us: { label: "United States shipping", countries: ["US"], shipping: Netlify.env.get("STRIPE_US_SHIPPING_CENTS") },
-    canada: { label: "Canada shipping", countries: ["CA"], shipping: Netlify.env.get("STRIPE_CANADA_SHIPPING_CENTS") },
+    us: { label: "United States shipping", countries: ["US"], shipping: process.env.STRIPE_US_SHIPPING_CENTS },
+    canada: { label: "Canada shipping", countries: ["CA"], shipping: process.env.STRIPE_CANADA_SHIPPING_CENTS },
     "uk-eu": {
       label: "UK and Europe shipping",
       countries: ["GB", "IE", "FR", "DE", "NL", "BE", "ES", "IT", "PT", "AT", "FI", "SE", "DK", "NO", "CH", "PL", "CZ"],
-      shipping: Netlify.env.get("STRIPE_UK_EU_SHIPPING_CENTS")
+      shipping: process.env.STRIPE_UK_EU_SHIPPING_CENTS
     },
     international: {
       label: "International shipping",
       countries: internationalCountries,
-      shipping: Netlify.env.get("STRIPE_INTERNATIONAL_SHIPPING_CENTS")
+      shipping: process.env.STRIPE_INTERNATIONAL_SHIPPING_CENTS
     }
   };
 
@@ -91,7 +91,7 @@ export default async function handler(request) {
       return failure(request, 400, "Please provide a valid email, quantity and configured delivery region.");
     }
 
-    const secret = Netlify.env.get("STRIPE_SECRET_KEY");
+    const secret = process.env.STRIPE_SECRET_KEY;
     if (!secret) {
       return failure(
         request,
@@ -129,7 +129,7 @@ export default async function handler(request) {
     params.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", "usd");
     params.set("shipping_options[0][shipping_rate_data][display_name]", region.label);
 
-    if (String(Netlify.env.get("STRIPE_AUTOMATIC_TAX") || "").toLowerCase() === "true") {
+    if (String(process.env.STRIPE_AUTOMATIC_TAX || "").toLowerCase() === "true") {
       params.set("automatic_tax[enabled]", "true");
     }
 
