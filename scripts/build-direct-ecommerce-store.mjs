@@ -18,6 +18,7 @@ const required = [
   "paperbackRegularPriceNigeria",
   "paperbackPriceNigeria",
   "paperbackSavingsNigeria",
+  "storeUrl",
   "amazonPaperbackUrl",
   "amazonKindleUrl",
   "whatsappPrimary",
@@ -80,7 +81,7 @@ const indexHtml = render(indexTemplate);
 const successHtml = render(successTemplate);
 
 for (const expected of [
-  "https://gleaningground.com/shop/",
+  config.storeUrl,
   config.paperbackPriceUs,
   config.paperbackRegularPriceUs,
   config.paperbackPriceNigeria,
@@ -94,11 +95,31 @@ for (const expected of [
 
 await writeFile(join(storeRoot, "index.html"), indexHtml, "utf8");
 await writeFile(join(successRoot, "index.html"), successHtml, "utf8");
+
+const redirectsPath = join(siteRoot, "_redirects");
+let redirects = "";
+try {
+  redirects = await readFile(redirectsPath, "utf8");
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
+const checkoutRedirects = `
+# Divine Blueprint direct ecommerce checkout
+/api/checkout/stripe /.netlify/functions/create-stripe-checkout 200
+/api/checkout/stripe/verify /.netlify/functions/verify-stripe-checkout 200
+/api/checkout/paystack /.netlify/functions/create-paystack-checkout 200
+/api/checkout/paystack/verify /.netlify/functions/verify-paystack-checkout 200
+`;
+if (!redirects.includes("# Divine Blueprint direct ecommerce checkout")) {
+  redirects = `${checkoutRedirects.trim()}\n${redirects.trim()}\n`;
+  await writeFile(redirectsPath, redirects, "utf8");
+}
+
 await writeFile(
   join(siteRoot, "direct-store-status.txt"),
   [
     "DIRECT_ECOMMERCE_STORE=ACTIVE",
-    "STORE_URL=https://gleaningground.com/shop/",
+    `STORE_URL=${config.storeUrl}`,
     `PAPERBACK_US=${config.paperbackPriceUs}`,
     `KINDLE=${config.kindleLaunchPrice}`,
     `PAPERBACK_NIGERIA=${config.paperbackPriceNigeria}`,
@@ -109,4 +130,4 @@ await writeFile(
   "utf8"
 );
 
-console.log("Generated the direct ecommerce store at https://gleaningground.com/shop/.");
+console.log(`Generated the direct ecommerce store at ${config.storeUrl}.`);
