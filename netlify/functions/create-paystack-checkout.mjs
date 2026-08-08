@@ -95,7 +95,13 @@ export default async function handler(request) {
     const paystackResponse = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: { authorization: `Bearer ${secret}`, "content-type": "application/json" },
-      body: JSON.stringify({ email, amount, currency: "NGN", callback_url: callbackUrl, metadata })
+      body: JSON.stringify({
+        email,
+        amount: String(amount),
+        currency: "NGN",
+        callback_url: callbackUrl,
+        metadata: JSON.stringify(metadata)
+      })
     });
     const result = await paystackResponse.json();
 
