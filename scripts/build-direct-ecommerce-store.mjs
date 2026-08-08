@@ -2,8 +2,7 @@ import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-const publishRoot = "_site";
-const siteRoot = join(publishRoot, "divine-blueprint-site");
+const siteRoot = join("_site", "divine-blueprint-site");
 const storeRoot = join(siteRoot, "shop");
 const successRoot = join(storeRoot, "success");
 const assetsRoot = join(siteRoot, "assets");
@@ -96,26 +95,6 @@ for (const expected of [
 
 await writeFile(join(storeRoot, "index.html"), indexHtml, "utf8");
 await writeFile(join(successRoot, "index.html"), successHtml, "utf8");
-
-const redirectsPath = join(publishRoot, "_redirects");
-let redirects = "";
-try {
-  redirects = await readFile(redirectsPath, "utf8");
-} catch (error) {
-  if (error.code !== "ENOENT") throw error;
-}
-const checkoutRedirects = `
-# Divine Blueprint direct ecommerce checkout
-/api/checkout/stripe /.netlify/functions/create-stripe-checkout 200
-/api/checkout/stripe/verify /.netlify/functions/verify-stripe-checkout 200
-/api/checkout/paystack /.netlify/functions/create-paystack-checkout 200
-/api/checkout/paystack/verify /.netlify/functions/verify-paystack-checkout 200
-`;
-if (!redirects.includes("# Divine Blueprint direct ecommerce checkout")) {
-  redirects = `${checkoutRedirects.trim()}\n${redirects.trim()}\n`;
-  await writeFile(redirectsPath, redirects, "utf8");
-}
-
 await writeFile(
   join(siteRoot, "direct-store-status.txt"),
   [
