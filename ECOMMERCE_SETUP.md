@@ -1,18 +1,18 @@
-# Gleaning Ground Ecommerce Activation
+# Divine Blueprint Ecommerce Activation
 
 The storefront is generated at:
 
-- `https://gleaningground.com/shop/`
+- `https://divineblueprint.gleaningground.com/shop/`
 
-The code is complete, but live payments remain safely disabled until the private payment credentials and shipping amounts below are added in Netlify.
+The code is complete, but live payments remain safely disabled until the private payment credentials and shipping amounts below are added to the Netlify project for `divineblueprint.gleaningground.com`.
 
 ## Netlify environment variables
 
-Open **Netlify → Project configuration → Environment variables** and add:
+Open **Netlify → The Divine Blueprint project → Project configuration → Environment variables** and add:
 
 ### Required for all checkouts
 
-- `PUBLIC_SITE_URL=https://gleaningground.com`
+- `PUBLIC_SITE_URL=https://divineblueprint.gleaningground.com`
 
 ### Stripe: US and international paperback
 
@@ -39,9 +39,9 @@ The Nigeria paperback price is enforced by the server at **₦8,000 per copy**. 
 
 1. Create or verify the Stripe and Paystack business accounts.
 2. Complete identity, bank and business verification with each provider.
-3. Add the live secret keys to Netlify. Never place a secret key in a webpage, GitHub file or CMS field.
+3. Add the live secret keys to the Netlify project. Never place a secret key in a webpage, GitHub file or CMS field.
 4. Decide and enter the four Stripe shipping amounts.
-5. Redeploy the site after saving the variables.
+5. Redeploy the Divine Blueprint Netlify project after saving the variables.
 6. Run one low-value live test order through each provider and refund the test transactions.
 7. Confirm that Stripe and Paystack receipts, shipping addresses, phone numbers and order metadata appear correctly in their dashboards.
 
