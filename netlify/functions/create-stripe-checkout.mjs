@@ -1,3 +1,5 @@
+export const config = { path: "/api/checkout/stripe" };
+
 const PRICE_CENTS = 1099;
 const MAX_DIRECT_QUANTITY = 10;
 
