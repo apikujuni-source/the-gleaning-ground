@@ -9,6 +9,16 @@ function json(status, body) {
   });
 }
 
+function parseMetadata(value) {
+  if (value && typeof value === "object") return value;
+  if (typeof value !== "string") return {};
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
+}
+
 export default async function handler(request) {
   if (request.method !== "GET") return json(405, { message: "Method not allowed." });
 
@@ -33,12 +43,15 @@ export default async function handler(request) {
     }
 
     const transaction = result.data || {};
-    const quantity = Number.parseInt(transaction.metadata?.quantity || "1", 10);
+    const metadata = parseMetadata(transaction.metadata);
+    const quantity = Number.parseInt(metadata.quantity || "1", 10);
     const expectedAmount = UNIT_PRICE_KOBO * quantity;
     const paid =
       transaction.status === "success" &&
       transaction.currency === "NGN" &&
-      transaction.amount === expectedAmount;
+      transaction.amount === expectedAmount &&
+      metadata.book === "the-divine-blueprint" &&
+      metadata.edition === "paperback";
 
     return json(paid ? 200 : 202, {
       paid,
