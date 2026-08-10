@@ -14,13 +14,13 @@
           "label": "Main heading — God Has a Blueprint for Your Becoming",
           "xpath": "/html/body/main/section[1]/div/div[1]/h1",
           "mode": "text",
-          "value": "God Has a Blueprint for Your Becoming"
+          "value": "God Has a Blueprint for Your Transformation"
         },
         {
           "label": "Paragraph — Discover the divine process through which God makes, matures, a…",
           "xpath": "/html/body/main/section[1]/div/div[1]/p",
           "mode": "text",
-          "value": "Discover the divine process through which God makes, matures, and manifests His sons."
+          "value": "Discover the divine process through which God forms, matures, and reveals His sons and daughters.\n"
         },
         {
           "label": "Button — Get the Book",
