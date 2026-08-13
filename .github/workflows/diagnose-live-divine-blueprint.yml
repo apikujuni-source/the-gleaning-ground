@@ -15,7 +15,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p qa
-          base="https://deploy-preview-58--the-divine-blueprint.netlify.app/divine-blueprint-site/assets/downloads"
+          base="https://deploy-preview-59--the-divine-blueprint.netlify.app/divine-blueprint-site/assets/downloads"
           curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Print-Ready.pdf" -o qa/print.pdf
           curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Fillable.pdf" -o qa/fillable.pdf
           test -s qa/print.pdf
