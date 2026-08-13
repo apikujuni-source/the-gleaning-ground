@@ -10,79 +10,40 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Partner With Us navigation branch
-        uses: actions/checkout@v4
-        with:
-          ref: agent/group-partner-with-us-nav
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build production output
-        run: npm run build
-
-      - name: Inspect fully rendered navigation
+      - name: Inspect fully rendered live Partner With Us navigation
         shell: bash
         run: |
           set -euo pipefail
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$chrome"
-
-          cd _site/divine-blueprint-site
-          python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/divine-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill $server_pid 2>/dev/null || true' EXIT
-          cd - >/dev/null
-
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:8080/ >/dev/null; then break; fi
-            sleep 1
-          done
-
           urls=(
-            "http://127.0.0.1:8080/"
-            "http://127.0.0.1:8080/ambassadors/"
-            "http://127.0.0.1:8080/church-partners/"
-            "http://127.0.0.1:8080/give-a-copy/"
+            "https://divineblueprint.gleaningground.com/"
+            "https://divineblueprint.gleaningground.com/ambassadors"
+            "https://divineblueprint.gleaningground.com/church-partners"
+            "https://divineblueprint.gleaningground.com/give-a-copy"
           )
 
-          for url in "${urls[@]}"; do
-            echo
-            echo "============================================================"
-            echo "RENDERED URL: $url"
+          check_url() {
+            local url="$1"
+            local dom
             dom=$(mktemp)
-            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=5000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || {
-              cat /tmp/chrome-errors.log || true
-              exit 1
-            }
-
+            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=5000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || return 1
             python - "$dom" <<'PY'
           import re, sys
           html=open(sys.argv[1],encoding='utf-8',errors='ignore').read()
           navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>',html,re.I)
-          if len(navs) != 1:
-              raise SystemExit(f'Expected one primary nav, found {len(navs)}')
+          if len(navs) != 1: raise SystemExit(1)
           nav=navs[0]
-          if len(re.findall(r'data-partner-menu',nav,re.I)) != 1:
-              raise SystemExit('Expected one Partner With Us dropdown')
+          if len(re.findall(r'data-partner-menu',nav,re.I)) != 1: raise SystemExit(1)
           partner=re.search(r'<div\b[^>]*data-partner-menu[^>]*>([\s\S]*?)</div>\s*</div>',nav,re.I)
-          if not partner or 'Partner With Us' not in partner.group(0):
-              raise SystemExit('Partner With Us dropdown missing')
+          if not partner or 'Partner With Us' not in partner.group(0): raise SystemExit(1)
           links=[]
           for href,text in re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',partner.group(0),re.I):
               text=re.sub(r'<[^>]+>',' ',text)
               text=re.sub(r'\s+',' ',text).strip()
               links.append((text,href))
           expected=[('Become an Ambassador','/ambassadors'),('Church Partners','/church-partners')]
-          if links != expected:
-              raise SystemExit(f'Unexpected Partner With Us items: {links}')
-
-          # Remove all dropdown blocks, then inspect only top-level anchors.
+          if links != expected: raise SystemExit(1)
           top=nav
           for attr in ['data-journey-menu','data-resource-menu','data-partner-menu']:
               top=re.sub(rf'<div\b[^>]*{attr}[^>]*>[\s\S]*?</div>\s*</div>', '', top, flags=re.I)
@@ -92,12 +53,25 @@ jobs:
               text=re.sub(r'\s+',' ',text).strip()
               anchors.append((text,href))
           expected_top=[('Home','/'),('The Companion','/companion'),('About','/about'),('Give a Copy','/give-a-copy')]
-          if anchors != expected_top:
-              raise SystemExit(f'Unexpected top-level nav: {anchors}')
-          if any(text in ['Ambassadors','Become an Ambassador','Church Partners'] for text,_ in anchors):
-              raise SystemExit(f'Partner links leaked to top level: {anchors}')
+          if anchors != expected_top: raise SystemExit(1)
           print('TOP LEVEL:', anchors)
           print('PARTNER MENU:', links)
           print('PASS')
           PY
+          }
+
+          for attempt in $(seq 1 12); do
+            echo "Live rendered verification attempt $attempt"
+            all_ok=1
+            for url in "${urls[@]}"; do
+              echo "Checking $url"
+              if ! check_url "$url"; then all_ok=0; break; fi
+            done
+            if [ "$all_ok" -eq 1 ]; then
+              echo "ALL LIVE PARTNER NAVIGATION CHECKS PASSED"
+              exit 0
+            fi
+            sleep 10
           done
+          echo "Live site did not converge to Partner With Us navigation."
+          exit 1
