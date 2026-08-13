@@ -10,52 +10,20 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live Ambassador form after JavaScript
+      - name: Fetch Companion preview PDFs
         shell: bash
         run: |
           set -euo pipefail
-          url="https://divineblueprint.gleaningground.com/ambassadors"
-          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          test -n "$chrome"
-
-          check_form() {
-            local rendered
-            rendered=$(mktemp)
-            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=7000 --dump-dom "$url" > "$rendered" 2>/tmp/chrome-errors.log || return 1
-            python - "$rendered" <<'PY'
-          import re, sys
-          html=open(sys.argv[1],encoding='utf-8',errors='ignore').read()
-          m=re.search(r'<form\b[^>]*name=["\']divine-blueprint-ambassador-application["\'][^>]*>[\s\S]*?</form>', html, re.I)
-          if not m:
-              raise SystemExit('FORM MISSING')
-          form=m.group(0)
-          emails=re.findall(r'<input\b[^>]*name=["\']email["\'][^>]*>', form, re.I)
-          if len(emails) != 1:
-              raise SystemExit(f'EXPECTED 1 EMAIL INPUT, FOUND {len(emails)}')
-          email=emails[0]
-          if not re.search(r'type=["\']email["\']', email, re.I) or not re.search(r'\brequired(?:=["\'][^"\']*["\'])?', email, re.I):
-              raise SystemExit('EMAIL INPUT IS NOT REQUIRED TYPE=EMAIL')
-          if 'you@example.com' not in form:
-              raise SystemExit('EMAIL PLACEHOLDER MISSING')
-          if 'This is how we will contact selected ambassadors.' not in form:
-              raise SystemExit('EMAIL CONTACT NOTE MISSING')
-          if re.search(r'<div class=["\']form-row["\']>\s*<label>Full name[\s\S]*?<label[^>]*>\s*Email address', form, re.I):
-              raise SystemExit('OLD SIDE-BY-SIDE NAME/EMAIL ROW STILL PRESENT')
-          print('EMAIL INPUT:', email)
-          print('STANDALONE EMAIL FIELD: PASS')
-          print('CONTACT NOTE: PASS')
-          print('OLD SIDE-BY-SIDE ROW: ABSENT')
-          PY
-          }
-
-          for attempt in $(seq 1 18); do
-            echo "Live form verification attempt $attempt"
-            if check_form; then
-              echo "LIVE AMBASSADOR EMAIL FIELD VERIFIED"
-              exit 0
-            fi
-            sleep 10
-          done
-
-          echo "Live Ambassador form did not converge to the corrected email field."
-          exit 1
+          mkdir -p qa
+          base="https://deploy-preview-58--the-divine-blueprint.netlify.app/assets/downloads"
+          curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Print-Ready.pdf" -o qa/print.pdf
+          curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Fillable.pdf" -o qa/fillable.pdf
+          test -s qa/print.pdf
+          test -s qa/fillable.pdf
+          ls -lh qa/*.pdf
+      - name: Upload Companion preview PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-preview-pdfs
+          path: qa/*.pdf
+          retention-days: 3
