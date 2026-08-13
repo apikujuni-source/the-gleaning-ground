@@ -19,6 +19,82 @@ function replaceRequired(pattern, replacement, label) {
 }
 
 replaceRequired(
+  /function wrap\(value, max = 70\) \{[\s\S]*?\n\}\nfunction text\(cmd,/,
+  `function glyphEm(ch, font = "F1") {
+  const times = font === "F3" || font === "F4";
+  if (ch === " ") return times ? 0.25 : 0.278;
+  if (/[ilI1.,'!:;|]/.test(ch)) return times ? 0.28 : 0.25;
+  if (/[mwMW@%]/.test(ch)) return times ? 0.84 : 0.86;
+  if (/[fjrt()\\[\\]{}\\-]/.test(ch)) return times ? 0.34 : 0.33;
+  if (/[A-Z]/.test(ch)) return times ? 0.68 : 0.66;
+  if (/[0-9]/.test(ch)) return times ? 0.50 : 0.556;
+  return times ? 0.48 : 0.52;
+}
+function measureTextWidth(value, size = 10, font = "F1") {
+  return [...ascii(value)].reduce((sum, ch) => sum + glyphEm(ch, font) * size, 0);
+}
+function wrap(value, maxWidth = 360, size = 10, font = "F1") {
+  const lines = [];
+  for (const paragraphValue of ascii(value).split(/\\n/)) {
+    const words = paragraphValue.trim().split(/\\s+/).filter(Boolean);
+    let lineValue = "";
+    for (const word of words) {
+      const candidate = lineValue ? lineValue + " " + word : word;
+      if (lineValue && measureTextWidth(candidate, size, font) > maxWidth) {
+        lines.push(lineValue);
+        lineValue = word;
+      } else {
+        lineValue = candidate;
+      }
+    }
+    if (lineValue) lines.push(lineValue);
+    if (!words.length) lines.push("");
+  }
+  return lines;
+}
+function text(cmd,`,
+  "width-aware text wrapping"
+);
+
+replaceRequired(
+  /function paragraph\(cmd, value, x, y, widthChars = 72, size = 10, leading = 14, font = "F1", color = INK, maxLines = 99\) \{[\s\S]*?\n\}/,
+  `function paragraph(cmd, value, x, y, widthChars = 72, size = 10, leading = 14, font = "F1", color = INK, maxLines = 99) {
+  const inferredWidth = widthChars * size * 0.70;
+  let rightEdge = PAGE_W - 52;
+  if (x === 68 && font === "F3" && Math.abs(size - 10) < 0.01) rightEdge = 436;
+  const maxWidth = Math.max(40, Math.min(inferredWidth, rightEdge - x));
+  const lines = wrap(value, maxWidth, size, font).slice(0, maxLines);
+  lines.forEach((lineValue, i) => text(cmd, lineValue, x, y - i * leading, size, font, color));
+  return y - lines.length * leading;
+}`,
+  "paragraph wrapping based on available rendered width"
+);
+
+replaceRequired(
+  `function pageTitle(cmd, kicker, titleValue, pageNo) {
+  pageBase(cmd, pageNo);
+  text(cmd, kicker.toUpperCase(), 42, 660, 8, "F2", GOLD);
+  paragraph(cmd, titleValue, 42, 630, 34, 24, 27, "F4", NAVY, 3);
+  line(cmd, 42, 572, PAGE_W - 42, 572, GOLD, 0.8);
+}`,
+  `function pageTitle(cmd, kicker, titleValue, pageNo) {
+  pageBase(cmd, pageNo);
+  text(cmd, kicker.toUpperCase(), 42, 660, 8, "F2", GOLD);
+  const titleMaxWidth = PAGE_W - 84;
+  let titleSize = 24;
+  while (titleSize > 20 && measureTextWidth(titleValue, titleSize, "F4") > titleMaxWidth) titleSize -= 0.5;
+  if (measureTextWidth(titleValue, titleSize, "F4") <= titleMaxWidth) {
+    text(cmd, titleValue, 42, 630, titleSize, "F4", NAVY);
+  } else {
+    const titleLines = wrap(titleValue, titleMaxWidth, 20, "F4").slice(0, 2);
+    titleLines.forEach((lineValue, i) => text(cmd, lineValue, 42, 630 - i * 24, 20, "F4", NAVY));
+  }
+  line(cmd, 42, 572, PAGE_W - 42, 572, GOLD, 0.8);
+}`,
+  "section headings fitted to available page width"
+);
+
+replaceRequired(
   'const pageNames = ["", "Chapter Objective & Prepare Your Heart", "Formation Pathway & Personal Inventory", "Guided Reflection", "Chapter Synthesis", "Scripture Meditation", "Observe, Understand, Apply", "My Story", "Practice & Declarations", "Kingdom Journal & Spiritual Checkpoint"];',
   'const pageNames = ["", "Chapter Objective & Prepare Your Heart", "Formation Pathway & Personal Reflection", "Unused", "Chapter Synthesis", "Scripture Meditation", "Observe, Understand, Apply", "My Story", "Practice & Declarations", "Kingdom Journal & Spiritual Checkpoint"];',
   "chapter page names"
@@ -129,4 +205,4 @@ for (const path of [fillablePath, printPath]) {
   }
 }
 
-console.log("Built and verified an 89-page Companion with improved Prepare Your Heart and Message in One View text wrapping.");
+console.log("Built and verified an 89-page Companion with width-aware text wrapping in both fillable and print-ready PDFs.");
