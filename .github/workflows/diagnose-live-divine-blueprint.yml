@@ -1,0 +1,64 @@
+name: Diagnose live Divine Blueprint
+
+on:
+  push:
+    branches:
+      - agent/diagnose-live-divine-blueprint
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch live and Netlify production origins
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://divineblueprint.gleaningground.com/"
+            "https://divineblueprint.gleaningground.com/ambassadors"
+            "https://divineblueprint.gleaningground.com/give-a-copy"
+            "https://the-divine-blueprint.netlify.app/"
+            "https://the-divine-blueprint.netlify.app/ambassadors"
+            "https://the-divine-blueprint.netlify.app/give-a-copy"
+            "https://thegleaningground.netlify.app/"
+          )
+
+          for url in "${urls[@]}"; do
+            echo
+            echo "============================================================"
+            echo "URL: $url"
+            echo "------------------------------------------------------------"
+            tmp=$(mktemp)
+            headers=$(mktemp)
+            status=$(curl -L -sS --max-time 30 -D "$headers" -o "$tmp" -w '%{http_code}' "$url" || true)
+            echo "STATUS: $status"
+            echo "FINAL URL: $(curl -L -sS -o /dev/null -w '%{url_effective}' --max-time 30 "$url" || true)"
+            echo "HEADERS:"
+            grep -Ei '^(date|server|cache-control|age|etag|x-nf-request-id|x-nf-cache|location|last-modified):' "$headers" || true
+            echo "TITLE:"
+            grep -Eio '<title>[^<]*</title>' "$tmp" | head -1 || true
+            echo "NAVIGATION BLOCKS:"
+            python - "$tmp" <<'PY'
+          import re, sys
+          p=sys.argv[1]
+          html=open(p,encoding='utf-8',errors='ignore').read()
+          navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>', html, flags=re.I)
+          if not navs:
+              print('NO nav-links BLOCK FOUND')
+          for i,nav in enumerate(navs,1):
+              anchors=re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',nav,flags=re.I)
+              print(f'NAV {i}:')
+              for href,text in anchors:
+                  clean=re.sub(r'<[^>]+>',' ',text)
+                  clean=re.sub(r'\s+',' ',clean).strip()
+                  print(f'  {clean} -> {href}')
+          print('COUNTS:')
+          print('  Ambassadors href:', len(re.findall(r'href=["\']/ambassadors(?:["\'/#?])',html,flags=re.I)))
+          print('  Give a Copy href:', len(re.findall(r'href=["\']/give-a-copy(?:["\'/#?])',html,flags=re.I)))
+          print('  Text "Ambassadors":', len(re.findall(r'>\s*Ambassadors\s*<',html,flags=re.I)))
+          print('  Text "Give a Copy":', len(re.findall(r'>\s*Give a Copy\s*<',html,flags=re.I)))
+          print('  Text "Build a Copy":', len(re.findall(r'>\s*Build a Copy\s*<',html,flags=re.I)))
+          print('  Text "Sponsor Copies":', len(re.findall(r'>\s*Sponsor Copies\s*<',html,flags=re.I)))
+          PY
+          done
