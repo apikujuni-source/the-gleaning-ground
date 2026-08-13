@@ -10,44 +10,32 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Compare server and rendered Ambassador form
+      - name: Checkout Ambassador email fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-ambassador-email-field
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build production output
+        run: npm run build
+      - name: Inspect built Ambassador form
         shell: bash
         run: |
           set -euo pipefail
-          url="https://divineblueprint.gleaningground.com/ambassadors"
-          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          test -n "$chrome"
-
-          server=$(mktemp)
-          rendered=$(mktemp)
-          curl -fsSL "$url" > "$server"
-          "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=7000 --dump-dom "$url" > "$rendered" 2>/tmp/chrome-errors.log
-
-          python - "$server" "$rendered" <<'PY'
-          import re, sys
-
-          def inspect(path, label):
-              html=open(path,encoding='utf-8',errors='ignore').read()
-              form_match=re.search(r'<form\b[^>]*name=["\']divine-blueprint-ambassador-application["\'][^>]*>([\s\S]*?)</form>',html,re.I)
-              if not form_match:
-                  print(label, 'FORM MISSING')
-                  raise SystemExit(1)
-              form=form_match.group(0)
-              emails=re.findall(r'<input\b[^>]*name=["\']email["\'][^>]*>',form,re.I)
-              print(label, 'EMAIL INPUT COUNT:', len(emails))
-              for item in emails: print(label, 'EMAIL INPUT:', item)
-              name_pos=form.lower().find('name="name"')
-              email_pos=form.lower().find('name="email"')
-              between=form[name_pos:email_pos] if name_pos >= 0 and email_pos >= 0 else ''
-              print(label, 'NAME/EMAIL BETWEEN:', re.sub(r'\s+',' ',between)[-500:])
-              print(label, 'HAS EMAIL REQUIRED COPY:', 'Email address (required)' in form)
-              print(label, 'HAS CONTACT NOTE:', 'This is how we will contact selected ambassadors.' in form)
-              print(label, 'HAS OLD SIDE-BY-SIDE ROW:', bool(re.search(r'<div class=["\']form-row["\']>\s*<label>Full name[\s\S]*?name=["\']name["\'][\s\S]*?<label>Email address', form, re.I)))
-              scripts=re.findall(r'<script[^>]+src=["\']([^"\']+)["\']',html,re.I)
-              print(label, 'CMS RUNTIME SCRIPTS:', [s for s in scripts if 'cms-page-editor' in s])
-              return form
-
-          server_form=inspect(sys.argv[1], 'SERVER')
-          rendered_form=inspect(sys.argv[2], 'RENDERED')
-          print('FORM IDENTICAL AFTER NORMALIZED WHITESPACE:', re.sub(r'\s+',' ',server_form)==re.sub(r'\s+',' ',rendered_form))
+          python - <<'PY'
+          import re
+          path='_site/divine-blueprint-site/ambassadors/index.html'
+          html=open(path,encoding='utf-8',errors='ignore').read()
+          form=re.search(r'<form\b[^>]*name=["\']divine-blueprint-ambassador-application["\'][^>]*>[\s\S]*?</form>',html,re.I)
+          if not form: raise SystemExit('FORM MISSING')
+          form=form.group(0)
+          print('EMAIL INPUTS:', re.findall(r'<input\b[^>]*name=["\']email["\'][^>]*>',form,re.I))
+          print('HAS EMAIL REQUIRED COPY:', 'Email address (required)' in form)
+          print('HAS CONTACT NOTE:', 'This is how we will contact selected ambassadors.' in form)
+          print('HAS OLD SIDE-BY-SIDE ROW:', bool(re.search(r'<div class=["\']form-row["\']>\s*<label>Full name[\s\S]*?<label>Email address',form,re.I)))
           PY
