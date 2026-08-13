@@ -10,27 +10,53 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect PR 55 preview static and rendered navigation
+      - name: Checkout runtime navigation fix
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-runtime-ambassador-nav
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build production output
+        run: npm run build
+
+      - name: Serve and inspect fully rendered Divine Blueprint DOM
         shell: bash
         run: |
           set -euo pipefail
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$chrome"
-          base="https://deploy-preview-55--the-divine-blueprint.netlify.app"
-          urls=("$base/" "$base/ambassadors" "$base/give-a-copy")
+
+          cd _site/divine-blueprint-site
+          python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/divine-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          cd - >/dev/null
+
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/ >/dev/null; then break; fi
+            sleep 1
+          done
+
+          urls=(
+            "http://127.0.0.1:8080/"
+            "http://127.0.0.1:8080/ambassadors/"
+            "http://127.0.0.1:8080/give-a-copy/"
+          )
 
           for url in "${urls[@]}"; do
             echo
             echo "============================================================"
-            echo "PREVIEW URL: $url"
+            echo "RENDERED URL: $url"
             echo "------------------------------------------------------------"
-            static=$(mktemp)
-            status=$(curl -L -sS --max-time 30 -o "$static" -w '%{http_code}' "$url")
-            echo "STATIC STATUS: $status"
-            test "$status" = "200"
-
             dom=$(mktemp)
-            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=7000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || {
+            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=5000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || {
               cat /tmp/chrome-errors.log || true
               exit 1
             }
