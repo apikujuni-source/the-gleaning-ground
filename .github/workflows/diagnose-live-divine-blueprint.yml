@@ -62,3 +62,58 @@ jobs:
           print('  Text "Sponsor Copies":', len(re.findall(r'>\s*Sponsor Copies\s*<',html,flags=re.I)))
           PY
           done
+
+      - name: Inspect fully rendered browser DOM
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$chrome" ]; then
+            echo "No Chrome/Chromium binary found"
+            exit 1
+          fi
+          echo "Using browser: $chrome"
+          urls=(
+            "https://divineblueprint.gleaningground.com/"
+            "https://divineblueprint.gleaningground.com/ambassadors"
+            "https://divineblueprint.gleaningground.com/give-a-copy"
+          )
+          for url in "${urls[@]}"; do
+            echo
+            echo "============================================================"
+            echo "RENDERED URL: $url"
+            echo "------------------------------------------------------------"
+            dom=$(mktemp)
+            "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=7000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || {
+              cat /tmp/chrome-errors.log || true
+              exit 1
+            }
+            python - "$dom" <<'PY'
+          import re, sys
+          p=sys.argv[1]
+          html=open(p,encoding='utf-8',errors='ignore').read()
+          title=re.search(r'<title>([\s\S]*?)</title>',html,re.I)
+          print('TITLE:', re.sub(r'\s+',' ',title.group(1)).strip() if title else 'NONE')
+          navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>', html, flags=re.I)
+          print('NAV BLOCK COUNT:',len(navs))
+          for i,nav in enumerate(navs,1):
+              anchors=re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',nav,flags=re.I)
+              print(f'NAV {i}:')
+              for href,text in anchors:
+                  clean=re.sub(r'<[^>]+>',' ',text)
+                  clean=re.sub(r'\s+',' ',clean).strip()
+                  print(f'  {clean} -> {href}')
+          print('RENDERED COUNTS:')
+          for label,pat in [
+              ('Ambassadors href',r'href=["\']/ambassadors(?:["\'/#?])'),
+              ('Give a Copy href',r'href=["\']/give-a-copy(?:["\'/#?])'),
+              ('Ambassadors text',r'>\s*Ambassadors\s*<'),
+              ('Give a Copy text',r'>\s*Give a Copy\s*<'),
+              ('Build a Copy text',r'>\s*Build a Copy\s*<'),
+              ('Sponsor Copies text',r'>\s*Sponsor Copies\s*<')]:
+              print(f'  {label}:',len(re.findall(pat,html,re.I)))
+          print('SCRIPTS:')
+          for src in re.findall(r'<script\b[^>]*src=["\']([^"\']+)["\']',html,re.I):
+              print(' ',src)
+          PY
+          done
