@@ -10,110 +10,58 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch live and Netlify production origins
-        shell: bash
-        run: |
-          set -euo pipefail
-          urls=(
-            "https://divineblueprint.gleaningground.com/"
-            "https://divineblueprint.gleaningground.com/ambassadors"
-            "https://divineblueprint.gleaningground.com/give-a-copy"
-            "https://the-divine-blueprint.netlify.app/"
-            "https://the-divine-blueprint.netlify.app/ambassadors"
-            "https://the-divine-blueprint.netlify.app/give-a-copy"
-            "https://thegleaningground.netlify.app/"
-          )
-
-          for url in "${urls[@]}"; do
-            echo
-            echo "============================================================"
-            echo "URL: $url"
-            echo "------------------------------------------------------------"
-            tmp=$(mktemp)
-            headers=$(mktemp)
-            status=$(curl -L -sS --max-time 30 -D "$headers" -o "$tmp" -w '%{http_code}' "$url" || true)
-            echo "STATUS: $status"
-            echo "FINAL URL: $(curl -L -sS -o /dev/null -w '%{url_effective}' --max-time 30 "$url" || true)"
-            echo "HEADERS:"
-            grep -Ei '^(date|server|cache-control|age|etag|x-nf-request-id|x-nf-cache|location|last-modified):' "$headers" || true
-            echo "TITLE:"
-            grep -Eio '<title>[^<]*</title>' "$tmp" | head -1 || true
-            echo "NAVIGATION BLOCKS:"
-            python - "$tmp" <<'PY'
-          import re, sys
-          p=sys.argv[1]
-          html=open(p,encoding='utf-8',errors='ignore').read()
-          navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>', html, flags=re.I)
-          if not navs:
-              print('NO nav-links BLOCK FOUND')
-          for i,nav in enumerate(navs,1):
-              anchors=re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',nav,flags=re.I)
-              print(f'NAV {i}:')
-              for href,text in anchors:
-                  clean=re.sub(r'<[^>]+>',' ',text)
-                  clean=re.sub(r'\s+',' ',clean).strip()
-                  print(f'  {clean} -> {href}')
-          print('COUNTS:')
-          print('  Ambassadors href:', len(re.findall(r'href=["\']/ambassadors(?:["\'/#?])',html,flags=re.I)))
-          print('  Give a Copy href:', len(re.findall(r'href=["\']/give-a-copy(?:["\'/#?])',html,flags=re.I)))
-          print('  Text "Ambassadors":', len(re.findall(r'>\s*Ambassadors\s*<',html,flags=re.I)))
-          print('  Text "Give a Copy":', len(re.findall(r'>\s*Give a Copy\s*<',html,flags=re.I)))
-          print('  Text "Build a Copy":', len(re.findall(r'>\s*Build a Copy\s*<',html,flags=re.I)))
-          print('  Text "Sponsor Copies":', len(re.findall(r'>\s*Sponsor Copies\s*<',html,flags=re.I)))
-          PY
-          done
-
-      - name: Inspect fully rendered browser DOM
+      - name: Inspect PR 55 preview static and rendered navigation
         shell: bash
         run: |
           set -euo pipefail
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          if [ -z "$chrome" ]; then
-            echo "No Chrome/Chromium binary found"
-            exit 1
-          fi
-          echo "Using browser: $chrome"
-          urls=(
-            "https://divineblueprint.gleaningground.com/"
-            "https://divineblueprint.gleaningground.com/ambassadors"
-            "https://divineblueprint.gleaningground.com/give-a-copy"
-          )
+          test -n "$chrome"
+          base="https://deploy-preview-55--the-divine-blueprint.netlify.app"
+          urls=("$base/" "$base/ambassadors" "$base/give-a-copy")
+
           for url in "${urls[@]}"; do
             echo
             echo "============================================================"
-            echo "RENDERED URL: $url"
+            echo "PREVIEW URL: $url"
             echo "------------------------------------------------------------"
+            static=$(mktemp)
+            status=$(curl -L -sS --max-time 30 -o "$static" -w '%{http_code}' "$url")
+            echo "STATIC STATUS: $status"
+            test "$status" = "200"
+
             dom=$(mktemp)
             "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=7000 --dump-dom "$url" > "$dom" 2>/tmp/chrome-errors.log || {
               cat /tmp/chrome-errors.log || true
               exit 1
             }
+
             python - "$dom" <<'PY'
           import re, sys
-          p=sys.argv[1]
-          html=open(p,encoding='utf-8',errors='ignore').read()
-          title=re.search(r'<title>([\s\S]*?)</title>',html,re.I)
-          print('TITLE:', re.sub(r'\s+',' ',title.group(1)).strip() if title else 'NONE')
-          navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>', html, flags=re.I)
-          print('NAV BLOCK COUNT:',len(navs))
-          for i,nav in enumerate(navs,1):
-              anchors=re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',nav,flags=re.I)
-              print(f'NAV {i}:')
-              for href,text in anchors:
-                  clean=re.sub(r'<[^>]+>',' ',text)
-                  clean=re.sub(r'\s+',' ',clean).strip()
-                  print(f'  {clean} -> {href}')
-          print('RENDERED COUNTS:')
-          for label,pat in [
-              ('Ambassadors href',r'href=["\']/ambassadors(?:["\'/#?])'),
-              ('Give a Copy href',r'href=["\']/give-a-copy(?:["\'/#?])'),
-              ('Ambassadors text',r'>\s*Ambassadors\s*<'),
-              ('Give a Copy text',r'>\s*Give a Copy\s*<'),
-              ('Build a Copy text',r'>\s*Build a Copy\s*<'),
-              ('Sponsor Copies text',r'>\s*Sponsor Copies\s*<')]:
-              print(f'  {label}:',len(re.findall(pat,html,re.I)))
-          print('SCRIPTS:')
-          for src in re.findall(r'<script\b[^>]*src=["\']([^"\']+)["\']',html,re.I):
-              print(' ',src)
+          html=open(sys.argv[1],encoding='utf-8',errors='ignore').read()
+          navs=re.findall(r'<nav\b[^>]*class=["\'][^"\']*nav-links[^"\']*["\'][^>]*>([\s\S]*?)</nav>',html,re.I)
+          if len(navs) != 1:
+              raise SystemExit(f'Expected exactly one primary nav, found {len(navs)}')
+          nav=navs[0]
+          anchors=[]
+          for href,text in re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',nav,re.I):
+              clean=re.sub(r'<[^>]+>',' ',text)
+              clean=re.sub(r'\s+',' ',clean).strip()
+              anchors.append((clean,href))
+          print('RENDERED PRIMARY NAV:')
+          for text,href in anchors:
+              print(f'  {text} -> {href}')
+          expected={'Ambassadors':'/ambassadors','Church Partners':'/church-partners','Give a Copy':'/give-a-copy'}
+          for label,href in expected.items():
+              matches=[a for a in anchors if a==(label,href)]
+              if len(matches)!=1:
+                  raise SystemExit(f'Expected exactly one {label} -> {href}; found {len(matches)}')
+          labels=[text for text,_ in anchors]
+          if labels.count('Give a Copy') != 1:
+              raise SystemExit(f'Give a Copy is duplicated in rendered nav: {labels}')
+          if labels.count('Ambassadors') != 1:
+              raise SystemExit(f'Ambassadors missing/duplicated in rendered nav: {labels}')
+          if any(label in labels for label in ['Build a Copy','Sponsor Copies']):
+              raise SystemExit(f'Legacy copy link remains: {labels}')
+          print('PASS: rendered browser nav has exactly one Ambassadors, Church Partners, and Give a Copy.')
           PY
           done
