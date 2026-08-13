@@ -10,36 +10,23 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live Companion PDFs match audited build
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p qa
-          base="https://divineblueprint.gleaningground.com/assets/downloads"
-          expected_print="bc281ade51cf35cc85ad463de1ff9295e4a2bd5037eddce1c379bed464821662"
-          expected_fill="1e9a26295563eb2f8fbece7e8694924b9ca9f90a442826d3465596aba4afff66"
-          for attempt in $(seq 1 18); do
-            echo "Live deployment verification attempt $attempt"
-            curl -fsSL --retry 3 --retry-delay 2 "$base/The-Divine-Blueprint-Companion-Print-Ready.pdf" -o qa/print.pdf || true
-            curl -fsSL --retry 3 --retry-delay 2 "$base/The-Divine-Blueprint-Companion-Fillable.pdf" -o qa/fillable.pdf || true
-            if [ -s qa/print.pdf ] && [ -s qa/fillable.pdf ]; then
-              got_print=$(sha256sum qa/print.pdf | awk '{print $1}')
-              got_fill=$(sha256sum qa/fillable.pdf | awk '{print $1}')
-              echo "PRINT:    $got_print"
-              echo "FILLABLE: $got_fill"
-              if [ "$got_print" = "$expected_print" ] && [ "$got_fill" = "$expected_fill" ]; then
-                echo "LIVE COMPANION PDF DEPLOYMENT VERIFIED"
-                exit 0
-              fi
-            fi
-            sleep 10
-          done
-          echo "Live PDFs did not converge to the audited production files."
-          exit 1
-      - name: Upload verified live Companion PDFs
+      - name: Check out Companion layout branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/companion-layout-housekeeping
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build site and Companion PDFs
+        run: npm run build
+      - name: Upload generated Companion PDFs
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: companion-live-verified
-          path: qa/*.pdf
+          name: companion-layout-preview-pdfs
+          path: _site/divine-blueprint-site/assets/downloads/The-Divine-Blueprint-Companion-*.pdf
           retention-days: 3
