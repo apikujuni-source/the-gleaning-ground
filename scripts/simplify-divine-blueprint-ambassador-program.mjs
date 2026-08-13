@@ -121,10 +121,13 @@ const ambassadorMain = `<main id="main">
     <form class="contact-form ambassador-form" name="divine-blueprint-ambassador-application" method="POST" action="/ambassadors/thanks" data-netlify="true" netlify-honeypot="bot-field">
       <input type="hidden" name="form-name" value="divine-blueprint-ambassador-application">
       <p class="hidden-field"><label>Do not fill this out: <input name="bot-field"></label></p>
-      <div class="form-row">
-        <label>Full name<input name="name" type="text" autocomplete="name" required></label>
-        <label>Email address<input name="email" type="email" autocomplete="email" required></label>
-      </div>
+      <label>Full name
+        <input name="name" type="text" autocomplete="name" placeholder="Your full name" required>
+      </label>
+      <label class="ambassador-email-field">Email address (required)
+        <input name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
+        <small class="form-note">Please use an email address you check regularly. This is how we will contact selected ambassadors.</small>
+      </label>
       <div class="form-row">
         <label>Phone or WhatsApp <span>(optional)</span><input name="phone" type="tel" autocomplete="tel"></label>
         <label>City and country<input name="location" type="text" required></label>
@@ -199,10 +202,15 @@ thanksHtml = replaceMain(thanksHtml, thanksMain);
 fs.writeFileSync(thanksPath, thanksHtml);
 
 const check = fs.readFileSync(ambassadorPath, 'utf8');
-for (const required of ['Ambassador Requirements', 'Program Benefits', '15%', 'applications are reviewed', 'Toolkit sent manually']) {
+for (const required of ['Ambassador Requirements', 'Program Benefits', '15%', 'applications are reviewed', 'Toolkit sent manually', 'Email address', 'you@example.com', 'This is how we will contact selected ambassadors']) {
   if (!check.toLowerCase().includes(required.toLowerCase())) {
     throw new Error(`Simplified ambassador page is missing required copy: ${required}`);
   }
 }
 
-console.log('Simplified Divine Blueprint Ambassador flow installed: requirements, benefits, application, manual selection, manual contact, and toolkit delivery.');
+const emailInputs = check.match(/<input\b[^>]*name=["']email["'][^>]*>/gi) || [];
+if (emailInputs.length !== 1 || !/type=["']email["']/i.test(emailInputs[0]) || !/\brequired\b/i.test(emailInputs[0])) {
+  throw new Error('Ambassador application must contain exactly one required email input.');
+}
+
+console.log('Simplified Divine Blueprint Ambassador flow installed with a prominent required email contact field.');
