@@ -10,7 +10,7 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Companion preview PDFs
+      - name: Fetch latest Companion preview PDFs
         shell: bash
         run: |
           set -euo pipefail
