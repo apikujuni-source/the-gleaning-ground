@@ -10,14 +10,24 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Companion preview PDFs
+      - name: Resolve and fetch Companion preview PDFs
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p qa
-          base="https://deploy-preview-58--the-divine-blueprint.netlify.app/assets/downloads"
-          curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Print-Ready.pdf" -o qa/print.pdf
-          curl -fL --retry 5 --retry-delay 3 "$base/The-Divine-Blueprint-Companion-Fillable.pdf" -o qa/fillable.pdf
+          host="https://deploy-preview-58--the-divine-blueprint.netlify.app"
+          curl -fL --retry 5 --retry-delay 3 "$host/companion" -o qa/companion.html
+          grep -oiE 'href="[^"]+\.pdf[^"]*"' qa/companion.html | sed 's/^href="//;s/"$//' | sort -u | tee qa/pdf-links.txt
+          print_path=$(grep -oiE 'href="[^"]*Companion-Print-Ready[^" ]*\.pdf[^" ]*"' qa/companion.html | head -1 | sed 's/^href="//;s/"$//')
+          fill_path=$(grep -oiE 'href="[^"]*Companion-Fillable[^" ]*\.pdf[^" ]*"' qa/companion.html | head -1 | sed 's/^href="//;s/"$//')
+          test -n "$print_path"
+          test -n "$fill_path"
+          case "$print_path" in http*) print_url="$print_path";; *) print_url="$host${print_path}";; esac
+          case "$fill_path" in http*) fill_url="$fill_path";; *) fill_url="$host${fill_path}";; esac
+          echo "PRINT=$print_url" | tee qa/resolved.txt
+          echo "FILLABLE=$fill_url" | tee -a qa/resolved.txt
+          curl -fL --retry 5 --retry-delay 3 "$print_url" -o qa/print.pdf
+          curl -fL --retry 5 --retry-delay 3 "$fill_url" -o qa/fillable.pdf
           test -s qa/print.pdf
           test -s qa/fillable.pdf
           ls -lh qa/*.pdf
@@ -25,5 +35,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: companion-preview-pdfs
-          path: qa/*.pdf
+          path: |
+            qa/*.pdf
+            qa/resolved.txt
+            qa/pdf-links.txt
           retention-days: 3
