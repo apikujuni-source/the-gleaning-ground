@@ -124,7 +124,7 @@ const ambassadorMain = `<main id="main">
       <label>Full name
         <input name="name" type="text" autocomplete="name" placeholder="Your full name" required>
       </label>
-      <label class="ambassador-email-field">Email address <span>(required)</span>
+      <label class="ambassador-email-field">Email address (required)
         <input name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
         <small class="form-note">Please use an email address you check regularly. This is how we will contact selected ambassadors.</small>
       </label>
