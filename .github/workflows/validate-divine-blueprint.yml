@@ -2,7 +2,7 @@ name: Validate Divine Blueprint website
 
 on:
   push:
-    branches: [main]
+    branches: [main, agent/diagnose-text-flow-live]
   workflow_dispatch:
 
 permissions:
@@ -29,3 +29,15 @@ jobs:
 
       - name: Validate final website output
         run: node scripts/validate-divine-blueprint-build.mjs
+
+      - name: Upload text-flow diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: divine-blueprint-text-flow-debug
+          path: |
+            _site/divine-blueprint-site/**/*.html
+            _site/divine-blueprint-site/assets/styles.css
+            _site/divine-blueprint-site/assets/text-flow-audit.json
+            _site/divine-blueprint-site/assets/typography-audit.json
+          if-no-files-found: error
+          retention-days: 1
