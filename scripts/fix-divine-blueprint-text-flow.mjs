@@ -304,7 +304,7 @@ for (const requiredCss of [
   "--db-type-h1:clamp(2rem,8.7vw,2.20rem)",
   ".prose{",
   "padding:clamp(1.20rem,5.25vw,1.40rem)!important",
-  "compact card"
+  "font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important"
 ]) {
   if (!styles.includes(requiredCss)) throw new Error(`Missing professional text-flow correction: ${requiredCss}`);
 }
