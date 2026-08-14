@@ -32,7 +32,7 @@ const typographyAudit = JSON.parse(await readFile(join(root, "assets/typography-
 const requiredCompanionFragments = [
   '<base href="/">',
   `href="${styleUrl}"`,
-  'More Than a<br>Journal',
+  'More Than<br>a Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
   `src="${companionCoverPath}"`,
@@ -48,6 +48,14 @@ const requiredCompanionFragments = [
 
 for (const fragment of requiredCompanionFragments) {
   if (!companion.includes(fragment)) throw new Error(`Companion page is missing: ${fragment}`);
+}
+
+const companionHeading = companion.match(/<h1\b[^>]*\bid=["']companion-original-title["'][^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "";
+if (companionHeading !== "More Than<br>a Journal") {
+  throw new Error(`Companion title is not locked to two lines: ${companionHeading}`);
+}
+if ((companionHeading.match(/<br\s*\/?\s*>/gi) || []).length !== 1) {
+  throw new Error("Companion title must contain exactly one explicit line break.");
 }
 
 const coverTag = companion.match(
@@ -83,6 +91,9 @@ if (/canonical-book-cover\.js|divine-blueprint-cover-final\.js|companion-cover-d
 }
 if (!styles.includes("SINGLE FLAT COVER Companion page")) {
   throw new Error("Single flat-cover Companion CSS is missing.");
+}
+if (!styles.includes("COMPANION TWO-LINE TITLE: START") || !styles.includes("white-space:nowrap")) {
+  throw new Error("Companion two-line title protection is missing.");
 }
 if (!styles.includes("object-fit:contain!important")) {
   throw new Error("The flat cover is not protected from cropping.");
