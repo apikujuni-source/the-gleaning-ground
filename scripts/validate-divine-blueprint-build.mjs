@@ -3,9 +3,9 @@ import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 const root = "_site/divine-blueprint-site";
-const styleUrl = "/assets/styles.css?v=20260814-text-flow-v2";
+const styleUrl = "/assets/styles.css?v=20260814-text-flow-v3";
 const typographyVersion = "20260805-responsive-type-v1";
-const textFlowVersion = "20260814-text-flow-v2";
+const textFlowVersion = "20260814-text-flow-v3";
 const companionCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const requiredFiles = [
   "companion.html",
@@ -35,7 +35,7 @@ const textFlowAudit = JSON.parse(await readFile(join(root, "assets/text-flow-aud
 const requiredCompanionFragments = [
   '<base href="/">',
   `href="${styleUrl}"`,
-  'More Than<br>a Journal',
+  'More Than a Journal',
   'class="companion-flat-book"',
   'class="companion-flat-book-image"',
   `src="${companionCoverPath}"`,
@@ -54,11 +54,11 @@ for (const fragment of requiredCompanionFragments) {
 }
 
 const companionHeading = companion.match(/<h1\b[^>]*\bid=["']companion-original-title["'][^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "";
-if (companionHeading !== "More Than<br>a Journal") {
-  throw new Error(`Companion title is not locked to two lines: ${companionHeading}`);
+if (companionHeading !== "More Than a Journal") {
+  throw new Error(`Companion title is not locked to one line: ${companionHeading}`);
 }
-if ((companionHeading.match(/<br\s*\/?\s*>/gi) || []).length !== 1) {
-  throw new Error("Companion title must contain exactly one explicit line break.");
+if (/<br\s*\/?\s*>/i.test(companionHeading)) {
+  throw new Error("Companion title contains a forced line break.");
 }
 
 const coverTag = companion.match(
@@ -95,8 +95,8 @@ if (/canonical-book-cover\.js|divine-blueprint-cover-final\.js|companion-cover-d
 if (!styles.includes("SINGLE FLAT COVER Companion page")) {
   throw new Error("Single flat-cover Companion CSS is missing.");
 }
-if (!styles.includes("COMPANION TWO-LINE TITLE: START") || !styles.includes("white-space:nowrap")) {
-  throw new Error("Companion two-line title protection is missing.");
+if (!styles.includes("COMPANION SINGLE-LINE TITLE: START") || !styles.includes("white-space:nowrap!important")) {
+  throw new Error("Companion single-line title protection is missing.");
 }
 if (!styles.includes("object-fit:contain!important")) {
   throw new Error("The flat cover is not protected from cropping.");
@@ -108,14 +108,17 @@ if (/<[^>]*data-modal-open[^>]*>[^<]*Get the Companion/i.test(companion)) {
 if (!styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: START") || !styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: END")) {
   throw new Error("The site-wide responsive typography layer is missing.");
 }
-if (!styles.includes("PROFESSIONAL TEXT FLOW: START") || !styles.includes("text-wrap:wrap!important")) {
-  throw new Error("The site-wide professional text-flow layer is missing.");
+if (!styles.includes("PROFESSIONAL TEXT FLOW: START") || !styles.includes("max-width:min(1040px,100%)!important")) {
+  throw new Error("The site-wide professional text-flow layer is missing its width corrections.");
 }
 if (typographyAudit.version !== typographyVersion || !Array.isArray(typographyAudit.pages)) {
   throw new Error("The typography audit report is missing or has the wrong version.");
 }
 if (textFlowAudit.version !== textFlowVersion || !Array.isArray(textFlowAudit.pages)) {
   throw new Error("The text-flow audit report is missing or has the wrong version.");
+}
+if (!Array.isArray(textFlowAudit.widthConstraintsCorrected) || textFlowAudit.widthConstraintsCorrected.length !== 4) {
+  throw new Error("The text-flow audit did not verify all four global width corrections.");
 }
 
 const failures = [];
@@ -141,7 +144,6 @@ async function walk(directory) {
     htmlPageCount += 1;
     const pagePath = relative(root, path).replaceAll("\\", "/");
     const isHomepage = pagePath === "index.html";
-    const isCompanion = pagePath === "companion.html" || pagePath === "companion/index.html";
     const html = await readFile(path, "utf8");
 
     if (/href=["']\/?divine-blueprint-site\//i.test(html)) {
@@ -162,9 +164,9 @@ async function walk(directory) {
 
     for (const heading of html.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) {
       const inner = heading[2];
-      if (!/<br\s*\/?>/i.test(inner)) continue;
-      const approved = isCompanion && plainText(inner).toLowerCase() === "more than a journal";
-      if (!approved) failures.push(`${path}: unnecessary forced heading line break in “${plainText(inner)}”`);
+      if (/<br\s*\/?>/i.test(inner)) {
+        failures.push(`${path}: unnecessary forced heading line break in “${plainText(inner)}”`);
+      }
     }
 
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
@@ -196,4 +198,4 @@ if (textFlowAudit.pageCount !== htmlPageCount || textFlowAudit.pages.length !== 
 }
 
 if (failures.length) throw new Error(failures.join("\n"));
-console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages with natural text flow, the approved Companion Journal cover, and clean public routes.`);
+console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages with corrected width constraints, natural text flow, a single-line Companion title, the approved Companion Journal cover, and clean public routes.`);
