@@ -3,8 +3,9 @@ import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 const root = "_site/divine-blueprint-site";
-const styleUrl = "/assets/styles.css?v=20260805-responsive-type-v1";
+const styleUrl = "/assets/styles.css?v=20260814-text-flow-v2";
 const typographyVersion = "20260805-responsive-type-v1";
+const textFlowVersion = "20260814-text-flow-v2";
 const companionCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const requiredFiles = [
   "companion.html",
@@ -15,6 +16,7 @@ const requiredFiles = [
   "assets/divine-blueprint-cover.webp",
   "assets/companion-journal-cover-v3.webp",
   "assets/typography-audit.json",
+  "assets/text-flow-audit.json",
   "assets/downloads/The-Divine-Blueprint-Companion-Fillable.pdf",
   "assets/downloads/The-Divine-Blueprint-Companion-Print-Ready.pdf"
 ];
@@ -28,6 +30,7 @@ const companionPath = join(root, "companion/index.html");
 const companion = await readFile(companionPath, "utf8");
 const styles = await readFile(join(root, "assets/styles.css"), "utf8");
 const typographyAudit = JSON.parse(await readFile(join(root, "assets/typography-audit.json"), "utf8"));
+const textFlowAudit = JSON.parse(await readFile(join(root, "assets/text-flow-audit.json"), "utf8"));
 
 const requiredCompanionFragments = [
   '<base href="/">',
@@ -105,12 +108,26 @@ if (/<[^>]*data-modal-open[^>]*>[^<]*Get the Companion/i.test(companion)) {
 if (!styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: START") || !styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: END")) {
   throw new Error("The site-wide responsive typography layer is missing.");
 }
+if (!styles.includes("PROFESSIONAL TEXT FLOW: START") || !styles.includes("text-wrap:wrap!important")) {
+  throw new Error("The site-wide professional text-flow layer is missing.");
+}
 if (typographyAudit.version !== typographyVersion || !Array.isArray(typographyAudit.pages)) {
   throw new Error("The typography audit report is missing or has the wrong version.");
+}
+if (textFlowAudit.version !== textFlowVersion || !Array.isArray(textFlowAudit.pages)) {
+  throw new Error("The text-flow audit report is missing or has the wrong version.");
 }
 
 const failures = [];
 let htmlPageCount = 0;
+
+function plainText(html = "") {
+  return String(html)
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -124,19 +141,30 @@ async function walk(directory) {
     htmlPageCount += 1;
     const pagePath = relative(root, path).replaceAll("\\", "/");
     const isHomepage = pagePath === "index.html";
+    const isCompanion = pagePath === "companion.html" || pagePath === "companion/index.html";
     const html = await readFile(path, "utf8");
 
     if (/href=["']\/?divine-blueprint-site\//i.test(html)) {
       failures.push(`${path}: exposes internal folder in a public link`);
     }
     if (!html.includes(`href="${styleUrl}"`)) {
-      failures.push(`${path}: stylesheet reference is not cache-busted for responsive typography`);
+      failures.push(`${path}: stylesheet reference is not cache-busted for the current text-flow revision`);
     }
     if (!html.includes(`data-typography-audit="${typographyVersion}"`)) {
       failures.push(`${path}: typography audit marker is missing`);
     }
+    if (!html.includes(`data-text-flow-audit="${textFlowVersion}"`)) {
+      failures.push(`${path}: text-flow audit marker is missing`);
+    }
     if (!/<meta\b[^>]*name=(['"])viewport\1/i.test(html)) {
       failures.push(`${path}: responsive viewport metadata is missing`);
+    }
+
+    for (const heading of html.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) {
+      const inner = heading[2];
+      if (!/<br\s*\/?>/i.test(inner)) continue;
+      const approved = isCompanion && plainText(inner).toLowerCase() === "more than a journal";
+      if (!approved) failures.push(`${path}: unnecessary forced heading line break in “${plainText(inner)}”`);
     }
 
     for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
@@ -163,6 +191,9 @@ await walk(root);
 if (typographyAudit.pageCount !== htmlPageCount || typographyAudit.pages.length !== htmlPageCount) {
   failures.push(`Typography audit covers ${typographyAudit.pages.length} pages, but the build contains ${htmlPageCount} HTML pages.`);
 }
+if (textFlowAudit.pageCount !== htmlPageCount || textFlowAudit.pages.length !== htmlPageCount) {
+  failures.push(`Text-flow audit covers ${textFlowAudit.pages.length} pages, but the build contains ${htmlPageCount} HTML pages.`);
+}
 
 if (failures.length) throw new Error(failures.join("\n"));
-console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages, the approved Companion Journal cover, and clean public routes.`);
+console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages with natural text flow, the approved Companion Journal cover, and clean public routes.`);
