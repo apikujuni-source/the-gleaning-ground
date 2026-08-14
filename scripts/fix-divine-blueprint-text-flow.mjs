@@ -5,7 +5,7 @@ import { join, relative } from "node:path";
 const root = "_site/divine-blueprint-site";
 const stylesPath = join(root, "assets", "styles.css");
 const reportPath = join(root, "assets", "text-flow-audit.json");
-const auditVersion = "20260814-text-flow-v3";
+const auditVersion = "20260814-text-flow-v4";
 const blockStart = "/* PROFESSIONAL TEXT FLOW: START */";
 const blockEnd = "/* PROFESSIONAL TEXT FLOW: END */";
 
@@ -13,9 +13,10 @@ if (!existsSync(stylesPath)) throw new Error(`Missing Divine Blueprint styleshee
 
 const textFlowCss = `${blockStart}
 /*
-  Professional natural text flow across the Divine Blueprint site.
-  These rules remove artificial text-column restrictions and tune the display
-  type scale so words use available space before wrapping to another line.
+  Final text-flow refinement.
+  The goal is not to force every heading onto one line, but to remove avoidable
+  wrapping caused by narrow measures, oversized display type, compact-card
+  typography, and desktop padding carried unchanged onto small screens.
 */
 :where(h1,h2,h3,h4,h5,h6){
   text-wrap:wrap!important;
@@ -27,38 +28,57 @@ const textFlowCss = `${blockStart}
   max-width:none!important;
 }
 
-/* The original stylesheet restricted every H1 to 780px. Let headings use the
-   width of their actual layout column instead. */
 h1{max-width:none!important;width:auto}
 
-/* Section headings were globally capped at 760px even inside a 1160px
-   container. Widen them while retaining a deliberate, centered measure. */
 .section-head{
   width:100%!important;
   max-width:min(1040px,100%)!important;
 }
 
-/* Page heroes were artificially narrowed to 900px. Keep the normal site
-   container width so headings can use the available desktop space. */
 .page-hero .container{
   max-width:1160px!important;
 }
 
-/* Lead text remains readable, but the old 650px cap was visibly too narrow
-   beside wider headings and layouts. */
 .lead{
   max-width:min(850px,100%)!important;
 }
 
-/* The previous responsive type scale made display headings unnecessarily
-   large, which created extra lines even after the width caps were removed.
-   This keeps the hierarchy strong while allowing more complete phrases per line. */
+/* A slightly tighter display scale prevents short headings from spilling onto
+   a new line while keeping the hierarchy strong on large screens. */
 @media(min-width:768px){
   :root{
     --db-type-h1:clamp(2.25rem,1.65rem + 2.6vw,3.85rem);
-    --db-type-h2:clamp(1.70rem,1.38rem + 1.25vw,2.55rem);
-    --db-type-h3:clamp(1.22rem,1.10rem + .45vw,1.50rem);
+    --db-type-h2:clamp(1.65rem,1.23rem + 1.25vw,2.30rem);
+    --db-type-h3:clamp(1.18rem,1.08rem + .40vw,1.42rem);
   }
+}
+
+/* Compact cards were one of the remaining sources of awkward two-word wraps.
+   Their headings need a denser scale than page or section headings. */
+:where(
+  .chapter-card,
+  .resource-card,
+  .feature,
+  .feature-card,
+  .study-card,
+  .teaching-card,
+  .edition-card,
+  .program-card,
+  .companion-preview-grid article,
+  .give-copy-benefit-grid article,
+  .partner-benefit-grid article,
+  .pathway-card,
+  .ambassador-step-grid article
+) h3{
+  font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important;
+  line-height:1.20!important;
+  letter-spacing:-.008em!important;
+}
+
+/* Give five-column Companion preview cards a little more usable text width. */
+.companion-preview-grid article{
+  padding-left:clamp(1.05rem,1.3vw,1.25rem)!important;
+  padding-right:clamp(1.05rem,1.3vw,1.25rem)!important;
 }
 
 :where(main p,main li,main dd,main dt,main blockquote,main figcaption,article p,article li,.prose p,.prose li){
@@ -75,8 +95,6 @@ h1{max-width:none!important;width:auto}
   max-width:none!important;
 }
 
-/* This title is intentionally one line at every viewport. Its own title
-   sizing is installed by fix-companion-title-layout.mjs. */
 .companion-original-copy #companion-original-title{
   text-wrap:nowrap!important;
   white-space:nowrap!important;
@@ -87,11 +105,39 @@ h1{max-width:none!important;width:auto}
 
 @media(max-width:767px){
   :root{
-    --db-type-h1:clamp(2.25rem,9.8vw,2.40rem);
+    --db-type-h1:clamp(2rem,8.7vw,2.20rem);
+    --db-type-h2:clamp(1.50rem,6.8vw,1.75rem);
+    --db-type-h3:clamp(1.10rem,4.8vw,1.25rem);
   }
+
   .section-head{max-width:100%!important}
   .page-hero .container{max-width:100%!important}
   .lead{max-width:100%!important}
+
+  /* The original 2.2rem prose padding left only ~292px of text width on a
+     390px phone. This restores useful line length without crowding the card. */
+  .prose{
+    padding:clamp(1.20rem,5.25vw,1.40rem)!important;
+  }
+
+  :where(
+    .chapter-card,
+    .resource-card,
+    .feature,
+    .feature-card,
+    .study-card,
+    .teaching-card,
+    .edition-card,
+    .program-card,
+    .companion-preview-grid article,
+    .give-copy-benefit-grid article,
+    .partner-benefit-grid article,
+    .pathway-card,
+    .ambassador-step-grid article
+  ) h3{
+    font-size:clamp(1.08rem,4.55vw,1.20rem)!important;
+    line-height:1.22!important;
+  }
 }
 ${blockEnd}`;
 
@@ -213,9 +259,13 @@ const report = {
     "h1 max-width 780px",
     "section-head max-width 760px",
     "page-hero container max-width 900px",
-    "lead max-width 650px"
+    "lead max-width 650px",
+    "mobile prose padding 2.2rem",
+    "compact card heading scale"
   ],
   displayScaleAdjusted: true,
+  compactHeadingScaleAdjusted: true,
+  mobileReadingWidthAdjusted: true,
   pages: []
 };
 
@@ -247,21 +297,19 @@ for (const page of pages) {
 }
 
 for (const requiredCss of [
-  "h1{max-width:none!important",
-  ".section-head{",
   "max-width:min(1040px,100%)!important",
-  ".page-hero .container{",
   "max-width:1160px!important",
-  ".lead{",
   "max-width:min(850px,100%)!important",
-  "--db-type-h1:clamp(2.25rem,1.65rem + 2.6vw,3.85rem)",
-  "--db-type-h2:clamp(1.70rem,1.38rem + 1.25vw,2.55rem)",
-  "--db-type-h3:clamp(1.22rem,1.10rem + .45vw,1.50rem)"
+  "--db-type-h2:clamp(1.65rem,1.23rem + 1.25vw,2.30rem)",
+  "--db-type-h1:clamp(2rem,8.7vw,2.20rem)",
+  ".prose{",
+  "padding:clamp(1.20rem,5.25vw,1.40rem)!important",
+  "compact card"
 ]) {
   if (!styles.includes(requiredCss)) throw new Error(`Missing professional text-flow correction: ${requiredCss}`);
 }
 
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(
-  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks, corrected the four global width constraints, and tuned display type to reduce unnecessary wrapping.`
+  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks, tightened display and card heading scales, and restored useful mobile reading width.`
 );
