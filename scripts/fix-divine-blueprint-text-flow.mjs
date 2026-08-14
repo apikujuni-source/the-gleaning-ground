@@ -68,7 +68,8 @@ h1{max-width:none!important;width:auto}
   .give-copy-benefit-grid article,
   .partner-benefit-grid article,
   .pathway-card,
-  .ambassador-step-grid article
+  .ambassador-step-grid article,
+  .process-step
 ) h3{
   font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important;
   line-height:1.20!important;
@@ -120,6 +121,19 @@ h1{max-width:none!important;width:auto}
     padding:clamp(1.20rem,5.25vw,1.40rem)!important;
   }
 
+  /* The assessment box also retained 2rem desktop padding on phones. */
+  .assessment{
+    padding:clamp(1.15rem,4.8vw,1.30rem)!important;
+  }
+
+  /* Process cards reserved too much space for the numbered icon and gaps,
+     leaving short headings trapped in a narrow text column. */
+  .process-step{
+    grid-template-columns:52px minmax(0,1fr)!important;
+    gap:.85rem!important;
+    padding:1.15rem!important;
+  }
+
   :where(
     .chapter-card,
     .resource-card,
@@ -133,7 +147,8 @@ h1{max-width:none!important;width:auto}
     .give-copy-benefit-grid article,
     .partner-benefit-grid article,
     .pathway-card,
-    .ambassador-step-grid article
+    .ambassador-step-grid article,
+    .process-step
   ) h3{
     font-size:clamp(1.08rem,4.55vw,1.20rem)!important;
     line-height:1.22!important;
@@ -261,11 +276,15 @@ const report = {
     "page-hero container max-width 900px",
     "lead max-width 650px",
     "mobile prose padding 2.2rem",
-    "compact card heading scale"
+    "compact card heading scale",
+    "mobile assessment padding 2rem",
+    "mobile process-step text width"
   ],
   displayScaleAdjusted: true,
   compactHeadingScaleAdjusted: true,
   mobileReadingWidthAdjusted: true,
+  mobileAssessmentWidthAdjusted: true,
+  mobileProcessWidthAdjusted: true,
   pages: []
 };
 
@@ -302,14 +321,15 @@ for (const requiredCss of [
   "max-width:min(850px,100%)!important",
   "--db-type-h2:clamp(1.65rem,1.23rem + 1.25vw,2.30rem)",
   "--db-type-h1:clamp(2rem,8.7vw,2.20rem)",
-  ".prose{",
   "padding:clamp(1.20rem,5.25vw,1.40rem)!important",
-  "font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important"
+  "font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important",
+  "padding:clamp(1.15rem,4.8vw,1.30rem)!important",
+  "grid-template-columns:52px minmax(0,1fr)!important"
 ]) {
   if (!styles.includes(requiredCss)) throw new Error(`Missing professional text-flow correction: ${requiredCss}`);
 }
 
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(
-  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks, tightened display and card heading scales, and restored useful mobile reading width.`
+  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks, tightened display and card heading scales, and restored useful reading width in prose, assessment, and process layouts.`
 );
