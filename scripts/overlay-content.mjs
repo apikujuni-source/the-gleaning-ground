@@ -39,6 +39,20 @@ if (existsSync("cms/config.yml")) {
   await cp("cms/config.yml", "src/admin/config.yml");
 }
 
+const homepagePath = "src/index.njk";
+const oldHomepageVerse = '<div class="hero-verse"><span>John 6:12</span>“Gather up the fragments that remain, that nothing be lost.”</div>';
+const newHomepageVerse = '<div class="hero-verse"><span>Matthew 4:4</span>“Man shall not live on bread alone, but on every word that comes from the mouth of God.”</div>';
+
+if (existsSync(homepagePath)) {
+  const homepage = await readFile(homepagePath, "utf8");
+  if (!homepage.includes(newHomepageVerse) && !homepage.includes(oldHomepageVerse)) {
+    throw new Error("Could not find the homepage hero Scripture quotation to update.");
+  }
+  if (!homepage.includes(newHomepageVerse)) {
+    await writeFile(homepagePath, homepage.replace(oldHomepageVerse, newHomepageVerse), "utf8");
+  }
+}
+
 const textExtensions = new Set([
   ".css", ".html", ".js", ".json", ".md", ".njk", ".svg",
   ".txt", ".xml", ".yaml", ".yml"
