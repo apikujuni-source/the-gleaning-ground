@@ -3,9 +3,9 @@ import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 const root = "_site/divine-blueprint-site";
-const styleUrl = "/assets/styles.css?v=20260814-text-flow-v3";
+const styleUrl = "/assets/styles.css?v=20260814-text-flow-v4";
 const typographyVersion = "20260805-responsive-type-v1";
-const textFlowVersion = "20260814-text-flow-v3";
+const textFlowVersion = "20260814-text-flow-v4";
 const companionCoverPath = "/assets/companion-journal-cover-v3.webp?v=20260805-ivory-gold-journal";
 const requiredFiles = [
   "companion.html",
@@ -111,14 +111,32 @@ if (!styles.includes("RESPONSIVE TYPOGRAPHY AUDIT: START") || !styles.includes("
 if (!styles.includes("PROFESSIONAL TEXT FLOW: START") || !styles.includes("max-width:min(1040px,100%)!important")) {
   throw new Error("The site-wide professional text-flow layer is missing its width corrections.");
 }
+for (const fragment of [
+  "--db-type-h2:clamp(1.65rem,1.23rem + 1.25vw,2.30rem)",
+  "--db-type-h1:clamp(2rem,8.7vw,2.20rem)",
+  "padding:clamp(1.20rem,5.25vw,1.40rem)!important",
+  "font-size:clamp(1.10rem,1.03rem + .28vw,1.28rem)!important",
+  "padding:clamp(1.15rem,4.8vw,1.30rem)!important",
+  "grid-template-columns:52px minmax(0,1fr)!important"
+]) {
+  if (!styles.includes(fragment)) throw new Error(`Text-flow v4 refinement is missing: ${fragment}`);
+}
 if (typographyAudit.version !== typographyVersion || !Array.isArray(typographyAudit.pages)) {
   throw new Error("The typography audit report is missing or has the wrong version.");
 }
 if (textFlowAudit.version !== textFlowVersion || !Array.isArray(textFlowAudit.pages)) {
   throw new Error("The text-flow audit report is missing or has the wrong version.");
 }
-if (!Array.isArray(textFlowAudit.widthConstraintsCorrected) || textFlowAudit.widthConstraintsCorrected.length !== 4) {
-  throw new Error("The text-flow audit did not verify all four global width corrections.");
+if (!Array.isArray(textFlowAudit.widthConstraintsCorrected) || textFlowAudit.widthConstraintsCorrected.length !== 8) {
+  throw new Error("The text-flow audit did not verify all eight width/scale corrections.");
+}
+for (const flag of [
+  "compactHeadingScaleAdjusted",
+  "mobileReadingWidthAdjusted",
+  "mobileAssessmentWidthAdjusted",
+  "mobileProcessWidthAdjusted"
+]) {
+  if (!textFlowAudit[flag]) throw new Error(`The text-flow audit is missing ${flag}.`);
 }
 
 const failures = [];
@@ -198,4 +216,4 @@ if (textFlowAudit.pageCount !== htmlPageCount || textFlowAudit.pages.length !== 
 }
 
 if (failures.length) throw new Error(failures.join("\n"));
-console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages with corrected width constraints, natural text flow, a single-line Companion title, the approved Companion Journal cover, and clean public routes.`);
+console.log(`Validated ${htmlPageCount} responsive Divine Blueprint pages with refined heading scale, compact-card text flow, wider mobile reading areas, a single-line Companion title, the approved Companion Journal cover, and clean public routes.`);
