@@ -5,7 +5,7 @@ import { join, relative } from "node:path";
 const root = "_site/divine-blueprint-site";
 const stylesPath = join(root, "assets", "styles.css");
 const reportPath = join(root, "assets", "text-flow-audit.json");
-const auditVersion = "20260814-text-flow-v2";
+const auditVersion = "20260814-text-flow-v3";
 const blockStart = "/* PROFESSIONAL TEXT FLOW: START */";
 const blockEnd = "/* PROFESSIONAL TEXT FLOW: END */";
 
@@ -13,9 +13,9 @@ if (!existsSync(stylesPath)) throw new Error(`Missing Divine Blueprint styleshee
 
 const textFlowCss = `${blockStart}
 /*
-  Natural text flow across the Divine Blueprint site.
-  Prevent balanced/forced wrapping from creating premature line breaks,
-  while preserving the intentionally requested two-line Companion title.
+  Professional natural text flow across the Divine Blueprint site.
+  These rules remove artificial text-column restrictions that were causing
+  headings and lead copy to wrap while visible horizontal space was unused.
 */
 :where(h1,h2,h3,h4,h5,h6){
   text-wrap:wrap!important;
@@ -24,6 +24,30 @@ const textFlowCss = `${blockStart}
   line-break:auto!important;
   hyphens:none!important;
   white-space:normal;
+  max-width:none!important;
+}
+
+/* The original stylesheet restricted every H1 to 780px. Let headings use the
+   width of their actual layout column instead. */
+h1{max-width:none!important;width:auto}
+
+/* Section headings were globally capped at 760px even inside a 1160px
+   container. Widen them while retaining a deliberate, centered measure. */
+.section-head{
+  width:100%!important;
+  max-width:min(1040px,100%)!important;
+}
+
+/* Page heroes were artificially narrowed to 900px. Keep the normal site
+   container width so headings can use the available desktop space. */
+.page-hero .container{
+  max-width:1160px!important;
+}
+
+/* Lead text remains readable, but the old 650px cap was visibly too narrow
+   beside wider headings and layouts. */
+.lead{
+  max-width:min(850px,100%)!important;
 }
 
 :where(main p,main li,main dd,main dt,main blockquote,main figcaption,article p,article li,.prose p,.prose li){
@@ -37,12 +61,23 @@ const textFlowCss = `${blockStart}
   text-wrap:wrap!important;
   overflow-wrap:normal!important;
   word-break:normal!important;
+  max-width:none!important;
 }
 
+/* This title is intentionally one line at every viewport. Its own title
+   sizing is installed by fix-companion-title-layout.mjs. */
 .companion-original-copy #companion-original-title{
-  text-wrap:wrap!important;
+  text-wrap:nowrap!important;
+  white-space:nowrap!important;
   overflow-wrap:normal!important;
   word-break:normal!important;
+  max-width:100%!important;
+}
+
+@media(max-width:767px){
+  .section-head{max-width:100%!important}
+  .page-hero .container{max-width:100%!important}
+  .lead{max-width:100%!important}
 }
 ${blockEnd}`;
 
@@ -82,31 +117,17 @@ function stripForcedBreaks(value = "") {
     .trim();
 }
 
-function isCompanionPath(pagePath) {
-  return pagePath === "companion.html" || pagePath === "companion/index.html";
-}
-
-function isApprovedCompanionHeading(value, pagePath) {
-  return isCompanionPath(pagePath) && plainText(value).toLowerCase() === "more than a journal";
-}
-
-function normalizeVisibleHeadings(html, pagePath, stats) {
+function normalizeVisibleHeadings(html, stats) {
   return html.replace(/<h([1-6])\b([^>]*)>([\s\S]*?)<\/h\1>/gi, (full, level, attributes, inner) => {
     const breakCount = (inner.match(/<br\s*\/?>/gi) || []).length;
     if (!breakCount) return full;
-
     stats.headingBreaksFound += breakCount;
-    if (isApprovedCompanionHeading(inner, pagePath)) {
-      stats.intentionalBreaksKept += 1;
-      return `<h${level}${attributes}>More Than<br>a Journal</h${level}>`;
-    }
-
     stats.headingBreaksRemoved += breakCount;
     return `<h${level}${attributes}>${stripForcedBreaks(inner)}</h${level}>`;
   });
 }
 
-function normalizeCmsPageData(html, pagePath, stats) {
+function normalizeCmsPageData(html, stats) {
   return html.replace(
     /<script\b([^>]*\bid=["']cms-page-data["'][^>]*)>([\s\S]*?)<\/script>/gi,
     (full, attributes, body) => {
@@ -122,25 +143,16 @@ function normalizeCmsPageData(html, pagePath, stats) {
         for (const field of section.textFields || []) {
           if (!field || typeof field !== "object") continue;
           const xpath = String(field.xpath || "");
-          const isHeadingField = /\/h[1-6]$/i.test(xpath);
-          if (!isHeadingField || typeof field.value !== "string") continue;
+          if (!/\/h[1-6]$/i.test(xpath) || typeof field.value !== "string") continue;
 
           const breakCount = (field.value.match(/<br\s*\/?>/gi) || []).length;
           if (!breakCount) continue;
 
           stats.cmsHeadingBreaksFound += breakCount;
-          if (isApprovedCompanionHeading(field.value, pagePath)) {
-            if (field.value !== "More Than<br>a Journal") {
-              field.value = "More Than<br>a Journal";
-              changed = true;
-            }
-            stats.cmsIntentionalBreaksKept += 1;
-            continue;
-          }
-
-          field.value = stripForcedBreaks(field.value);
-          if (typeof field.label === "string") field.label = field.label.replace(/\s+/g, " ").trim();
           stats.cmsHeadingBreaksRemoved += breakCount;
+          field.value = stripForcedBreaks(field.value);
+          field.mode = "text";
+          if (typeof field.label === "string") field.label = field.label.replace(/\s+/g, " ").trim();
           changed = true;
         }
       }
@@ -160,13 +172,10 @@ function addAuditMarker(html) {
   });
 }
 
-function findUnapprovedHeadingBreaks(html, pagePath) {
+function findHeadingBreaks(html) {
   const failures = [];
   for (const match of html.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) {
-    const inner = match[2];
-    if (!/<br\s*\/?>/i.test(inner)) continue;
-    if (isApprovedCompanionHeading(inner, pagePath)) continue;
-    failures.push(plainText(inner));
+    if (/<br\s*\/?>/i.test(match[2])) failures.push(plainText(match[2]));
   }
   return failures;
 }
@@ -184,10 +193,14 @@ const report = {
   pageCount: pages.length,
   headingBreaksFound: 0,
   headingBreaksRemoved: 0,
-  intentionalBreaksKept: 0,
   cmsHeadingBreaksFound: 0,
   cmsHeadingBreaksRemoved: 0,
-  cmsIntentionalBreaksKept: 0,
+  widthConstraintsCorrected: [
+    "h1 max-width 780px",
+    "section-head max-width 760px",
+    "page-hero container max-width 900px",
+    "lead max-width 650px"
+  ],
   pages: []
 };
 
@@ -196,41 +209,41 @@ for (const page of pages) {
   const stats = {
     headingBreaksFound: 0,
     headingBreaksRemoved: 0,
-    intentionalBreaksKept: 0,
     cmsHeadingBreaksFound: 0,
-    cmsHeadingBreaksRemoved: 0,
-    cmsIntentionalBreaksKept: 0
+    cmsHeadingBreaksRemoved: 0
   };
 
   let html = await readFile(page, "utf8");
-  html = normalizeVisibleHeadings(html, pagePath, stats);
-  html = normalizeCmsPageData(html, pagePath, stats);
+  html = normalizeVisibleHeadings(html, stats);
+  html = normalizeCmsPageData(html, stats);
   html = addAuditMarker(html);
 
-  const remaining = findUnapprovedHeadingBreaks(html, pagePath);
+  const remaining = findHeadingBreaks(html);
   if (remaining.length) {
     throw new Error(`${pagePath} still contains forced heading line breaks: ${remaining.join(" | ")}`);
   }
 
   await writeFile(page, html, "utf8");
 
-  for (const key of [
-    "headingBreaksFound",
-    "headingBreaksRemoved",
-    "intentionalBreaksKept",
-    "cmsHeadingBreaksFound",
-    "cmsHeadingBreaksRemoved",
-    "cmsIntentionalBreaksKept"
-  ]) report[key] += stats[key];
-
+  for (const key of ["headingBreaksFound", "headingBreaksRemoved", "cmsHeadingBreaksFound", "cmsHeadingBreaksRemoved"]) {
+    report[key] += stats[key];
+  }
   report.pages.push({ path: pagePath, ...stats });
 }
 
-if (!styles.includes(blockStart) || !styles.includes("text-wrap:wrap!important")) {
-  throw new Error("Professional text-flow CSS was not installed correctly.");
+for (const requiredCss of [
+  "h1{max-width:none!important",
+  ".section-head{",
+  "max-width:min(1040px,100%)!important",
+  ".page-hero .container{",
+  "max-width:1160px!important",
+  ".lead{",
+  "max-width:min(850px,100%)!important"
+]) {
+  if (!styles.includes(requiredCss)) throw new Error(`Missing professional text-flow correction: ${requiredCss}`);
 }
 
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(
-  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} visible forced heading breaks and ${report.cmsHeadingBreaksRemoved} CMS/runtime heading breaks. Preserved only the approved two-line Companion title.`
+  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks and corrected the four global width constraints that caused premature wrapping.`
 );
