@@ -14,8 +14,8 @@ if (!existsSync(stylesPath)) throw new Error(`Missing Divine Blueprint styleshee
 const textFlowCss = `${blockStart}
 /*
   Professional natural text flow across the Divine Blueprint site.
-  These rules remove artificial text-column restrictions that were causing
-  headings and lead copy to wrap while visible horizontal space was unused.
+  These rules remove artificial text-column restrictions and tune the display
+  type scale so words use available space before wrapping to another line.
 */
 :where(h1,h2,h3,h4,h5,h6){
   text-wrap:wrap!important;
@@ -50,6 +50,17 @@ h1{max-width:none!important;width:auto}
   max-width:min(850px,100%)!important;
 }
 
+/* The previous responsive type scale made display headings unnecessarily
+   large, which created extra lines even after the width caps were removed.
+   This keeps the hierarchy strong while allowing more complete phrases per line. */
+@media(min-width:768px){
+  :root{
+    --db-type-h1:clamp(2.25rem,1.65rem + 2.6vw,3.85rem);
+    --db-type-h2:clamp(1.70rem,1.38rem + 1.25vw,2.55rem);
+    --db-type-h3:clamp(1.22rem,1.10rem + .45vw,1.50rem);
+  }
+}
+
 :where(main p,main li,main dd,main dt,main blockquote,main figcaption,article p,article li,.prose p,.prose li){
   text-wrap:wrap!important;
   word-break:normal!important;
@@ -75,6 +86,9 @@ h1{max-width:none!important;width:auto}
 }
 
 @media(max-width:767px){
+  :root{
+    --db-type-h1:clamp(2.25rem,9.8vw,2.40rem);
+  }
   .section-head{max-width:100%!important}
   .page-hero .container{max-width:100%!important}
   .lead{max-width:100%!important}
@@ -201,6 +215,7 @@ const report = {
     "page-hero container max-width 900px",
     "lead max-width 650px"
   ],
+  displayScaleAdjusted: true,
   pages: []
 };
 
@@ -238,12 +253,15 @@ for (const requiredCss of [
   ".page-hero .container{",
   "max-width:1160px!important",
   ".lead{",
-  "max-width:min(850px,100%)!important"
+  "max-width:min(850px,100%)!important",
+  "--db-type-h1:clamp(2.25rem,1.65rem + 2.6vw,3.85rem)",
+  "--db-type-h2:clamp(1.70rem,1.38rem + 1.25vw,2.55rem)",
+  "--db-type-h3:clamp(1.22rem,1.10rem + .45vw,1.50rem)"
 ]) {
   if (!styles.includes(requiredCss)) throw new Error(`Missing professional text-flow correction: ${requiredCss}`);
 }
 
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(
-  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks and corrected the four global width constraints that caused premature wrapping.`
+  `Reviewed ${pages.length} Divine Blueprint pages for text flow; removed ${report.headingBreaksRemoved} forced heading breaks, corrected the four global width constraints, and tuned display type to reduce unnecessary wrapping.`
 );
