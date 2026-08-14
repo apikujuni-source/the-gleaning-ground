@@ -1,0 +1,29 @@
+name: Debug text flow v4
+
+on:
+  push:
+    branches: [agent/text-flow-v4-refinement]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run build
+      - run: node scripts/validate-divine-blueprint-build.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: text-flow-v4-preview
+          path: |
+            _site/divine-blueprint-site/**/*.html
+            _site/divine-blueprint-site/assets/styles.css
+            _site/divine-blueprint-site/assets/text-flow-audit.json
+          retention-days: 1
