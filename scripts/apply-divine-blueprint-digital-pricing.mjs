@@ -6,20 +6,20 @@ const config = JSON.parse(await readFile("content/divine-blueprint/purchase.json
 const noteMarker = "data-digital-pricing-note";
 const styleMarker = "/* Divine Blueprint Digital Pricing Summary */";
 
-const expected = {
-  digitalRegularPriceInternational: "$9.99",
-  digitalPreorderPriceInternational: "$7.99",
-  kindleRegularPrice: "$9.99",
-  kindleLaunchPrice: "$7.99",
-  digitalRegularPriceNigeria: "₦10,000",
-  digitalPreorderPriceNigeria: "₦8,000"
-};
-
-for (const [key, value] of Object.entries(expected)) {
-  if (config[key] !== value) throw new Error(`Unexpected ${key}: ${config[key]}; expected ${value}.`);
-}
-if (config.kindleRegularPrice !== config.digitalRegularPriceInternational || config.kindleLaunchPrice !== config.digitalPreorderPriceInternational) {
-  throw new Error("Kindle pricing must match the international digital pricing.");
+for (const key of [
+  "digitalRegularPriceInternational",
+  "digitalPreorderPriceInternational",
+  "digitalSavingsInternational",
+  "kindleRegularPrice",
+  "kindleLaunchPrice",
+  "kindleSavings",
+  "digitalRegularPriceNigeria",
+  "digitalPreorderPriceNigeria",
+  "digitalSavingsNigeria"
+]) {
+  if (typeof config[key] !== "string" || !config[key].trim()) {
+    throw new Error(`Purchase setting ${key} must be a non-empty string.`);
+  }
 }
 
 const note = `<div class="book-digital-pricing-note" ${noteMarker}>
@@ -49,46 +49,44 @@ async function findHtmlFiles(directory) {
   return files;
 }
 
-function removeExistingNote(html) {
-  return html.replace(/\s*<div\b[^>]*data-digital-pricing-note[^>]*>[\s\S]*?<\/div>\s*<small>Every digital copy includes access to the digital Companion Journal\.<\/small>\s*<\/div>/gi, "");
-}
-
 let pagesUpdated = 0;
-for (const page of await findHtmlFiles(siteRoot)) {
-  let html = await readFile(page, "utf8");
-  if (!html.includes('id="book-purchase-modal"')) continue;
+const preorderMode = config.mode === "preorder";
 
-  html = removeExistingNote(html);
-  if (!html.includes(styleMarker)) html = html.replace("</head>", `${styles}\n</head>`);
+if (preorderMode) {
+  for (const page of await findHtmlFiles(siteRoot)) {
+    let html = await readFile(page, "utf8");
+    if (!html.includes('id="book-purchase-modal"')) continue;
 
-  const gridClose = /(<div class="book-purchase-grid">[\s\S]*?<\/div>)\s*(<div class="book-purchase-footer">)/i;
-  if (!gridClose.test(html)) throw new Error(`Could not locate purchase grid/footer boundary in ${page}.`);
-  html = html.replace(gridClose, `$1\n${note}\n$2`);
+    if (!html.includes(styleMarker)) html = html.replace("</head>", `${styles}\n</head>`);
 
-  const modal = html.match(/<div class="book-purchase-modal"[\s\S]*?<\/section>\s*<\/div>/i)?.[0] || "";
-  for (const value of [
-    config.digitalRegularPriceInternational,
-    config.digitalPreorderPriceInternational,
-    config.digitalRegularPriceNigeria,
-    config.digitalPreorderPriceNigeria
-  ]) {
-    if (!modal.includes(value)) throw new Error(`${page}: digital pricing value missing from purchase modal: ${value}`);
+    const gridClose = /(<div class="book-purchase-grid">[\s\S]*?<\/div>)\s*(<div class="book-purchase-footer">)/i;
+    if (!gridClose.test(html)) throw new Error(`Could not locate purchase grid/footer boundary in ${page}.`);
+    if (!html.includes(noteMarker)) html = html.replace(gridClose, `$1\n${note}\n$2`);
+
+    const modal = html.match(/<div class="book-purchase-modal"[\s\S]*?<\/section>\s*<\/div>/i)?.[0] || "";
+    for (const value of [
+      config.digitalRegularPriceInternational,
+      config.digitalPreorderPriceInternational,
+      config.digitalRegularPriceNigeria,
+      config.digitalPreorderPriceNigeria
+    ]) {
+      if (!modal.includes(value)) throw new Error(`${page}: configured digital pricing value is missing from the purchase modal: ${value}`);
+    }
+    if ((modal.match(/data-digital-pricing-note/g) || []).length !== 1) {
+      throw new Error(`${page}: expected exactly one digital pricing summary.`);
+    }
+
+    await writeFile(page, html, "utf8");
+    pagesUpdated += 1;
   }
-  for (const stale of ["$6.99", "$8.99", "₦7,000", "₦9,000"]) {
-    if (modal.includes(stale)) throw new Error(`${page}: stale digital price remains in purchase modal: ${stale}`);
-  }
-  if ((modal.match(/data-digital-pricing-note/g) || []).length !== 1) throw new Error(`${page}: expected exactly one digital pricing summary.`);
 
-  await writeFile(page, html, "utf8");
-  pagesUpdated += 1;
+  if (!pagesUpdated) throw new Error("No Divine Blueprint purchase modals were updated with digital preorder pricing.");
 }
-
-if (!pagesUpdated) throw new Error("No Divine Blueprint purchase modals were updated with digital pricing.");
 
 await writeFile(
   join(siteRoot, "digital-pricing-status.txt"),
   [
-    "DIGITAL_PRICING=ACTIVE",
+    `DIGITAL_PRICING_MODE=${preorderMode ? "PREORDER" : "STANDARD"}`,
     `INTERNATIONAL_REGULAR=${config.digitalRegularPriceInternational}`,
     `INTERNATIONAL_PREORDER=${config.digitalPreorderPriceInternational}`,
     `NIGERIA_REGULAR=${config.digitalRegularPriceNigeria}`,
@@ -98,4 +96,8 @@ await writeFile(
   "utf8"
 );
 
-console.log(`Applied Divine Blueprint digital pricing summary across ${pagesUpdated} purchase page(s).`);
+console.log(
+  preorderMode
+    ? `Applied admin-managed Divine Blueprint digital preorder pricing across ${pagesUpdated} purchase page(s).`
+    : "Divine Blueprint digital pricing is in standard mode; preorder-only digital pricing summaries were not added."
+);
