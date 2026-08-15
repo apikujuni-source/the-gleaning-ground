@@ -69,20 +69,9 @@ footer [class*="footer"][class*="brand"]{
   text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 18px rgba(201,155,64,.22)!important;
 }
 
-footer a[data-ambassador-footer-link],
-footer a[href="/ambassadors"],
-footer a[href="/ambassadors/"]{
+.ambassador-invite h2{
   color:#fff4d6!important;
-  opacity:1!important;
-}
-
-footer a[data-ambassador-footer-link]:hover,
-footer a[data-ambassador-footer-link]:focus-visible,
-footer a[href="/ambassadors"]:hover,
-footer a[href="/ambassadors"]:focus-visible,
-footer a[href="/ambassadors/"]:hover,
-footer a[href="/ambassadors/"]:focus-visible{
-  color:#ffffff!important;
+  text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 18px rgba(201,155,64,.18)!important;
 }
 
 footer img.divine-footer-logo,
@@ -124,4 +113,4 @@ for (const page of pages) {
   }
 }
 
-console.log(`Applied a warm ivory, high-contrast treatment to footer branding and the Ambassador footer link on ${updatedPages} Divine Blueprint pages.`);
+console.log(`Applied a warm ivory, high-contrast treatment to footer branding and the homepage Ambassador callout heading on ${updatedPages} Divine Blueprint pages.`);
