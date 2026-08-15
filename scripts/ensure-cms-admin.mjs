@@ -6,11 +6,20 @@ const outputDirectory = "_site/admin";
 const sourceConfig = "cms/config.yml";
 const editorFragment = "cms/divine-blueprint-editor.yml";
 const brandingFragment = "cms/site-branding.yml";
+const controlFragment = "cms/site-control-center.yml";
 const siteSettingsPath = "content/site.json";
+const seriesTitlePath = "content/divine-blueprint/teaching-series-titles.json";
 const outputConfig = `${outputDirectory}/config.yml`;
 const outputIndex = `${outputDirectory}/index.html`;
 
-for (const requiredPath of [sourceConfig, editorFragment, brandingFragment, siteSettingsPath]) {
+for (const requiredPath of [
+  sourceConfig,
+  editorFragment,
+  brandingFragment,
+  controlFragment,
+  siteSettingsPath,
+  seriesTitlePath
+]) {
   if (!existsSync(requiredPath)) throw new Error(`Missing CMS source file: ${requiredPath}`);
 }
 
@@ -19,7 +28,9 @@ await mkdir(outputDirectory, { recursive: true });
 let config = await readFile(sourceConfig, "utf8");
 const editorContent = (await readFile(editorFragment, "utf8")).trimEnd();
 const brandingContent = (await readFile(brandingFragment, "utf8")).trimEnd();
+const controlContent = (await readFile(controlFragment, "utf8")).trimEnd();
 const siteSettings = JSON.parse(await readFile(siteSettingsPath, "utf8"));
+const seriesTitleMap = JSON.parse(await readFile(seriesTitlePath, "utf8"));
 const logoPath = String(siteSettings.logo || "/assets/uploads/logo_official.png").trim();
 const insertionMarker = "collections:\n";
 
@@ -30,6 +41,7 @@ if (!config.includes(insertionMarker)) {
 const fragments = [];
 if (!config.includes("name: site_branding")) fragments.push(brandingContent);
 if (!config.includes("name: divine_chapter_resources")) fragments.push(editorContent);
+if (!config.includes("name: divine_purchase_settings")) fragments.push(controlContent);
 if (fragments.length) {
   config = config.replace(insertionMarker, `${insertionMarker}${fragments.join("\n\n")}\n\n`);
 }
@@ -37,10 +49,14 @@ if (fragments.length) {
 config = config
   .replace(/^logo_url:.*$/m, `logo_url: https://gleaningground.com${logoPath}`)
   .replace("    label: The Divine Blueprint\n", '    label: "4. Homepage & Book Cover"\n')
-  .replace("    label: Divine Blueprint Pages\n", '    label: "Advanced — Divine Blueprint Pages"\n')
+  .replace("    label: Divine Blueprint Pages\n", '    label: "Divine Blueprint Pages — Full Static Page Editor"\n')
   .replace(
     '    description: "Edit the homepage, Start Here, all nine chapters, studies, teachings, podcast, companion, and ministry pages."',
-    '    description: "Advanced section-by-section editor. Use Site Logo & Branding, Edit Chapter Resources, Teaching Series, and Additional Teachings for normal updates."'
+    '    description: "Edit headings, paragraphs, buttons, links, images, form labels, SEO, and other captured content on every static Divine Blueprint page. Generated program pages have their own editor under Generated Sections & Special Pages."'
+  )
+  .replace(
+    '    description: "Edit every static section on gleaningground.com. Devotional, teaching, book, and resource cards remain connected to their dedicated collections."',
+    '    description: "Edit headings, paragraphs, buttons, links, images, form labels, SEO, and other captured content on every static gleaningground.com page. Devotional, teaching, book, and resource cards remain connected to their dedicated collections."'
   );
 
 let parsedConfig;
@@ -54,23 +70,62 @@ if (!parsedConfig || typeof parsedConfig !== "object" || !Array.isArray(parsedCo
   throw new Error("Generated CMS configuration is missing its collections array.");
 }
 
+const preferredOrder = [
+  "site_branding",
+  "divine_chapter_resources",
+  "divine_series_teachings",
+  "divine_teachings",
+  "divine_blueprint",
+  "divine_purchase_settings",
+  "divine_series_title_map",
+  "generated_site_controls",
+  "global_areas",
+  "main_pages",
+  "divine_pages",
+  "devotionals",
+  "teachings",
+  "books",
+  "resources",
+  "settings",
+  "advanced_site_overrides"
+];
+const order = new Map(preferredOrder.map((name, index) => [name, index]));
+parsedConfig.collections = parsedConfig.collections
+  .map((collection, index) => ({ collection, index }))
+  .sort((a, b) => {
+    const aRank = order.has(a.collection.name) ? order.get(a.collection.name) : 1000 + a.index;
+    const bRank = order.has(b.collection.name) ? order.get(b.collection.name) : 1000 + b.index;
+    return aRank - bRank;
+  })
+  .map(({ collection }) => collection);
+
 parsedConfig.logo_url = `https://gleaningground.com${logoPath}`;
 parsedConfig.load_config_file = false;
 const inlineConfig = JSON.stringify(parsedConfig).replaceAll("<", "\\u003c");
+await writeFile(outputConfig, YAML.stringify(parsedConfig), "utf8");
 
-await writeFile(outputConfig, config, "utf8");
-
-const chapterSeries = [
-  [1, "The Light of Men", ["The Condition Before Creation", "Without Form, Void, and in Darkness", "Why God Created Light First", "Jesus, the Light of Men", "The Spirit and the Word in Recreation"]],
-  [2, "If Children, Then Heirs", ["The Spirit of Adoption", "Redemption: Bought Back to God", "Translation into the Kingdom", "The Identity of a Child", "Heirs of God and Joint Heirs with Christ"]],
-  [3, "Partakers of His Divine Nature", ["What the Divine Nature Means", "Partakers of His Holiness", "No Condemnation in Christ", "Bold Access to the Father", "The Power at Work in Believers"]],
-  [4, "But Is Under Tutors", ["The Heir Who Is Still a Child", "God’s Tutors and Governors", "The Place of Discipline", "Learning Under Spiritual Authority", "Submitting to the Process"]],
-  [5, "Becoming Sons", ["Children by Birth, Sons by Maturity", "The Marks of Spiritual Childhood", "The Formation of Character", "Responsibility and Inheritance", "Growing into the Measure of Christ"]],
-  [6, "The Cross in the Making of Sons", ["The Cross Beyond Forgiveness", "Dying to Self-Will", "Learning Obedience", "Suffering and Spiritual Formation", "The Life of Christ Revealed in Us"]],
-  [7, "Knowledge in the Making of Sons", ["Knowledge That Transforms", "The Spirit of Wisdom and Revelation", "Scripture and Spiritual Formation", "Discernment in a Confused World", "Knowing God, Not Merely Knowing About Him"]],
-  [8, "The Fellowship of the Spirit in the Making of Sons", ["The Fellowship of the Holy Spirit", "Learning the Voice of the Spirit", "Prayer, Worship, and Communion", "The Role of Spiritual Community", "Walking in Intimacy and Power"]],
-  [9, "The Manifestation of the Sons of God", ["Creation Awaits Manifestation", "Character Before Visibility", "Gifts, Calling, and Stewardship", "Serving the Purposes of God", "Raising Other Sons"]]
-];
+if (!Array.isArray(seriesTitleMap.chapters) || seriesTitleMap.chapters.length !== 9) {
+  throw new Error("Canonical Teaching Series title map must contain all nine chapters.");
+}
+const chapterNames = new Map([
+  [1, "The Light of Men"],
+  [2, "If Children, Then Heirs"],
+  [3, "Partakers of His Divine Nature"],
+  [4, "But Is Under Tutors"],
+  [5, "Becoming Sons"],
+  [6, "The Cross in the Making of Sons"],
+  [7, "Knowledge in the Making of Sons"],
+  [8, "The Fellowship of the Spirit in the Making of Sons"],
+  [9, "The Manifestation of the Sons of God"]
+]);
+const chapterSeries = [...seriesTitleMap.chapters]
+  .sort((a, b) => Number(a.chapter) - Number(b.chapter))
+  .map(({ chapter, titles }) => {
+    if (!chapterNames.has(Number(chapter)) || !Array.isArray(titles) || titles.length !== 5) {
+      throw new Error(`Chapter ${chapter} must have exactly five canonical Teaching Series titles.`);
+    }
+    return [Number(chapter), chapterNames.get(Number(chapter)), titles];
+  });
 
 const seriesLinks = chapterSeries.map(([chapter, chapterTitle, titles]) => {
   const links = titles.map((title, index) => {
@@ -91,7 +146,7 @@ const adminHtml = `<!doctype html>
   <style>
     :root{color-scheme:light}
     body{margin:0;background:#f4f1e9}
-    .admin-help{position:fixed;right:18px;bottom:18px;z-index:99999;width:min(480px,calc(100vw - 36px));max-height:min(82vh,760px);overflow:auto;font:14px/1.5 Arial,sans-serif;color:#102f50;background:#fff;border:1px solid #d6c49b;border-radius:14px;box-shadow:0 12px 36px rgba(8,31,55,.2)}
+    .admin-help{position:fixed;right:18px;bottom:18px;z-index:99999;width:min(520px,calc(100vw - 36px));max-height:min(84vh,800px);overflow:auto;font:14px/1.5 Arial,sans-serif;color:#102f50;background:#fff;border:1px solid #d6c49b;border-radius:14px;box-shadow:0 12px 36px rgba(8,31,55,.2)}
     .admin-help summary{position:sticky;top:0;z-index:2;cursor:pointer;padding:12px 15px;font-weight:700;background:#102f50;color:white;border-radius:13px;list-style:none}
     .admin-help summary::-webkit-details-marker{display:none}
     .admin-help>div{padding:14px 16px}
@@ -99,6 +154,7 @@ const adminHtml = `<!doctype html>
     .admin-help li{margin:.35rem 0}
     .admin-help h3{margin:1rem 0 .55rem;font-size:15px}
     .admin-help>a,.admin-help div>a{color:#8a6424;font-weight:700}
+    .admin-help .note{padding:.7rem .8rem;background:#faf7ef;border-left:3px solid #b38742;border-radius:0 8px 8px 0}
     .series-shortcuts{display:grid;gap:.8rem}
     .series-chapter{display:grid;gap:.4rem;padding:.7rem;background:#faf7ef;border:1px solid #e5d6b5;border-radius:12px}
     .series-chapter h4{margin:0 0 .2rem;font-size:13px;color:#173b62}
@@ -113,15 +169,22 @@ const adminHtml = `<!doctype html>
 </head>
 <body>
   <details class="admin-help">
-    <summary>Gleaning Ground quick guide</summary>
+    <summary>Website admin quick guide</summary>
     <div>
       <ol>
-        <li><strong>Site Logo & Branding</strong> lets you upload the official logo yourself. The uploaded file is used exactly as supplied.</li>
-        <li><strong>Edit Chapter Resources</strong> changes the Central Truth, studies, questions, journal prompts, declarations, and prayers.</li>
-        <li><strong>Teaching Series</strong> contains the five teachings listed under every chapter. Each teaching is a separate editable entry.</li>
-        <li><strong>Additional Teachings</strong> is only for material outside a chapter’s Teaching Series.</li>
+        <li><strong>Site Logo & Branding</strong> — site identity, contact details, social links, and official logo.</li>
+        <li><strong>Gleaning Ground Pages</strong> — every captured static section on gleaningground.com, including homepage text and Scripture.</li>
+        <li><strong>Global Navigation & Footer</strong> — shared navigation/footer text, links, and images.</li>
+        <li><strong>Divine Blueprint Pages — Full Static Page Editor</strong> — homepage, Start Here, chapters, Companion, studies, teachings, podcast, and other static pages.</li>
+        <li><strong>Edit Chapter Resources</strong> — Central Truth, studies, group questions, Journal Prompts, declarations, and prayers. Journal Prompt changes also flow into the generated Companion Journal.</li>
+        <li><strong>Teaching Series / Additional Teachings</strong> — teaching titles, status, media, summaries, notes, and downloads.</li>
+        <li><strong>Book Sales, Pricing & Order Links</strong> — preorder/standard mode, all prices, savings, Amazon links, WhatsApp numbers, email, and ISBN.</li>
+        <li><strong>Generated Sections & Special Pages</strong> — Ambassador, Church Partner, Give a Copy, their homepage callouts, terms, and confirmation page.</li>
+        <li><strong>Advanced — Any Page / Site-Wide Override</strong> — for anything not exposed above, including exact text/HTML, links, images, and page-specific or site-wide CSS.</li>
       </ol>
+      <p class="note"><strong>Publishing:</strong> Save changes, then Publish them in the editorial workflow. The website rebuild applies your admin-managed content after generated sections so those edits are not silently overwritten.</p>
       <p><a href="#/collections/site_branding/entries/site">Open Site Logo & Branding →</a></p>
+      <p><a href="#/collections/divine_purchase_settings/entries/purchase">Open Book Sales & Pricing →</a></p>
       <h3>Edit a Teaching Series item directly</h3>
       <div class="series-shortcuts">${seriesLinks}</div>
       <p><a href="https://divineblueprint.gleaningground.com/teachings" target="_blank" rel="noopener">Open the public teachings page ↗</a></p>
@@ -148,4 +211,6 @@ const adminHtml = `<!doctype html>
 `;
 
 await writeFile(outputIndex, adminHtml, "utf8");
-console.log(`Built the CMS with ${parsedConfig.collections.length} collections, an editable official-logo setting, and 45 direct Teaching Series links.`);
+console.log(
+  `Built the CMS with ${parsedConfig.collections.length} collections, full static-page editors, generated-page controls, storefront settings, site-wide override capability, and 45 canonical Teaching Series shortcuts.`
+);
