@@ -38,6 +38,12 @@ jobs:
           grep -q 'Any Page / Site-Wide Override' _site/admin/index.html
           test -f _site/admin-site-overrides-status.json
           test -f _site/divine-blueprint-site/admin-site-overrides-status.json
+          test -f content/site-overrides/presets/divine-home-generated.json
+          test -f content/site-overrides/presets/divine-ambassadors.json
+          test -f content/site-overrides/presets/divine-ambassador-terms.json
+          test -f content/site-overrides/presets/divine-ambassador-thanks.json
+          test -f content/site-overrides/presets/divine-church-partners.json
+          test -f content/site-overrides/presets/divine-give-a-copy.json
       - name: Validate current homepage content
         run: |
           grep -q 'Matthew 4:4' _site/index.html
