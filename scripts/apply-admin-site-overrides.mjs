@@ -135,6 +135,7 @@ for (const file of files) {
   if (typeof entry.pagePath !== "string") {
     throw new Error(`${relative(process.cwd(), file)} is missing pagePath.`);
   }
+  const wildcard = entry.pagePath.trim() === "*";
 
   const candidates = await pageCandidates(entry.target, entry.pagePath);
   const matches = candidates.filter(existsSync);
@@ -164,7 +165,7 @@ for (const file of files) {
       const result = applyTextReplacement(html, item);
       html = result.html;
       replacementCount += result.count;
-      if (item.required !== false && result.count === 0 && String(item.value ?? "") !== String(item.find ?? "")) {
+      if (!wildcard && item.required !== false && result.count === 0 && String(item.value ?? "") !== String(item.find ?? "")) {
         throw new Error(
           `${entryReport.title}: could not find required ${item.mode === "html" ? "HTML" : "text"} field “${item.label || item.find}” in ${relative(process.cwd(), page)}.`
         );
@@ -176,7 +177,7 @@ for (const file of files) {
       const result = replaceAttribute(html, "href", item.from, item.to, Boolean(item.all));
       html = result.html;
       linkCount += result.count;
-      if (item.required !== false && result.count === 0 && item.from !== item.to) {
+      if (!wildcard && item.required !== false && result.count === 0 && item.from !== item.to) {
         throw new Error(`${entryReport.title}: link “${item.label || item.from}” was not found in ${relative(process.cwd(), page)}.`);
       }
     }
@@ -186,7 +187,7 @@ for (const file of files) {
       const result = replaceAttribute(html, "src", item.from, item.to, Boolean(item.all));
       html = result.html;
       imageCount += result.count;
-      if (item.required !== false && result.count === 0 && item.from !== item.to) {
+      if (!wildcard && item.required !== false && result.count === 0 && item.from !== item.to) {
         throw new Error(`${entryReport.title}: image “${item.label || item.from}” was not found in ${relative(process.cwd(), page)}.`);
       }
     }
