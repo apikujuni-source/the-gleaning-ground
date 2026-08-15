@@ -15,16 +15,9 @@
               - {label: "Standard — use active prices without preorder messaging", value: standard}
             hint: "When switching to Standard, set each Active Price to the price customers should currently pay."
           - {label: ISBN, name: isbn, widget: string}
-          - label: "Paperback — United States / International"
-            name: paperbackUsGroup
-            widget: object
-            collapsed: true
-            fields:
-              - {label: Planned / Regular Price, name: _regular, widget: hidden, required: false}
-            hint: "The actual editable paperback fields are immediately below."
-          - {label: Paperback Regular Price — US, name: paperbackRegularPriceUs, widget: string, hint: "Example: $14.99"}
-          - {label: Paperback Active Price — US, name: paperbackPriceUs, widget: string, hint: "The price displayed/used now. During preorder this is the preorder price."}
-          - {label: Paperback Savings Label — US, name: paperbackSavingsUs, widget: string, hint: "Example: Save $4.00"}
+          - {label: Paperback Regular Price — US / International, name: paperbackRegularPriceUs, widget: string, hint: "Example: $14.99"}
+          - {label: Paperback Active Price — US / International, name: paperbackPriceUs, widget: string, hint: "The price displayed/used now. During preorder this is the preorder price."}
+          - {label: Paperback Savings Label — US / International, name: paperbackSavingsUs, widget: string, hint: "Example: Save $4.00"}
           - {label: Digital Regular Price — International, name: digitalRegularPriceInternational, widget: string}
           - {label: Digital Preorder Price — International, name: digitalPreorderPriceInternational, widget: string}
           - {label: Digital Savings Label — International, name: digitalSavingsInternational, widget: string}
@@ -72,7 +65,7 @@
   - name: generated_site_controls
     label: "7. Generated Sections & Special Pages"
     label_singular: "Generated Page Control"
-    description: "Edit content that is generated late in the build, including the Ambassador, Church Partner, Give a Copy, and other special sections that are not part of the normal page editor."
+    description: "Edit the generated Ambassador, Ambassador Terms, Ambassador confirmation, Church Partner, Give a Copy, and homepage partner/outreach sections."
     folder: content/site-overrides/presets
     create: false
     extension: json
@@ -111,6 +104,7 @@
           - {label: Canonical URL, name: from, widget: hidden}
           - {label: Destination URL, name: to, widget: string}
           - {label: Replace Every Match, name: all, widget: hidden, default: false}
+          - {label: Required, name: required, widget: hidden, default: false}
       - label: Images
         name: images
         widget: list
@@ -124,12 +118,13 @@
           - {label: Canonical Image, name: from, widget: hidden}
           - {label: Image, name: to, widget: image}
           - {label: Replace Every Match, name: all, widget: hidden, default: false}
+          - {label: Required, name: required, widget: hidden, default: false}
       - {label: Page-Specific CSS Overrides, name: css, widget: text, required: false, hint: "Advanced. Add CSS only when you intentionally want to change this page’s styling."}
 
   - name: advanced_site_overrides
-    label: "Advanced — Any Page Override"
+    label: "Advanced — Any Page / Site-Wide Override"
     label_singular: "Page Override"
-    description: "A last-resort editor for content not exposed elsewhere. Create an override for any public page on either website, then replace exact text/HTML, links, images, or add page-specific CSS."
+    description: "A last-resort control for anything not exposed elsewhere. Replace exact text/HTML, links, images, or add CSS on any public page. Use * as the Page Path to apply an override to every page on the selected website."
     folder: content/site-overrides/custom
     create: true
     slug: "{{slug}}"
@@ -144,7 +139,7 @@
         options:
           - {label: "Gleaning Ground — gleaningground.com", value: main}
           - {label: "The Divine Blueprint — divineblueprint.gleaningground.com", value: divine}
-      - {label: Page Path, name: pagePath, widget: string, hint: "Examples: / for the homepage, /about, /chapter-1, /ambassadors"}
+      - {label: Page Path, name: pagePath, widget: string, hint: "Examples: / for the homepage, /about, /chapter-1, /ambassadors. Use * to apply to every public page on the selected website."}
       - {label: Enabled, name: enabled, widget: boolean, default: true}
       - label: Text / HTML Replacements
         name: replacements
@@ -176,6 +171,7 @@
           - {label: Current URL, name: from, widget: string}
           - {label: New URL, name: to, widget: string}
           - {label: Replace Every Match, name: all, widget: boolean, default: false}
+          - {label: Require a Match, name: required, widget: boolean, default: true}
       - label: Image Replacements
         name: images
         widget: list
@@ -187,4 +183,5 @@
           - {label: Current Image URL, name: from, widget: string}
           - {label: New Image, name: to, widget: image}
           - {label: Replace Every Match, name: all, widget: boolean, default: false}
-      - {label: Page-Specific CSS, name: css, widget: text, required: false, hint: "Advanced: CSS is injected only on this page."}
+          - {label: Require a Match, name: required, widget: boolean, default: true}
+      - {label: Page-Specific or Site-Wide CSS, name: css, widget: text, required: false, hint: "Advanced: CSS is injected on the selected page, or every page when Page Path is *."}
