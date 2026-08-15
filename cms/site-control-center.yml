@@ -1,0 +1,187 @@
+  - name: divine_purchase_settings
+    label: "5. Book Sales, Pricing & Order Links"
+    description: "Manage The Divine Blueprint storefront from the admin: active prices, regular prices, savings labels, ISBN, Amazon links, WhatsApp ordering, email, and Companion access URL."
+    files:
+      - label: "The Divine Blueprint — Purchase Settings"
+        name: purchase
+        file: content/divine-blueprint/purchase.json
+        format: json
+        fields:
+          - label: Store Mode
+            name: mode
+            widget: select
+            options:
+              - {label: "Preorder — show preorder messaging and savings", value: preorder}
+              - {label: "Standard — use active prices without preorder messaging", value: standard}
+            hint: "When switching to Standard, set each Active Price to the price customers should currently pay."
+          - {label: ISBN, name: isbn, widget: string}
+          - {label: Paperback Regular Price — US / International, name: paperbackRegularPriceUs, widget: string, hint: "Example: $14.99"}
+          - {label: Paperback Active Price — US / International, name: paperbackPriceUs, widget: string, hint: "The price displayed/used now. During preorder this is the preorder price."}
+          - {label: Paperback Savings Label — US / International, name: paperbackSavingsUs, widget: string, hint: "Example: Save $4.00"}
+          - {label: Digital Regular Price — International, name: digitalRegularPriceInternational, widget: string}
+          - {label: Digital Preorder Price — International, name: digitalPreorderPriceInternational, widget: string}
+          - {label: Digital Savings Label — International, name: digitalSavingsInternational, widget: string}
+          - {label: Kindle Regular Price, name: kindleRegularPrice, widget: string}
+          - {label: Kindle Active / Launch Price, name: kindleLaunchPrice, widget: string}
+          - {label: Kindle Savings Label, name: kindleSavings, widget: string}
+          - {label: Digital Regular Price — Nigeria, name: digitalRegularPriceNigeria, widget: string}
+          - {label: Digital Preorder Price — Nigeria, name: digitalPreorderPriceNigeria, widget: string}
+          - {label: Digital Savings Label — Nigeria, name: digitalSavingsNigeria, widget: string}
+          - {label: Paperback Regular Price — Nigeria, name: paperbackRegularPriceNigeria, widget: string}
+          - {label: Paperback Active Price — Nigeria, name: paperbackPriceNigeria, widget: string}
+          - {label: Paperback Savings Label — Nigeria, name: paperbackSavingsNigeria, widget: string}
+          - {label: Amazon Paperback URL, name: amazonPaperbackUrl, widget: string}
+          - {label: Amazon Kindle URL, name: amazonKindleUrl, widget: string}
+          - {label: Primary WhatsApp Number, name: whatsappPrimary, widget: string, hint: "Digits only, including country code. Example: 2347088530334"}
+          - {label: Alternate WhatsApp Number, name: whatsappAlternate, widget: string, required: false, hint: "Digits only, including country code."}
+          - {label: Order / Bulk Email, name: email, widget: string}
+          - {label: Companion Journal URL, name: companionUrl, widget: string}
+
+  - name: divine_series_title_map
+    label: "6. Canonical Teaching Series Titles"
+    description: "Edit the five official Teaching Series titles assigned to each chapter. These are the canonical titles used across chapter pages and the Teaching Series."
+    files:
+      - label: "All 45 Teaching Series Titles"
+        name: titles
+        file: content/divine-blueprint/teaching-series-titles.json
+        format: json
+        fields:
+          - {label: Version, name: version, widget: string, hint: "Internal version label. You may leave this unchanged when editing titles."}
+          - label: Chapters
+            name: chapters
+            widget: list
+            allow_add: false
+            collapsed: true
+            minimize_collapsed: true
+            summary: "Chapter {{fields.chapter}}"
+            fields:
+              - {label: Chapter Number, name: chapter, widget: number, value_type: int, min: 1, max: 9}
+              - label: Five Teaching Titles
+                name: titles
+                widget: list
+                allow_add: false
+                field: {label: Teaching Title, name: title, widget: string}
+
+  - name: generated_site_controls
+    label: "7. Generated Sections & Special Pages"
+    label_singular: "Generated Page Control"
+    description: "Edit the generated Ambassador, Ambassador Terms, Ambassador confirmation, Church Partner, Give a Copy, and homepage partner/outreach sections."
+    folder: content/site-overrides/presets
+    create: false
+    extension: json
+    format: json
+    identifier_field: adminTitle
+    fields:
+      - {label: Page / Section, name: adminTitle, widget: string}
+      - {label: Website, name: target, widget: hidden}
+      - {label: Page Path, name: pagePath, widget: hidden}
+      - {label: Enabled, name: enabled, widget: boolean, default: true}
+      - label: Text & HTML
+        name: replacements
+        widget: list
+        required: false
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field, name: label, widget: string}
+          - {label: Match Mode, name: mode, widget: hidden, default: text}
+          - {label: Canonical Source Text, name: find, widget: hidden}
+          - {label: Content, name: value, widget: text}
+          - {label: Replace Every Match, name: all, widget: hidden, default: false}
+          - {label: Required, name: required, widget: hidden, default: true}
+      - label: Links
+        name: links
+        widget: list
+        required: false
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field, name: label, widget: string}
+          - {label: Canonical URL, name: from, widget: hidden}
+          - {label: Destination URL, name: to, widget: string}
+          - {label: Replace Every Match, name: all, widget: hidden, default: false}
+          - {label: Required, name: required, widget: hidden, default: false}
+      - label: Images
+        name: images
+        widget: list
+        required: false
+        allow_add: false
+        collapsed: true
+        minimize_collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field, name: label, widget: string}
+          - {label: Canonical Image, name: from, widget: hidden}
+          - {label: Image, name: to, widget: image}
+          - {label: Replace Every Match, name: all, widget: hidden, default: false}
+          - {label: Required, name: required, widget: hidden, default: false}
+      - {label: Page-Specific CSS Overrides, name: css, widget: text, required: false, hint: "Advanced. Add CSS only when you intentionally want to change this page’s styling."}
+
+  - name: advanced_site_overrides
+    label: "Advanced — Any Page / Site-Wide Override"
+    label_singular: "Page Override"
+    description: "A last-resort control for anything not exposed elsewhere. Replace exact text/HTML, links, images, or add CSS on any public page. Use * as the Page Path to apply an override to every page on the selected website."
+    folder: content/site-overrides/custom
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    identifier_field: adminTitle
+    fields:
+      - {label: Override Name, name: adminTitle, widget: string}
+      - label: Website
+        name: target
+        widget: select
+        options:
+          - {label: "Gleaning Ground — gleaningground.com", value: main}
+          - {label: "The Divine Blueprint — divineblueprint.gleaningground.com", value: divine}
+      - {label: Page Path, name: pagePath, widget: string, hint: "Examples: / for the homepage, /about, /chapter-1, /ambassadors. Use * to apply to every public page on the selected website."}
+      - {label: Enabled, name: enabled, widget: boolean, default: true}
+      - label: Text / HTML Replacements
+        name: replacements
+        widget: list
+        required: false
+        collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field Label, name: label, widget: string}
+          - label: Match Mode
+            name: mode
+            widget: select
+            default: text
+            options:
+              - {label: "Plain text — safest", value: text}
+              - {label: "Raw HTML — advanced", value: html}
+          - {label: Find, name: find, widget: text, hint: "Enter the exact current text or HTML that exists in the generated page."}
+          - {label: Replace With, name: value, widget: text}
+          - {label: Replace Every Match, name: all, widget: boolean, default: false}
+          - {label: Require a Match, name: required, widget: boolean, default: true}
+      - label: Link Replacements
+        name: links
+        widget: list
+        required: false
+        collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field Label, name: label, widget: string}
+          - {label: Current URL, name: from, widget: string}
+          - {label: New URL, name: to, widget: string}
+          - {label: Replace Every Match, name: all, widget: boolean, default: false}
+          - {label: Require a Match, name: required, widget: boolean, default: true}
+      - label: Image Replacements
+        name: images
+        widget: list
+        required: false
+        collapsed: true
+        summary: "{{fields.label}}"
+        fields:
+          - {label: Field Label, name: label, widget: string}
+          - {label: Current Image URL, name: from, widget: string}
+          - {label: New Image, name: to, widget: image}
+          - {label: Replace Every Match, name: all, widget: boolean, default: false}
+          - {label: Require a Match, name: required, widget: boolean, default: true}
+      - {label: Page-Specific or Site-Wide CSS, name: css, widget: text, required: false, hint: "Advanced: CSS is injected on the selected page, or every page when Page Path is *."}
