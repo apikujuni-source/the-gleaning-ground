@@ -1,9 +1,11 @@
 {
-  "adminTitle": "Divine Blueprint Homepage — Generated Partner & Outreach Sections",
+  "adminTitle": "Divine Blueprint Homepage — Hero & Generated Partner / Outreach Sections",
   "target": "divine",
   "pagePath": "/",
   "enabled": true,
   "replacements": [
+    {"label":"Homepage hero heading","mode":"text","find":"God Has a Blueprint for Your Becoming","value":"God Has a Blueprint for Your Becoming","all":true,"required":true},
+
     {"label":"Church Partner eyebrow","mode":"text","find":"For Churches and Ministry Groups","value":"For Churches and Ministry Groups","all":false,"required":true},
     {"label":"Church Partner heading","mode":"text","find":"Lead Your Community Through The Divine Blueprint","value":"Lead Your Community Through The Divine Blueprint","all":false,"required":true},
     {"label":"Church Partner description","mode":"text","find":"Use the book, digital Companion Journal, chapter studies, and teaching resources as a shared discipleship journey for your congregation, small groups, leadership team, or ministry fellowship.","value":"Use the book, digital Companion Journal, chapter studies, and teaching resources as a shared discipleship journey for your congregation, small groups, leadership team, or ministry fellowship.","all":false,"required":true},
@@ -31,13 +33,13 @@
     {"label":"Ambassador description","mode":"html","find":"Share a message you believe in, help others discover <em>The Divine Blueprint</em>, and earn 15% on qualifying purchases made through your personal referral link.","value":"Share a message you believe in, help others discover <em>The Divine Blueprint</em>, and earn 15% on qualifying purchases made through your personal referral link.","all":false,"required":true},
     {"label":"Ambassador button","mode":"text","find":"Explore the Ambassador Program →","value":"Explore the Ambassador Program →","all":false,"required":true},
     {"label":"Ambassador commission label","mode":"text","find":"Standard Commission","value":"Standard Commission","all":false,"required":true},
-    {"label":"Ambassador commission rate","mode":"text","find":"15%","value":"15%","all":false,"required":true},
+    {"label":"Ambassador commission rate — all homepage references","mode":"text","find":"15%","value":"15%","all":true,"required":true},
     {"label":"Ambassador commission note","mode":"text","find":"on qualifying sales attributed to your approved referral link.","value":"on qualifying sales attributed to your approved referral link.","all":false,"required":true}
   ],
   "links": [
-    {"label":"Church Partner page","from":"/church-partners","to":"/church-partners","all":false,"required":true},
-    {"label":"Give a Copy page","from":"/give-a-copy","to":"/give-a-copy","all":false,"required":true},
-    {"label":"Ambassador page","from":"/ambassadors","to":"/ambassadors","all":false,"required":true}
+    {"label":"Church Partner page","from":"/church-partners","to":"/church-partners","all":false,"required":false},
+    {"label":"Give a Copy page","from":"/give-a-copy","to":"/give-a-copy","all":false,"required":false},
+    {"label":"Ambassador page","from":"/ambassadors","to":"/ambassadors","all":false,"required":false}
   ],
   "images": [],
   "css": ""
