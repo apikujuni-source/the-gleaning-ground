@@ -38,10 +38,26 @@ async function listJsonFiles(directory) {
   return files.sort();
 }
 
-function pageCandidates(target, pagePath) {
+async function listPublicHtml(target, directory = roots[target]) {
+  if (!existsSync(directory)) return [];
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (target === "main" && (path === roots.divine || path === join(roots.main, "admin"))) continue;
+      files.push(...await listPublicHtml(target, path));
+    } else if (entry.isFile() && entry.name.endsWith(".html")) {
+      files.push(path);
+    }
+  }
+  return files.sort();
+}
+
+async function pageCandidates(target, pagePath) {
   const root = roots[target];
   if (!root) throw new Error(`Unknown admin override target: ${target}`);
   const clean = String(pagePath || "/").trim();
+  if (clean === "*") return listPublicHtml(target);
   if (!clean || clean === "/") return [join(root, "index.html")];
   const normalized = clean.replace(/^\/+|\/+$/g, "");
   if (!normalized) return [join(root, "index.html")];
@@ -61,10 +77,16 @@ function replaceLiteral(html, from, to, all = false) {
 }
 
 function applyTextReplacement(html, item) {
-  const mode = item.mode === "html" ? "html" : "text";
-  const from = mode === "html" ? String(item.find || "") : escapeHtml(item.find || "");
-  const to = mode === "html" ? String(item.value ?? "") : escapeHtml(item.value ?? "");
-  return replaceLiteral(html, from, to, Boolean(item.all));
+  if (item.mode === "html") {
+    return replaceLiteral(html, String(item.find || ""), String(item.value ?? ""), Boolean(item.all));
+  }
+
+  const rawFind = String(item.find || "");
+  const escapedFind = escapeHtml(rawFind);
+  const safeValue = escapeHtml(item.value ?? "");
+  let result = replaceLiteral(html, rawFind, safeValue, Boolean(item.all));
+  if (result.count || escapedFind === rawFind) return result;
+  return replaceLiteral(html, escapedFind, safeValue, Boolean(item.all));
 }
 
 function replaceAttribute(html, attribute, from, to, all = false) {
@@ -114,7 +136,7 @@ for (const file of files) {
     throw new Error(`${relative(process.cwd(), file)} is missing pagePath.`);
   }
 
-  const candidates = pageCandidates(entry.target, entry.pagePath);
+  const candidates = await pageCandidates(entry.target, entry.pagePath);
   const matches = candidates.filter(existsSync);
   if (!matches.length) {
     throw new Error(
