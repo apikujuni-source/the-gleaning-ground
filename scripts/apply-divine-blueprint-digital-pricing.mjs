@@ -11,8 +11,8 @@ const expected = {
   digitalPreorderPriceInternational: "$7.99",
   kindleRegularPrice: "$9.99",
   kindleLaunchPrice: "$7.99",
-  digitalRegularPriceNigeria: "₦9,000",
-  digitalPreorderPriceNigeria: "₦7,000"
+  digitalRegularPriceNigeria: "₦10,000",
+  digitalPreorderPriceNigeria: "₦8,000"
 };
 
 for (const [key, value] of Object.entries(expected)) {
@@ -74,7 +74,7 @@ for (const page of await findHtmlFiles(siteRoot)) {
   ]) {
     if (!modal.includes(value)) throw new Error(`${page}: digital pricing value missing from purchase modal: ${value}`);
   }
-  for (const stale of ["$6.99", "$8.99"]) {
+  for (const stale of ["$6.99", "$8.99", "₦7,000", "₦9,000"]) {
     if (modal.includes(stale)) throw new Error(`${page}: stale digital price remains in purchase modal: ${stale}`);
   }
   if ((modal.match(/data-digital-pricing-note/g) || []).length !== 1) throw new Error(`${page}: expected exactly one digital pricing summary.`);
