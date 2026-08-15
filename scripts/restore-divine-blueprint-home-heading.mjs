@@ -5,14 +5,14 @@ const homepageSettingsPath = "content/divine-blueprint.json";
 const pageSettingsPath = "content/page-settings/divine/home.json";
 const siteRoot = "_site/divine-blueprint-site";
 const headingXpath = "/html/body/main/section[1]/div/div[1]/h1";
+const defaultHeading = "God Has a Blueprint for Your Becoming";
 
 if (!existsSync(homepageSettingsPath)) {
-  throw new Error(`Missing admin-managed Divine Blueprint homepage settings: ${homepageSettingsPath}`);
+  throw new Error(`Missing Divine Blueprint homepage settings: ${homepageSettingsPath}`);
 }
 
 const homepageSettings = JSON.parse(await readFile(homepageSettingsPath, "utf8"));
-const desiredHeading = String(homepageSettings.homepageHeading || "").trim();
-if (!desiredHeading) throw new Error("The Divine Blueprint homepage heading cannot be empty.");
+const desiredHeading = String(homepageSettings.homepageHeading || defaultHeading).trim() || defaultHeading;
 
 function escapeHtml(value = "") {
   return String(value)
@@ -78,9 +78,9 @@ if (existsSync(path)) {
   }
 
   if (!updated.includes(safeHeading) && !updated.includes(desiredHeading)) {
-    throw new Error(`Admin-managed homepage heading was not applied in ${path}.`);
+    throw new Error(`Homepage heading safeguard was not applied in ${path}.`);
   }
   if (updated !== original) await writeFile(path, updated, "utf8");
 }
 
-console.log(`Applied admin-managed Divine Blueprint homepage heading: “${desiredHeading}”.`);
+console.log(`Applied the Divine Blueprint homepage base heading: “${desiredHeading}”. Final admin overrides may customize it.`);
