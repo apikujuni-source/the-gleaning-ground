@@ -1,0 +1,19 @@
+{
+  "adminTitle": "Divine Blueprint — Ambassador Application Thank-You Page",
+  "target": "divine",
+  "pagePath": "/ambassadors/thanks",
+  "enabled": true,
+  "replacements": [
+    {"label":"Eyebrow","mode":"text","find":"Application Received","value":"Application Received","all":false,"required":true},
+    {"label":"Heading","mode":"text","find":"Thank You for Applying","value":"Thank You for Applying","all":false,"required":true},
+    {"label":"Message","mode":"text","find":"Your Divine Blueprint Ambassador application has been received. Applications are reviewed manually, and selected applicants will be contacted directly with the next steps, referral-link instructions, and Ambassador Toolkit.","value":"Your Divine Blueprint Ambassador application has been received. Applications are reviewed manually, and selected applicants will be contacted directly with the next steps, referral-link instructions, and Ambassador Toolkit.","all":false,"required":true},
+    {"label":"Return Home button","mode":"text","find":"Return Home →","value":"Return Home →","all":false,"required":true},
+    {"label":"Back to Ambassadors button","mode":"text","find":"Back to Ambassadors","value":"Back to Ambassadors","all":false,"required":true}
+  ],
+  "links": [
+    {"label":"Return Home URL","from":"/","to":"/","all":false,"required":false},
+    {"label":"Ambassadors URL","from":"/ambassadors","to":"/ambassadors","all":false,"required":false}
+  ],
+  "images": [],
+  "css": ""
+}
