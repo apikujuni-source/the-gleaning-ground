@@ -69,6 +69,22 @@ footer [class*="footer"][class*="brand"]{
   text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 18px rgba(201,155,64,.22)!important;
 }
 
+footer a[data-ambassador-footer-link],
+footer a[href="/ambassadors"],
+footer a[href="/ambassadors/"]{
+  color:#fff4d6!important;
+  opacity:1!important;
+}
+
+footer a[data-ambassador-footer-link]:hover,
+footer a[data-ambassador-footer-link]:focus-visible,
+footer a[href="/ambassadors"]:hover,
+footer a[href="/ambassadors"]:focus-visible,
+footer a[href="/ambassadors/"]:hover,
+footer a[href="/ambassadors/"]:focus-visible{
+  color:#ffffff!important;
+}
+
 footer img.divine-footer-logo,
 footer img[alt*="logo" i],
 footer img[src*="logo" i],
@@ -108,4 +124,4 @@ for (const page of pages) {
   }
 }
 
-console.log(`Applied a warm ivory, high-contrast treatment to footer branding on ${updatedPages} Divine Blueprint pages.`);
+console.log(`Applied a warm ivory, high-contrast treatment to footer branding and the Ambassador footer link on ${updatedPages} Divine Blueprint pages.`);
