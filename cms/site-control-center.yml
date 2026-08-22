@@ -1,6 +1,6 @@
   - name: divine_purchase_settings
     label: "5. Book Sales, Pricing & Order Links"
-    description: "Manage The Divine Blueprint storefront from the admin: active prices, regular prices, savings labels, ISBN, Amazon links, WhatsApp ordering, email, and Companion access URL."
+    description: "Manage The Divine Blueprint storefront from the admin: active prices, regular prices, savings labels, ISBN, Amazon links, Nigeria Selar eBook link, WhatsApp ordering, email, and Companion access URL."
     files:
       - label: "The Divine Blueprint — Purchase Settings"
         name: purchase
@@ -32,6 +32,7 @@
           - {label: Paperback Savings Label — Nigeria, name: paperbackSavingsNigeria, widget: string}
           - {label: Amazon Paperback URL, name: amazonPaperbackUrl, widget: string}
           - {label: Amazon Kindle URL, name: amazonKindleUrl, widget: string}
+          - {label: Selar eBook URL — Nigeria, name: selarUrl, widget: string, hint: "Used only for the Nigeria eBook purchase option."}
           - {label: Primary WhatsApp Number, name: whatsappPrimary, widget: string, hint: "Digits only, including country code. Example: 2347088530334"}
           - {label: Alternate WhatsApp Number, name: whatsappAlternate, widget: string, required: false, hint: "Digits only, including country code."}
           - {label: Order / Bulk Email, name: email, widget: string}
