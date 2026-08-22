@@ -3,6 +3,8 @@ name: Debug Nigeria paperback Selar
 on:
   push:
     branches: [agent/nigeria-paperback-selar-only]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
