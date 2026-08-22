@@ -4,39 +4,40 @@ import { join } from "node:path";
 
 const siteRoot = "_site/divine-blueprint-site";
 const configPath = "content/divine-blueprint/purchase.json";
-const styleMarker = "/* Divine Blueprint Selar Purchase Link */";
-const calloutMarker = 'data-selar-purchase="true"';
+const styleMarker = "/* Divine Blueprint Unified eBook Options */";
+const oldStyleMarker = "/* Divine Blueprint Selar Purchase Link */";
+const optionsMarker = 'data-ebook-options="true"';
 
 const config = JSON.parse(await readFile(configPath, "utf8"));
 const selarUrl = String(config.selarUrl || "").trim();
+const kindleUrl = String(config.amazonKindleUrl || "").trim();
 const mode = String(config.mode || "standard").trim().toLowerCase();
 
 if (!/^https:\/\/selar\.com\//i.test(selarUrl)) {
   throw new Error(`Invalid or missing Selar URL in ${configPath}: ${selarUrl}`);
 }
+if (!/^https:\/\//i.test(kindleUrl)) {
+  throw new Error(`Invalid or missing Kindle URL in ${configPath}: ${kindleUrl}`);
+}
 
-const actionLabel = mode === "preorder" ? "Preorder eBook on Selar ↗" : "Buy eBook on Selar ↗";
-const description = mode === "preorder"
-  ? "Prefer Selar? Reserve the digital edition securely through Selar."
-  : "Prefer Selar? Get the digital edition securely through Selar.";
+const kindleLabel = mode === "preorder" ? "Preorder on Kindle ↗" : "Buy on Kindle ↗";
+const selarLabel = mode === "preorder" ? "Preorder on Selar ↗" : "Buy on Selar ↗";
+const ebookDescription = mode === "preorder"
+  ? "Preorder the eBook at the launch price on Kindle or Selar and register for your digital Companion Journal."
+  : "Get the eBook on Kindle or Selar and register for your digital Companion Journal.";
 
-const callout = `
-    <div class="book-purchase-selar" ${calloutMarker}>
-      <div>
-        <strong>Digital eBook on Selar</strong>
-        <p>${description}</p>
-      </div>
-      <a class="book-purchase-action book-purchase-action-gold book-purchase-selar-action" href="${selarUrl}" target="_blank" rel="noopener noreferrer">${actionLabel}</a>
-    </div>`;
+const actions = `<div class="book-purchase-ebook-actions" ${optionsMarker}>
+          <a class="book-purchase-action book-purchase-action-gold" href="${kindleUrl}" target="_blank" rel="noopener noreferrer">${kindleLabel}</a>
+          <a class="book-purchase-action book-purchase-action-selar" href="${selarUrl}" target="_blank" rel="noopener noreferrer">${selarLabel}</a>
+        </div>`;
 
 const styles = `
 <style>
 ${styleMarker}
-.book-purchase-selar{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:20px;padding:20px 22px;border:1px solid rgba(185,135,44,.35);border-radius:14px;background:linear-gradient(135deg,#fff9ec,#fff)}
-.book-purchase-selar strong{display:block;color:#0e2d4d;font-size:1.05rem}
-.book-purchase-selar p{margin:.35rem 0 0;color:#5b6671;line-height:1.5}
-.book-purchase-selar-action{width:auto;min-width:220px;margin-top:0;flex:0 0 auto}
-@media(max-width:700px){.book-purchase-selar{align-items:flex-start;flex-direction:column}.book-purchase-selar-action{width:100%;min-width:0}}
+.book-purchase-ebook-actions{display:grid;gap:10px;width:100%;margin-top:auto}
+.book-purchase-ebook-actions .book-purchase-action{margin-top:0}
+.book-purchase-action-selar{background:#8050b8}
+.book-purchase-action-selar:hover,.book-purchase-action-selar:focus-visible{background:#6b409e}
 </style>`;
 
 async function findHtmlFiles(directory) {
@@ -59,19 +60,41 @@ for (const page of pages) {
   if (!html.includes('id="book-purchase-modal"')) continue;
   storefrontPages += 1;
 
+  // Remove the older standalone Selar callout if it is present in cached/generated source.
   html = html.replace(/\s*<div class="book-purchase-selar" data-selar-purchase="true">[\s\S]*?<\/div>\s*(?=<div class="book-purchase-footer">)/gi, "\n    ");
-  html = html.replace(/\s*<style>\s*\/\* Divine Blueprint Selar Purchase Link \*\/[\s\S]*?<\/style>/gi, "");
+  html = html.replace(new RegExp(`\\s*<style>\\s*\\/\\* ${oldStyleMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\*\\/[\\s\\S]*?<\\/style>`, "gi"), "");
+  html = html.replace(/\s*<style>\s*\/\* Divine Blueprint Unified eBook Options \*\/[\s\S]*?<\/style>/gi, "");
 
-  const insertionPoint = '<div class="book-purchase-footer">';
-  if (!html.includes(insertionPoint)) {
-    throw new Error(`Could not locate the purchase footer in ${page}.`);
+  html = html.replace("<h3>Kindle eBook</h3>", "<h3>eBook</h3>");
+  html = html.replace("Read instantly on Kindle and register for your digital Companion Journal.", ebookDescription);
+  html = html.replace("Preorder the Kindle edition at the launch price and register for your digital Companion Journal.", ebookDescription);
+
+  html = html.replace(/<div class="book-purchase-ebook-actions" data-ebook-options="true">[\s\S]*?<\/div>/gi, actions);
+
+  if (!html.includes(optionsMarker)) {
+    const kindleActionPattern = new RegExp(
+      `<a class="book-purchase-action book-purchase-action-gold" href="${kindleUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}" target="_blank" rel="noopener noreferrer">(?:Buy Kindle eBook ↗|Preorder Kindle eBook ↗|Buy on Kindle ↗|Preorder on Kindle ↗)<\\/a>`,
+      "i"
+    );
+    if (!kindleActionPattern.test(html)) {
+      throw new Error(`Could not locate the Kindle eBook action in ${page}.`);
+    }
+    html = html.replace(kindleActionPattern, actions);
   }
 
-  html = html.replace(insertionPoint, `${callout}\n\n    ${insertionPoint}`);
   html = html.replace("</head>", `${styles}\n</head>`);
 
-  if (!html.includes(selarUrl) || !html.includes(actionLabel)) {
-    throw new Error(`Selar purchase link was not installed correctly in ${page}.`);
+  if (
+    !html.includes("<h3>eBook</h3>") ||
+    html.includes("<h3>Kindle eBook</h3>") ||
+    !html.includes(optionsMarker) ||
+    !html.includes(kindleUrl) ||
+    !html.includes(selarUrl) ||
+    !html.includes(kindleLabel) ||
+    !html.includes(selarLabel) ||
+    html.includes('data-selar-purchase="true"')
+  ) {
+    throw new Error(`Unified eBook purchase options did not verify in ${page}.`);
   }
 
   await writeFile(page, html, "utf8");
@@ -86,11 +109,13 @@ await writeFile(
   join(siteRoot, "selar-purchase-status.txt"),
   [
     "SELAR_PURCHASE_LINK=ACTIVE",
+    "EBOOK_OPTIONS=KINDLE_AND_SELAR",
     `MODE=${mode}`,
-    `URL=${selarUrl}`,
+    `KINDLE_URL=${kindleUrl}`,
+    `SELAR_URL=${selarUrl}`,
     `UPDATED_PAGES=${updatedPages}`
   ].join("\n") + "\n",
   "utf8"
 );
 
-console.log(`Added the Selar eBook purchase link to ${updatedPages} Divine Blueprint storefront page(s).`);
+console.log(`Unified Kindle and Selar under the eBook purchase option across ${updatedPages} Divine Blueprint storefront page(s).`);
