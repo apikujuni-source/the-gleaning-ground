@@ -1,8 +1,8 @@
 name: Debug Selar purchase link
 
 on:
-  push:
-    branches: [agent/add-selar-link]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
