@@ -1,0 +1,37 @@
+name: Debug Nigeria order page
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Build website
+        run: npm run build
+      - name: Validate Nigeria order page
+        run: |
+          test -f _site/divine-blueprint-site/nigeria-order/index.html
+          test -f _site/divine-blueprint-site/nigeria-order/thanks/index.html
+          grep -q 'name="divine-blueprint-nigeria-order"' _site/divine-blueprint-site/nigeria-order/index.html
+          grep -q 'data-netlify="true"' _site/divine-blueprint-site/nigeria-order/index.html
+          grep -q '₦10,000' _site/divine-blueprint-site/nigeria-order/index.html
+          grep -q 'data-nigeria-website-order="true"' _site/divine-blueprint-site/index.html
+          grep -q 'href="/nigeria-order/"' _site/divine-blueprint-site/index.html
+          ! grep -q 'Preorder Paperback on Selar' _site/divine-blueprint-site/index.html
+          ! grep -q 'https://selar.com/thedivineblueprint' _site/divine-blueprint-site/index.html
+          node scripts/validate-divine-blueprint-build.mjs
