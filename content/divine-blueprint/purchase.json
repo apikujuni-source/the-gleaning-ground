@@ -20,6 +20,13 @@
   "amazonKindleUrl": "https://www.amazon.com/s?k=The+Divine+Blueprint+Ayo-Paul+Ikujuni&i=digital-text",
   "selarUrl": "https://selar.com/thedivineblueprint",
   "stripeNigeriaPaymentUrl": "https://buy.stripe.com/8x2eVc3JhfFGa9S5jscfK00",
+  "nigeriaDelivery": {
+    "lagos": {"fee": 3500, "label": "Lagos", "stripeUrl": "https://buy.stripe.com/5kQ5kCfrZ79abdW13ccfK03"},
+    "oyo": {"fee": 3000, "label": "Oyo", "stripeUrl": "https://buy.stripe.com/8x29AS0x5512dm4eU2cfK04"},
+    "southwest": {"fee": 4000, "label": "Other Southwest", "stripeUrl": "https://buy.stripe.com/3cIcN4frZctua9SfY6cfK05"},
+    "centralSouth": {"fee": 5000, "label": "FCT / North Central / South East / South South", "stripeUrl": "https://buy.stripe.com/fZu7sK6Vt0KMbdWfY6cfK06"},
+    "north": {"fee": 6000, "label": "North West / North East", "stripeUrl": "https://buy.stripe.com/4gMcN40x5bpq5TC3bkcfK07"}
+  },
   "whatsappPrimary": "2347088530334",
   "whatsappAlternate": "2347037180583",
   "email": "info@gleaningground.com",
