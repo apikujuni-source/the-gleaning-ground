@@ -27,6 +27,10 @@
     "centralSouth": {"fee": 5000, "label": "FCT / North Central / South East / South South", "stripeUrl": "https://buy.stripe.com/fZu7sK6Vt0KMbdWfY6cfK06"},
     "north": {"fee": 6000, "label": "North West / North East", "stripeUrl": "https://buy.stripe.com/4gMcN40x5bpq5TC3bkcfK07"}
   },
+  "nigeriaPickup": {
+    "lagos": {"fee": 0, "label": "Pickup in Lagos", "stripeUrl": "https://buy.stripe.com/8x24gy7Zx9hici0cLUcfK08"},
+    "ibadan": {"fee": 0, "label": "Pickup in Ibadan", "stripeUrl": "https://buy.stripe.com/9B65kC93B5125TC13ccfK09"}
+  },
   "whatsappPrimary": "2347088530334",
   "whatsappAlternate": "2347037180583",
   "email": "info@gleaningground.com",
