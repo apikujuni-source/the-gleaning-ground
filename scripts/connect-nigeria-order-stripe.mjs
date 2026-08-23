@@ -52,7 +52,7 @@ const stripeBlock = `<div class="order-form" data-stripe-checkout="true">
       <option value="pickup-ibadan">Free pickup — Ibadan</option>
     </select>
   </div>
-  <div class="order-field" id="delivery-state-wrap" hidden>
+  <div class="order-field" id="delivery-state-wrap" hidden style="display:none">
     <label for="delivery-state">Delivery state</label>
     <select id="delivery-state"><option value="" selected disabled>Select your state</option>${stateOptions}</select>
   </div>
@@ -88,10 +88,14 @@ const button=document.getElementById('stripe-pay-button');
 const money=(v)=>'₦'+Number(v).toLocaleString('en-NG');
 const disable=(text)=>{button.href='#';button.textContent=text;button.style.opacity='.55';button.style.pointerEvents='none';button.setAttribute('aria-disabled','true');};
 const enable=(url,text)=>{button.href=url;button.textContent=text;button.style.opacity='1';button.style.pointerEvents='auto';button.removeAttribute('aria-disabled');};
+const showDeliveryState=(show)=>{
+  stateWrap.hidden=!show;
+  stateWrap.style.display=show?'grid':'none';
+  if(!show) stateSelect.value='';
+};
 const setPickup=(city)=>{
   const option=pickupData[city];
-  stateWrap.hidden=true;
-  stateSelect.value='';
+  showDeliveryState(false);
   rowLabel.textContent='Pickup';
   feeEl.textContent='Free';
   totalEl.textContent=money(book);
@@ -99,7 +103,7 @@ const setPickup=(city)=>{
   enable(option.url,'Pay '+money(book)+' securely with Stripe');
 };
 const setDelivery=()=>{
-  stateWrap.hidden=false;
+  showDeliveryState(true);
   rowLabel.textContent='Standard delivery';
   feeEl.textContent='Select state';
   totalEl.textContent='—';
