@@ -62,8 +62,8 @@ const stripeBlock = `<div class="order-form" data-stripe-checkout="true">
     <div style="display:flex;justify-content:space-between;gap:18px;padding-top:8px;border-top:1px solid rgba(16,47,94,.14)"><span>Total for 1 copy</span><strong id="delivery-total">—</strong></div>
   </div>
   <p class="order-help" id="delivery-route-note">Choose delivery or pickup to see your total.</p>
+  <p class="order-help" id="referral-attribution" hidden style="display:none"></p>
   <a class="order-submit" id="stripe-pay-button" href="#" aria-disabled="true" style="display:flex;align-items:center;justify-content:center;text-decoration:none!important;opacity:.55;pointer-events:none">Choose delivery or pickup</a>
-  <p class="order-help"><strong>Ambassador referral:</strong> If you opened this page through an Ambassador's referral link, the referral is recorded automatically when you continue to Stripe. You do not need to enter a code.</p>
   <p class="order-help">You can choose 1–3 copies during secure checkout. For 4+ copies, contact us for a bulk order or delivery quote. Need help? <a href="https://wa.me/${whatsapp}?text=${encodeURIComponent('Hello, I need help with my Nigeria preorder for The Divine Blueprint paperback.')}" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
 </div>`;
 
@@ -87,6 +87,7 @@ const feeEl=document.getElementById('delivery-fee');
 const totalEl=document.getElementById('delivery-total');
 const rowLabel=document.getElementById('fulfillment-label');
 const note=document.getElementById('delivery-route-note');
+const referralEl=document.getElementById('referral-attribution');
 const button=document.getElementById('stripe-pay-button');
 const money=(v)=>'₦'+Number(v).toLocaleString('en-NG');
 const normalizeRef=(value)=>{const cleaned=String(value||'').trim().toUpperCase();return /^[A-Z0-9_-]{2,64}$/.test(cleaned)?cleaned:'';};
@@ -99,6 +100,8 @@ const getReferral=()=>{
   return shared||storedRef();
 };
 const withReferral=(url)=>{const ref=getReferral();if(!ref)return url;const target=new URL(url);target.searchParams.set('client_reference_id',ref);return target.toString();};
+const activeReferral=getReferral();
+if(activeReferral&&referralEl){referralEl.textContent='Ambassador referral '+activeReferral+' applied automatically.';referralEl.hidden=false;referralEl.style.display='block';}
 const disable=(text)=>{button.href='#';button.textContent=text;button.style.opacity='.55';button.style.pointerEvents='none';button.setAttribute('aria-disabled','true');};
 const enable=(url,text)=>{button.href=withReferral(url);button.textContent=text;button.style.opacity='1';button.style.pointerEvents='auto';button.removeAttribute('aria-disabled');};
 const showDeliveryState=(show)=>{
