@@ -63,6 +63,7 @@ const stripeBlock = `<div class="order-form" data-stripe-checkout="true">
   </div>
   <p class="order-help" id="delivery-route-note">Choose delivery or pickup to see your total.</p>
   <a class="order-submit" id="stripe-pay-button" href="#" aria-disabled="true" style="display:flex;align-items:center;justify-content:center;text-decoration:none!important;opacity:.55;pointer-events:none">Choose delivery or pickup</a>
+  <p class="order-help"><strong>Ambassador referral:</strong> If you opened this page through an Ambassador's referral link, the referral is recorded automatically when you continue to Stripe. You do not need to enter a code.</p>
   <p class="order-help">You can choose 1–3 copies during secure checkout. For 4+ copies, contact us for a bulk order or delivery quote. Need help? <a href="https://wa.me/${whatsapp}?text=${encodeURIComponent('Hello, I need help with my Nigeria preorder for The Divine Blueprint paperback.')}" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
 </div>`;
 
@@ -77,6 +78,8 @@ const stateToZone=${JSON.stringify(zones)};
 const zoneData=${JSON.stringify(zonePayload)};
 const pickupData=${JSON.stringify(pickupPayload)};
 const book=${bookPrice};
+const REF_KEY='divine_blueprint_referral';
+const REF_MAX_AGE=30*24*60*60*1000;
 const method=document.getElementById('fulfillment-method');
 const stateWrap=document.getElementById('delivery-state-wrap');
 const stateSelect=document.getElementById('delivery-state');
@@ -86,8 +89,18 @@ const rowLabel=document.getElementById('fulfillment-label');
 const note=document.getElementById('delivery-route-note');
 const button=document.getElementById('stripe-pay-button');
 const money=(v)=>'₦'+Number(v).toLocaleString('en-NG');
+const normalizeRef=(value)=>{const cleaned=String(value||'').trim().toUpperCase();return /^[A-Z0-9_-]{2,64}$/.test(cleaned)?cleaned:'';};
+const rememberRef=(id)=>{if(!id)return;try{localStorage.setItem(REF_KEY,JSON.stringify({id,ts:Date.now()}));}catch{}};
+const storedRef=()=>{try{const raw=localStorage.getItem(REF_KEY);if(!raw)return '';const record=JSON.parse(raw);const id=normalizeRef(record?.id);const ts=Number(record?.ts||0);if(!id||!ts||(Date.now()-ts)>REF_MAX_AGE){localStorage.removeItem(REF_KEY);return '';}return id;}catch{return '';}};
+const getReferral=()=>{
+  const incoming=normalizeRef(new URLSearchParams(location.search).get('ref'));
+  if(incoming){rememberRef(incoming);return incoming;}
+  const shared=normalizeRef(window.DivineBlueprintReferral?.get?.());
+  return shared||storedRef();
+};
+const withReferral=(url)=>{const ref=getReferral();if(!ref)return url;const target=new URL(url);target.searchParams.set('client_reference_id',ref);return target.toString();};
 const disable=(text)=>{button.href='#';button.textContent=text;button.style.opacity='.55';button.style.pointerEvents='none';button.setAttribute('aria-disabled','true');};
-const enable=(url,text)=>{button.href=url;button.textContent=text;button.style.opacity='1';button.style.pointerEvents='auto';button.removeAttribute('aria-disabled');};
+const enable=(url,text)=>{button.href=withReferral(url);button.textContent=text;button.style.opacity='1';button.style.pointerEvents='auto';button.removeAttribute('aria-disabled');};
 const showDeliveryState=(show)=>{
   stateWrap.hidden=!show;
   stateWrap.style.display=show?'grid':'none';
@@ -154,7 +167,10 @@ await writeFile(statusPath, [
   'DELIVERY_OYO=3000',
   'DELIVERY_SOUTHWEST=4000',
   'DELIVERY_CENTRAL_SOUTH=5000',
-  'DELIVERY_NORTH=6000'
+  'DELIVERY_NORTH=6000',
+  'AFFILIATE_ATTRIBUTION=REFERRAL_LINK',
+  'AFFILIATE_STRIPE_FIELD=CLIENT_REFERENCE_ID',
+  'AFFILIATE_WINDOW_DAYS=30'
 ].join('\n') + '\n', 'utf8');
 
-console.log('Connected Nigeria paperback order page to Stripe delivery and free pickup checkout.');
+console.log('Connected Nigeria paperback order page to Stripe delivery, pickup, and automatic referral-link attribution.');
