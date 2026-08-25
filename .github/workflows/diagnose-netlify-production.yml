@@ -23,36 +23,51 @@ jobs:
           dig +short CNAME gleaningground.com || true
           dig +short A gleaningground.com || true
 
-      - name: Probe live and Netlify endpoints
+      - name: Compare Divine Blueprint storefront outputs
         shell: bash
         run: |
           set -u
           urls=(
             'https://divineblueprint.gleaningground.com/'
-            'https://the-divine-blueprint.netlify.app/'
-            'https://thegleaningground.netlify.app/'
-            'https://deploy-preview-82--the-divine-blueprint.netlify.app/'
-            'https://deploy-preview-82--thegleaningground.netlify.app/'
+            'https://main--the-divine-blueprint.netlify.app/divine-blueprint-site/index.html'
+            'https://the-divine-blueprint.netlify.app/divine-blueprint-site/index.html'
+            'https://deploy-preview-82--the-divine-blueprint.netlify.app/divine-blueprint-site/index.html'
           )
+          amazon='https://www.amazon.com/s?k=9789786343204&i=stripbooks'
           for url in "${urls[@]}"; do
             echo "===== $url ====="
-            curl -sSIL --max-time 25 "$url" | sed -n '1,35p' || true
             body="$(mktemp)"
             code=$(curl -sSL --max-time 30 -o "$body" -w '%{http_code}' "$url" || true)
             echo "HTTP_BODY_STATUS=$code"
             echo "BODY_BYTES=$(wc -c < "$body")"
             echo "BODY_SHA256=$(sha256sum "$body" | awk '{print $1}')"
-            echo 'MARKERS:'
-            grep -Eo 'Book ordering is ready to connect|Nigeria orders only|Kindle eBook|Buy Paperback on Amazon[^<]*|Preorder Paperback on Amazon[^<]*|Preorder the Book|Ambassador referral[^<]*|Pay [^<]* securely with Stripe' "$body" | sort -u || true
-            echo 'TITLE:'
-            grep -Eio '<title>[^<]*</title>' "$body" | head -1 || true
+            echo "PURCHASE_MODAL_COUNT=$(grep -o 'id=\"book-purchase-modal\"' "$body" | wc -l)"
+            echo "AMAZON_PAPERBACK_URL_COUNT=$(grep -Fo "$amazon" "$body" | wc -l)"
+            echo "AMAZON_PAPERBACK_LABEL_COUNT=$(grep -Eo '(Buy|Preorder) Paperback on Amazon' "$body" | wc -l)"
+            echo "KINDLE_CARD_COUNT=$(grep -Fo '<h3>Kindle eBook</h3>' "$body" | wc -l)"
+            echo "NIGERIA_ORDER_MARKER_COUNT=$(grep -Fo 'data-nigeria-website-order=\"true\"' "$body" | wc -l)"
+            echo "NIGERIA_ORDER_PATH_COUNT=$(grep -Fo 'href=\"/nigeria-order/\"' "$body" | wc -l)"
+            echo "OLD_STORE_PLACEHOLDER_COUNT=$(grep -Fo 'Book ordering is ready to connect' "$body" | wc -l)"
+            echo 'VISIBLE PURCHASE SNIPPETS:'
+            python - "$body" <<'PY'
+import re,sys
+p=sys.argv[1]
+s=open(p,encoding='utf-8',errors='replace').read()
+for needle in ['United States &amp; international','Kindle eBook','data-nigeria-website-order="true"','Book ordering is ready to connect']:
+    i=s.find(needle)
+    print('\n---',needle,'---')
+    if i<0:
+        print('NOT FOUND')
+    else:
+        print(re.sub(r'\s+',' ',s[max(0,i-500):i+1000]))
+PY
             rm -f "$body"
           done
 
-      - name: Probe public Netlify site metadata endpoints
+      - name: Probe Netlify production metadata
         shell: bash
         run: |
           for site in the-divine-blueprint.netlify.app thegleaningground.netlify.app; do
             echo "===== Netlify API: $site ====="
-            curl -sS -i --max-time 20 "https://api.netlify.com/api/v1/sites/$site" | sed -n '1,80p' || true
+            curl -sS --max-time 20 "https://api.netlify.com/api/v1/sites/$site" | python -m json.tool | sed -n '1,160p' || true
           done
