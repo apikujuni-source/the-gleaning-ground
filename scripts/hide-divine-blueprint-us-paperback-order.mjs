@@ -27,7 +27,9 @@ async function findHtmlFiles(directory) {
   return files;
 }
 
-const usInternationalCardPattern = /\s*<article class="book-purchase-card">\s*<span class="book-purchase-region">United States (?:&amp;|&) international<\/span>[\s\S]*?<\/article>/gi;
+// The US/international paperback is the featured card. The Kindle card uses the same
+// region label, so matching only on the region would remove the wrong option.
+const usInternationalPaperbackCardPattern = /\s*<article class="book-purchase-card book-purchase-card-featured">\s*<span class="book-purchase-region">United States (?:&amp;|&) international<\/span>\s*<h3>Paperback<\/h3>[\s\S]*?<\/article>/gi;
 const paperbackHrefPattern = new RegExp(
   `\\s*<a\\b[^>]*href=(["'])${escapeRegExp(paperbackUrl)}\\1[^>]*>[\\s\\S]*?<\\/a>`,
   "gi"
@@ -44,9 +46,9 @@ for (const page of await findHtmlFiles(siteRoot)) {
   let html = await readFile(page, "utf8");
   const before = html;
 
-  const cardMatches = html.match(usInternationalCardPattern) || [];
+  const cardMatches = html.match(usInternationalPaperbackCardPattern) || [];
   removedCards += cardMatches.length;
-  html = html.replace(usInternationalCardPattern, "");
+  html = html.replace(usInternationalPaperbackCardPattern, "");
 
   // Defensive cleanup in case a legacy paperback action appears outside the purchase card.
   const directMatches = html.match(paperbackHrefPattern) || [];
@@ -70,7 +72,7 @@ for (const page of await findHtmlFiles(siteRoot)) {
     const nigeriaCard = modal.match(/<article class="book-purchase-card">\s*<span class="book-purchase-region">Nigeria<\/span>[\s\S]*?<\/article>/i)?.[0] || "";
 
     if (
-      /United States (?:&amp;|&) international/i.test(modal) ||
+      usInternationalPaperbackCardPattern.test(modal) ||
       modal.includes(paperbackUrl) ||
       /(?:Preorder|Buy) Paperback on Amazon ↗/i.test(modal) ||
       !modal.includes(kindleUrl) ||
@@ -81,6 +83,9 @@ for (const page of await findHtmlFiles(siteRoot)) {
     ) {
       throw new Error(`US/international paperback removal or preserved purchase options did not verify in ${page}.`);
     }
+
+    // Reset the global-regex state after test().
+    usInternationalPaperbackCardPattern.lastIndex = 0;
   }
 
   if (html !== before) {
