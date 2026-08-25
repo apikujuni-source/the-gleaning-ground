@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// Netlify Forms detection is enabled; keep this form present at build time for deploy-time processing.
 const siteDir = path.resolve('_site/divine-blueprint-site');
 const ambassadorPath = path.join(siteDir, 'ambassadors', 'index.html');
 const thanksPath = path.join(siteDir, 'ambassadors', 'thanks', 'index.html');
