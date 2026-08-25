@@ -22,7 +22,6 @@ jobs:
           import json
           import os
           import re
-          import sys
           import time
           import urllib.request
 
@@ -43,12 +42,15 @@ jobs:
           else:
               raise SystemExit(f'Netlify did not publish expected commit {expected}; latest published commit is {published}')
 
-          request = urllib.request.Request(
-              live + '?verify=' + expected,
-              headers={'Cache-Control': 'no-cache', 'User-Agent': 'GleaningGround-Live-Verify/1.0'}
-          )
-          with urllib.request.urlopen(request, timeout=30) as response:
-              html = response.read().decode('utf-8', 'replace')
+          def fetch(url):
+              request = urllib.request.Request(
+                  url,
+                  headers={'Cache-Control': 'no-cache', 'User-Agent': 'GleaningGround-Live-Verify/1.0'}
+              )
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return response.read().decode('utf-8', 'replace')
+
+          html = fetch(live + '?verify=' + expected)
 
           us_paperback = re.search(
               r'<article class="book-purchase-card book-purchase-card-featured">\s*'
@@ -67,6 +69,22 @@ jobs:
               'Nigeria order route present': '/nigeria-order/' in html,
           }
 
+          ambassador_html = fetch(live + 'ambassadors/?verify=' + expected)
+          ambassador_form = re.search(
+              r'<form\b[^>]*name=["\']divine-blueprint-ambassador-application["\'][^>]*>[\s\S]*?</form>',
+              ambassador_html,
+              re.I,
+          )
+          form_html = ambassador_form.group(0) if ambassador_form else ''
+          checks.update({
+              'Ambassador application form present': bool(form_html),
+              'Ambassador form uses POST': bool(re.search(r'method=["\']POST["\']', form_html, re.I)),
+              'Ambassador form-name preserved': bool(re.search(r'name=["\']form-name["\'][^>]*value=["\']divine-blueprint-ambassador-application["\']', form_html, re.I)),
+              'Ambassador success route configured': bool(re.search(r'action=["\']/ambassadors/thanks/["\']', form_html, re.I)),
+              'Ambassador submit runtime present': 'data-ambassador-netlify-runtime="true"' in ambassador_html and "fetch('/'," in ambassador_html,
+              'Netlify form detection processed form': 'data-netlify="true"' not in form_html,
+          })
+
           for label, ok in checks.items():
               print(f'{label}: {"PASS" if ok else "FAIL"}')
 
@@ -74,5 +92,5 @@ jobs:
           if failed:
               raise SystemExit('Live storefront verification failed: ' + '; '.join(failed))
 
-          print(f'LIVE_STOREFRONT_VERIFIED_FOR={expected}')
+          print(f'LIVE_STOREFRONT_AND_AMBASSADOR_FORM_VERIFIED_FOR={expected}')
           PY
