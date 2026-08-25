@@ -1,0 +1,78 @@
+name: Verify live Divine Blueprint storefront
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Wait for matching Netlify production deploy and verify storefront
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          import time
+          import urllib.request
+
+          expected = os.environ['EXPECTED_SHA']
+          api = 'https://api.netlify.com/api/v1/sites/the-divine-blueprint.netlify.app'
+          live = 'https://divineblueprint.gleaningground.com/'
+
+          published = None
+          for attempt in range(30):
+              with urllib.request.urlopen(api, timeout=20) as response:
+                  data = json.load(response)
+              published = (data.get('published_deploy') or {}).get('commit_ref')
+              state = (data.get('published_deploy') or {}).get('state')
+              print(f'Attempt {attempt + 1}: published={published} state={state}')
+              if published == expected and state == 'ready':
+                  break
+              time.sleep(10)
+          else:
+              raise SystemExit(f'Netlify did not publish expected commit {expected}; latest published commit is {published}')
+
+          request = urllib.request.Request(
+              live + '?verify=' + expected,
+              headers={'Cache-Control': 'no-cache', 'User-Agent': 'GleaningGround-Live-Verify/1.0'}
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              html = response.read().decode('utf-8', 'replace')
+
+          us_paperback = re.search(
+              r'<article class="book-purchase-card book-purchase-card-featured">\s*'
+              r'<span class="book-purchase-region">United States (?:&amp;|&) international</span>\s*'
+              r'<h3>Paperback</h3>[\s\S]*?</article>',
+              html,
+              re.I,
+          )
+
+          amazon_paperback = 'https://www.amazon.com/s?k=9789786343204&i=stripbooks'
+          checks = {
+              'US international paperback card absent': us_paperback is None,
+              'US paperback Amazon URL absent': amazon_paperback not in html,
+              'Kindle eBook present': 'Kindle eBook' in html,
+              'Nigeria website order present': 'data-nigeria-website-order="true"' in html,
+              'Nigeria order route present': '/nigeria-order/' in html,
+          }
+
+          for label, ok in checks.items():
+              print(f'{label}: {"PASS" if ok else "FAIL"}')
+
+          failed = [label for label, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit('Live storefront verification failed: ' + '; '.join(failed))
+
+          print(f'LIVE_STOREFRONT_VERIFIED_FOR={expected}')
+          PY
