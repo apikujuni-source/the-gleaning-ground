@@ -1,0 +1,58 @@
+name: Diagnose Netlify production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: DNS routing
+        shell: bash
+        run: |
+          echo '=== divineblueprint.gleaningground.com ==='
+          dig +short CNAME divineblueprint.gleaningground.com || true
+          dig +short A divineblueprint.gleaningground.com || true
+          echo '=== gleaningground.com ==='
+          dig +short CNAME gleaningground.com || true
+          dig +short A gleaningground.com || true
+
+      - name: Probe live and Netlify endpoints
+        shell: bash
+        run: |
+          set -u
+          urls=(
+            'https://divineblueprint.gleaningground.com/'
+            'https://the-divine-blueprint.netlify.app/'
+            'https://thegleaningground.netlify.app/'
+            'https://deploy-preview-82--the-divine-blueprint.netlify.app/'
+            'https://deploy-preview-82--thegleaningground.netlify.app/'
+          )
+          for url in "${urls[@]}"; do
+            echo "===== $url ====="
+            curl -sSIL --max-time 25 "$url" | sed -n '1,35p' || true
+            body="$(mktemp)"
+            code=$(curl -sSL --max-time 30 -o "$body" -w '%{http_code}' "$url" || true)
+            echo "HTTP_BODY_STATUS=$code"
+            echo "BODY_BYTES=$(wc -c < "$body")"
+            echo "BODY_SHA256=$(sha256sum "$body" | awk '{print $1}')"
+            echo 'MARKERS:'
+            grep -Eo 'Book ordering is ready to connect|Nigeria orders only|Kindle eBook|Buy Paperback on Amazon[^<]*|Preorder Paperback on Amazon[^<]*|Preorder the Book|Ambassador referral[^<]*|Pay [^<]* securely with Stripe' "$body" | sort -u || true
+            echo 'TITLE:'
+            grep -Eio '<title>[^<]*</title>' "$body" | head -1 || true
+            rm -f "$body"
+          done
+
+      - name: Probe public Netlify site metadata endpoints
+        shell: bash
+        run: |
+          for site in the-divine-blueprint.netlify.app thegleaningground.netlify.app; do
+            echo "===== Netlify API: $site ====="
+            curl -sS -i --max-time 20 "https://api.netlify.com/api/v1/sites/$site" | sed -n '1,80p' || true
+          done
