@@ -22,13 +22,13 @@ const whatsappHelpUrl = whatsapp
   ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hello, I need help with delivery for my paid Nigeria order of The Divine Blueprint paperback.')}`
   : '#';
 
-const stripeBlock = `<div class="order-form" data-stripe-checkout="true" data-book-only-checkout="true" data-whatsapp-required="true">
-  <div class="order-payment-note" style="border-left-width:5px"><strong>Important — delivery is not included in this payment.</strong><br>This checkout covers <strong>The Divine Blueprint paperback only</strong>. <strong>A WhatsApp number is required at checkout.</strong> After payment, our team will contact you on that WhatsApp number to confirm your delivery arrangement and delivery fee.</div>
+const stripeBlock = `<div class="order-form" data-stripe-checkout="true" data-book-only-checkout="true" data-whatsapp-required="true" data-email-required="true">
+  <div class="order-payment-note" style="border-left-width:5px"><strong>Important — delivery is not included in this payment.</strong><br>This checkout covers <strong>The Divine Blueprint paperback only</strong>. <strong>Your email address and WhatsApp number are required at checkout.</strong> After payment, our team will use these details to confirm your order and contact you on WhatsApp about your delivery arrangement and delivery fee.</div>
   <div class="order-total" data-book-only-total="true" style="display:grid;gap:8px">
     <div style="display:flex;justify-content:space-between;gap:18px"><span>Book payment</span><strong>₦${bookPrice.toLocaleString('en-NG')}</strong></div>
     <div style="display:flex;justify-content:space-between;gap:18px;padding-top:8px;border-top:1px solid rgba(16,47,94,.14)"><span>Delivery fee</span><strong>Not included</strong></div>
   </div>
-  <p class="order-help" style="text-align:left;margin:0"><strong>What happens next?</strong> Complete the book payment securely with Stripe and enter your required WhatsApp number. We will then send you a separate WhatsApp message about delivery. Delivery charges are paid separately and are not part of the amount shown here.</p>
+  <p class="order-help" style="text-align:left;margin:0"><strong>What happens next?</strong> Complete the book payment securely with Stripe and enter your required email address and WhatsApp number. We will then send you a separate WhatsApp message about delivery. Delivery charges are paid separately and are not part of the amount shown here.</p>
   <p class="order-help" id="referral-attribution" hidden style="display:none"></p>
   <a class="order-submit" id="stripe-pay-button" href="${paymentUrl}" style="display:flex;align-items:center;justify-content:center;text-decoration:none!important">Pay ₦${bookPrice.toLocaleString('en-NG')} for the book</a>
   <p class="order-help">You can choose 1–3 copies during secure checkout. For 4+ copies, contact us for a bulk order. Need help with your order or delivery? <a href="${whatsappHelpUrl}" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
@@ -38,9 +38,9 @@ html = html
   .replace('Tell us where to send your copy', 'Complete your secure book payment')
   .replace(
     'Complete the details below to reserve your copy. We will use your information only to process this order, arrange payment, and coordinate delivery.',
-    'Pay securely for your paperback copy. A WhatsApp number is required during checkout so we can arrange delivery after payment. Delivery is arranged separately, and the delivery fee is not included in this checkout.'
+    'Pay securely for your paperback copy. Your email address and WhatsApp number are required during checkout so we can confirm your order and arrange delivery after payment. Delivery is arranged separately, and the delivery fee is not included in this checkout.'
   )
-  .replace('<li>Local delivery details collected with your order</li>', '<li>Required WhatsApp number collected during secure checkout</li>')
+  .replace('<li>Local delivery details collected with your order</li>', '<li>Required email address and WhatsApp number collected during secure checkout</li>')
   .replace('<li>Order support available through WhatsApp</li>', '<li>Delivery fee is separate from the book payment</li>')
   .replace(formPattern, stripeBlock)
   .replace(/<script>\(\(\)=>\{const q=document\.getElementById\('quantity'\)[\s\S]*?<\/script>/i, '');
@@ -80,7 +80,7 @@ for (const forbidden of [
 for (const required of [
   'delivery is not included in this payment',
   'Delivery fee</span><strong>Not included',
-  'A WhatsApp number is required at checkout',
+  'Your email address and WhatsApp number are required at checkout',
   'separate WhatsApp message about delivery',
   paymentUrl
 ]) {
@@ -113,6 +113,7 @@ await writeFile(statusPath, [
   'FORM_BACKEND=STRIPE_CHECKOUT',
   'PAYMENT_PROCESSOR=STRIPE',
   'CHECKOUT=BOOK_ONLY',
+  'EMAIL_REQUIRED=YES',
   'WHATSAPP_REQUIRED=YES',
   'DELIVERY_PRICE_OPTIONS=REMOVED',
   'DELIVERY_FEE_INCLUDED=NO',
@@ -122,4 +123,4 @@ await writeFile(statusPath, [
   'AFFILIATE_WINDOW_DAYS=30'
 ].join('\n') + '\n', 'utf8');
 
-console.log('Connected Nigeria paperback order page to book-only Stripe checkout with a required WhatsApp number and delivery arranged separately after payment.');
+console.log('Connected Nigeria paperback order page to book-only Stripe checkout with required email and WhatsApp details and delivery arranged separately after payment.');
