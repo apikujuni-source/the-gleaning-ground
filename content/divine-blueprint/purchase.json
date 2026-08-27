@@ -13,23 +13,23 @@
   "digitalRegularPriceNigeria": "₦10,000",
   "digitalPreorderPriceNigeria": "₦8,000",
   "digitalSavingsNigeria": "Save ₦2,000",
-  "paperbackRegularPriceNigeria": "₦12,000",
-  "paperbackPriceNigeria": "₦10,000",
+  "paperbackRegularPriceNigeria": "₦7,500",
+  "paperbackPriceNigeria": "₦5,500",
   "paperbackSavingsNigeria": "Save ₦2,000",
   "amazonPaperbackUrl": "https://www.amazon.com/s?k=9789786343204&i=stripbooks",
   "amazonKindleUrl": "https://www.amazon.com/s?k=The+Divine+Blueprint+Ayo-Paul+Ikujuni&i=digital-text",
   "selarUrl": "https://selar.com/thedivineblueprint",
-  "stripeNigeriaPaymentUrl": "https://buy.stripe.com/6oU7sK7Zx0KMdm4aDMcfK0h",
+  "stripeNigeriaPaymentUrl": "https://buy.stripe.com/bJecN45RpgJKa9S5jscfK0i",
   "nigeriaDelivery": {
-    "lagos": {"fee": 3500, "label": "Lagos", "stripeUrl": "https://buy.stripe.com/6oU4gydjRgJKbdWaDMcfK0a"},
-    "oyo": {"fee": 3000, "label": "Oyo", "stripeUrl": "https://buy.stripe.com/bJecN4gw31OQgygfY6cfK0b"},
-    "southwest": {"fee": 4000, "label": "Other Southwest", "stripeUrl": "https://buy.stripe.com/eVqfZgbbJdxy4Pyh2acfK0c"},
-    "centralSouth": {"fee": 5000, "label": "FCT / North Central / South East / South South", "stripeUrl": "https://buy.stripe.com/7sY28q2Fd1OQbdW3bkcfK0d"},
-    "north": {"fee": 6000, "label": "North West / North East", "stripeUrl": "https://buy.stripe.com/cNi5kCfrZbpq81K9zIcfK0e"}
+    "lagos": {"fee": 3500, "label": "Lagos", "stripeUrl": "https://buy.stripe.com/00w6oG93BfFGfuc3bkcfK0j"},
+    "oyo": {"fee": 3000, "label": "Oyo", "stripeUrl": "https://buy.stripe.com/7sY9ASbbJ1OQa9SfY6cfK0k"},
+    "southwest": {"fee": 4000, "label": "Other Southwest", "stripeUrl": "https://buy.stripe.com/eVq6oG6Vtbpq3Lu4focfK0l"},
+    "centralSouth": {"fee": 5000, "label": "FCT / North Central / South East / South South", "stripeUrl": "https://buy.stripe.com/6oUfZg93B9hi0zi7rAcfK0m"},
+    "north": {"fee": 6000, "label": "North West / North East", "stripeUrl": "https://buy.stripe.com/14A9AS6Vt0KM2Hq6nwcfK0n"}
   },
   "nigeriaPickup": {
-    "lagos": {"fee": 0, "label": "Pickup in Lagos", "stripeUrl": "https://buy.stripe.com/6oU4gy2Fd79a5TCbHQcfK0f"},
-    "ibadan": {"fee": 0, "label": "Pickup in Ibadan", "stripeUrl": "https://buy.stripe.com/aFa6oGenV79abdW27gcfK0g"}
+    "lagos": {"fee": 0, "label": "Pickup in Lagos", "stripeUrl": "https://buy.stripe.com/aFa14mgw38de0zieU2cfK0o"},
+    "ibadan": {"fee": 0, "label": "Pickup in Ibadan", "stripeUrl": "https://buy.stripe.com/eVqdR8gw32SU1Dm27gcfK0p"}
   },
   "whatsappPrimary": "2349122632551",
   "whatsappAlternate": "2347037180583",
