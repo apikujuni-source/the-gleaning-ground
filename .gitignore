@@ -2,3 +2,13 @@ node_modules/
 _site/
 .DS_Store
 .env
+.env.*
+!.env.example
+.netlify/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pem
+*.key
