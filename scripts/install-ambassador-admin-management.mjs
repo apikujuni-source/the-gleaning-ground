@@ -95,6 +95,13 @@ const ambassadorCollection = {
       hint: 'Generated automatically from the Referral ID. Reopen the entry after the first save to copy the link.'
     },
     {
+      label: 'Approval Email',
+      name: 'approvalEmail',
+      widget: 'approval-email',
+      required: false,
+      hint: 'Generated automatically for active ambassadors. Save/publish first, then reopen the entry and click Send approval email. The message opens for review before you send it.'
+    },
+    {
       label: 'Internal Notes',
       name: 'notes',
       widget: 'text',
@@ -142,6 +149,23 @@ const adminRuntime = `
         }
         return (hash >>> 0).toString(36).toUpperCase().padStart(5, '0').slice(-5);
       };
+      const buildApprovalEmail = ({ email, referralLink, status }) => {
+        if (status !== 'Active' || !email || !referralLink) return '';
+        const subject = 'Welcome to the Divine Blueprint Ambassador Program';
+        const body = [
+          'Congratulations! Your application to become a Divine Blueprint Ambassador has been approved.',
+          '',
+          'We’re excited to have you join us in helping share the message of The Divine Blueprint.',
+          '',
+          'Your personal referral link:',
+          referralLink,
+          '',
+          'Your Ambassador Toolkit will be sent to you shortly.',
+          '',
+          'Welcome to the Ambassador Program!'
+        ].join('\\n');
+        return 'mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      };
 
       const ReferralLinkControl = createClass({
         getInitialState: function() { return { copied: false }; },
@@ -187,7 +211,34 @@ const adminRuntime = `
         }
       });
 
+      const ApprovalEmailControl = createClass({
+        openEmail: function(event) {
+          event.preventDefault();
+          const value = String(this.props.value || '');
+          if (!/^mailto:/i.test(value)) return;
+          window.location.href = value;
+        },
+        render: function() {
+          const value = String(this.props.value || '');
+          const ready = /^mailto:/i.test(value);
+          return h('div', { className: 'ambassador-approval-email-widget' },
+            h('button', {
+              type: 'button',
+              onClick: this.openEmail,
+              disabled: !ready,
+              className: 'ambassador-approval-email-button'
+            }, 'Send approval email'),
+            h('span', { className: 'ambassador-approval-email-note' },
+              ready
+                ? 'Opens a pre-addressed approval email with the personal referral link included. Review it before sending.'
+                : 'Save/publish this active ambassador first, then reopen the entry to enable the email button.'
+            )
+          );
+        }
+      });
+
       CMS.registerWidget('referral-link', ReferralLinkControl);
+      CMS.registerWidget('approval-email', ApprovalEmailControl);
       CMS.registerEventListener({
         name: 'preSave',
         handler: ({ entry }) => {
@@ -207,10 +258,12 @@ const adminRuntime = `
           const referralId = existing || generated;
           const referralLink = BASE_URL + '?ref=' + encodeURIComponent(referralId);
           const commission = Number(data.get('commissionRate'));
+          const approvalEmail = buildApprovalEmail({ email, referralLink, status });
 
           return data
             .set('referralId', referralId)
             .set('referralLink', referralLink)
+            .set('approvalEmail', approvalEmail)
             .set('commissionRate', Number.isFinite(commission) ? commission : 25);
         }
       });
@@ -227,7 +280,7 @@ if (!html.includes(marker)) {
 if (!html.includes('Open Ambassador Management →')) {
   html = html.replace(
     '<li><strong>Generated Sections & Special Pages</strong> — Ambassador, Church Partner, Give a Copy, their homepage callouts, terms, and confirmation page.</li>',
-    '<li><strong>Ambassador Management</strong> — add approved applicants, generate and copy personal referral links, track status, commission, and internal notes.</li>\n        <li><strong>Generated Sections & Special Pages</strong> — Ambassador, Church Partner, Give a Copy, their homepage callouts, terms, and confirmation page.</li>'
+    '<li><strong>Ambassador Management</strong> — add approved applicants, generate and copy personal referral links, prepare approval emails, track status, commission, and internal notes.</li>\n        <li><strong>Generated Sections & Special Pages</strong> — Ambassador, Church Partner, Give a Copy, their homepage callouts, terms, and confirmation page.</li>'
   );
   html = html.replace(
     '<p><a href="#/collections/divine_purchase_settings/entries/purchase">Open Book Sales & Pricing →</a></p>',
@@ -242,19 +295,26 @@ if (!html.includes('.ambassador-copy-button')) {
   );
 }
 
+if (!html.includes('.ambassador-approval-email-button')) {
+  html = html.replace(
+    '</style>',
+    `.ambassador-approval-email-widget{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;padding:.25rem 0}\n    .ambassador-approval-email-button{border:0;border-radius:7px;padding:.75rem 1rem;background:#173b62;color:#fff;font-weight:700;cursor:pointer}\n    .ambassador-approval-email-button:disabled{opacity:.5;cursor:not-allowed}\n    .ambassador-approval-email-note{font-size:.9rem;line-height:1.45;max-width:620px;color:#53606d}\n  </style>`
+  );
+}
+
 await writeFile(indexPath, html, 'utf8');
 
 const checkConfig = YAML.parse(await readFile(configPath, 'utf8'));
 const checkHtml = await readFile(indexPath, 'utf8');
 const installed = checkConfig.collections.find((collection) => collection?.name === collectionName);
 if (!installed) throw new Error('Ambassador Management collection was not installed.');
-for (const required of ['ambassadorName', 'email', 'status', 'commissionRate', 'referralId', 'referralLink']) {
+for (const required of ['ambassadorName', 'email', 'status', 'commissionRate', 'referralId', 'referralLink', 'approvalEmail']) {
   if (!installed.fields.some((field) => field?.name === required)) {
     throw new Error(`Ambassador Management is missing field: ${required}`);
   }
 }
-for (const required of [marker, "CMS.registerWidget('referral-link'", "name: 'preSave'", 'Open Ambassador Management →']) {
+for (const required of [marker, "CMS.registerWidget('referral-link'", "CMS.registerWidget('approval-email'", "name: 'preSave'", 'Send approval email', 'Open Ambassador Management →']) {
   if (!checkHtml.includes(required)) throw new Error(`Ambassador Management admin runtime is missing: ${required}`);
 }
 
-console.log('Installed Ambassador Management with automatic unique referral IDs, copyable referral links, status tracking, and 25% commission defaults.');
+console.log('Installed Ambassador Management with automatic unique referral IDs, copyable referral links, review-before-send approval emails, status tracking, and 25% commission defaults.');
