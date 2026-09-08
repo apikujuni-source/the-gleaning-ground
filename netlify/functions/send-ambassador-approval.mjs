@@ -4,6 +4,8 @@ import { once } from 'node:events';
 import { randomUUID } from 'node:crypto';
 
 const ADMIN_GITHUB_LOGIN = 'apikujuni-source';
+const REPO = 'apikujuni-source/the-gleaning-ground';
+const AMBASSADOR_FOLDER = 'content/divine-blueprint/approved-ambassadors';
 const FROM_EMAIL = 'info@gleaningground.com';
 const CC_EMAIL = 'apikujuni@gmail.com';
 const DEFAULT_SMTP_HOST = 'smtppro.zoho.com';
@@ -57,18 +59,72 @@ function normalizeReferralLink(value) {
   }
 }
 
-async function verifyGithubAdmin(token) {
-  const response = await fetch('https://api.github.com/user', {
+function normalizeSlug(value) {
+  const slug = String(value || '').trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{0,119}$/.test(slug) ? slug : '';
+}
+
+async function githubRequest(url, token, accept = 'application/vnd.github+json') {
+  return fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
-      accept: 'application/vnd.github+json',
+      accept,
       'user-agent': 'the-gleaning-ground-netlify-function',
       'x-github-api-version': '2022-11-28'
     }
   });
+}
+
+async function verifyGithubAdmin(token) {
+  const response = await githubRequest('https://api.github.com/user', token);
   if (!response.ok) return false;
   const profile = await response.json();
   return String(profile?.login || '').toLowerCase() === ADMIN_GITHUB_LOGIN.toLowerCase();
+}
+
+async function loadPublishedAmbassador(slug, token) {
+  const url = `https://api.github.com/repos/${REPO}/contents/${AMBASSADOR_FOLDER}/${encodeURIComponent(slug)}.json?ref=main`;
+  const response = await githubRequest(url, token, 'application/vnd.github.raw+json');
+
+  if (response.status === 404) {
+    const error = new Error('Ambassador entry is not published on main.');
+    error.code = 'AMBASSADOR_NOT_PUBLISHED';
+    throw error;
+  }
+  if (!response.ok) {
+    const error = new Error(`Could not load published ambassador record (${response.status}).`);
+    error.code = 'AMBASSADOR_LOOKUP_FAILED';
+    throw error;
+  }
+
+  let record;
+  try {
+    record = JSON.parse(await response.text());
+  } catch {
+    const error = new Error('Published ambassador record is invalid JSON.');
+    error.code = 'AMBASSADOR_RECORD_INVALID';
+    throw error;
+  }
+
+  if (String(record?.status || '').trim() !== 'Active') {
+    const error = new Error('Ambassador is not active.');
+    error.code = 'AMBASSADOR_NOT_ACTIVE';
+    throw error;
+  }
+
+  const email = normalizeEmail(record?.email);
+  const referralLink = normalizeReferralLink(record?.referralLink);
+  if (!email || !referralLink) {
+    const error = new Error('Published ambassador record is missing a valid email or referral link.');
+    error.code = 'AMBASSADOR_RECORD_INVALID';
+    throw error;
+  }
+
+  return {
+    email,
+    referralLink,
+    ambassadorName: String(record?.ambassadorName || '').trim()
+  };
 }
 
 function buildMessage({ to, referralLink }) {
@@ -123,12 +179,7 @@ async function sendViaZoho({ to, referralLink }) {
     throw error;
   }
 
-  const socket = tls.connect({
-    host,
-    port,
-    servername: host,
-    rejectUnauthorized: true
-  });
+  const socket = tls.connect({ host, port, servername: host, rejectUnauthorized: true });
   socket.setTimeout(20000);
   socket.on('timeout', () => socket.destroy(new Error('SMTP connection timed out.')));
 
@@ -182,6 +233,15 @@ async function sendViaZoho({ to, referralLink }) {
   }
 }
 
+function ambassadorErrorResponse(error, origin) {
+  const code = error?.code;
+  if (code === 'AMBASSADOR_NOT_PUBLISHED') return json(404, { ok: false, error: code }, origin);
+  if (code === 'AMBASSADOR_NOT_ACTIVE') return json(409, { ok: false, error: code }, origin);
+  if (code === 'AMBASSADOR_RECORD_INVALID') return json(422, { ok: false, error: code }, origin);
+  if (code === 'AMBASSADOR_LOOKUP_FAILED') return json(502, { ok: false, error: code }, origin);
+  return null;
+}
+
 export default async (request) => {
   const origin = request.headers.get('origin') || '';
 
@@ -190,10 +250,7 @@ export default async (request) => {
   }
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders(origin)
-    });
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
   if (request.method !== 'POST') {
@@ -219,26 +276,43 @@ export default async (request) => {
     return json(400, { ok: false, error: 'INVALID_JSON' }, origin);
   }
 
-  const email = normalizeEmail(payload?.email);
-  const referralLink = normalizeReferralLink(payload?.referralLink);
-  if (!email || !referralLink) {
-    return json(400, { ok: false, error: 'INVALID_AMBASSADOR_DATA' }, origin);
+  const slug = normalizeSlug(payload?.slug);
+  if (!slug) return json(400, { ok: false, error: 'INVALID_AMBASSADOR_SLUG' }, origin);
+
+  let ambassador;
+  try {
+    ambassador = await loadPublishedAmbassador(slug, token);
+  } catch (error) {
+    console.error('Published ambassador lookup failed', error);
+    return ambassadorErrorResponse(error, origin) || json(502, { ok: false, error: 'AMBASSADOR_LOOKUP_FAILED' }, origin);
+  }
+
+  if (payload?.preview === true) {
+    return json(200, {
+      ok: true,
+      preview: true,
+      from: FROM_EMAIL,
+      cc: CC_EMAIL,
+      to: ambassador.email,
+      ambassadorName: ambassador.ambassadorName,
+      referralLink: ambassador.referralLink
+    }, origin);
   }
 
   const now = Date.now();
-  const lastSend = recentSends.get(email) || 0;
+  const lastSend = recentSends.get(ambassador.email) || 0;
   if (now - lastSend < 60000) {
     return json(429, { ok: false, error: 'RECENTLY_SENT' }, origin);
   }
 
   try {
-    await sendViaZoho({ to: email, referralLink });
-    recentSends.set(email, now);
+    await sendViaZoho({ to: ambassador.email, referralLink: ambassador.referralLink });
+    recentSends.set(ambassador.email, now);
     return json(200, {
       ok: true,
       from: FROM_EMAIL,
       cc: CC_EMAIL,
-      to: email
+      to: ambassador.email
     }, origin);
   } catch (error) {
     if (error?.code === 'MAIL_NOT_CONFIGURED') {
