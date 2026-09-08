@@ -1,1 +1,0 @@
-Zoho ambassador approval mail is routed from the shared CMS at gleaningground.com to the Divine Blueprint Netlify project because the Zoho SMTP secret is stored on that project. The function explicitly allows only the Gleaning Ground production origins and verifies the GitHub admin token before sending.
