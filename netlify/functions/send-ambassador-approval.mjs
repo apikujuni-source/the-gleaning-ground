@@ -10,17 +10,30 @@ const DEFAULT_SMTP_HOST = 'smtppro.zoho.com';
 const DEFAULT_SMTP_PORT = 465;
 const ALLOWED_ORIGINS = new Set([
   'https://gleaningground.com',
-  'https://www.gleaningground.com'
+  'https://www.gleaningground.com',
+  'https://divineblueprint.gleaningground.com'
 ]);
 
 const recentSends = new Map();
 
-function json(status, body) {
+function corsHeaders(origin) {
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return {};
+  return {
+    'access-control-allow-origin': origin,
+    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-headers': 'authorization, content-type',
+    'access-control-max-age': '600',
+    vary: 'Origin'
+  };
+}
+
+function json(status, body, origin = '') {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store'
+      'cache-control': 'no-store',
+      ...corsHeaders(origin)
     }
   });
 }
@@ -94,10 +107,10 @@ function buildMessage({ to, referralLink }) {
 }
 
 async function sendViaZoho({ to, referralLink }) {
-  const user = String(process.env.ZOHO_SMTP_USER || FROM_EMAIL).trim();
-  const password = String(process.env.ZOHO_SMTP_PASSWORD || '').trim();
-  const host = String(process.env.ZOHO_SMTP_HOST || DEFAULT_SMTP_HOST).trim();
-  const port = Number(process.env.ZOHO_SMTP_PORT || DEFAULT_SMTP_PORT);
+  const user = String(Netlify.env.get('ZOHO_SMTP_USER') || FROM_EMAIL).trim();
+  const password = String(Netlify.env.get('ZOHO_SMTP_PASSWORD') || '').trim();
+  const host = String(Netlify.env.get('ZOHO_SMTP_HOST') || DEFAULT_SMTP_HOST).trim();
+  const port = Number(Netlify.env.get('ZOHO_SMTP_PORT') || DEFAULT_SMTP_PORT);
 
   if (!password) {
     const error = new Error('Zoho SMTP password is not configured.');
@@ -170,16 +183,26 @@ async function sendViaZoho({ to, referralLink }) {
 }
 
 export default async (request) => {
-  if (request.method !== 'POST') return json(405, { ok: false, error: 'METHOD_NOT_ALLOWED' });
+  const origin = request.headers.get('origin') || '';
 
-  const origin = request.headers.get('origin');
   if (origin && !ALLOWED_ORIGINS.has(origin)) {
-    return json(403, { ok: false, error: 'ORIGIN_NOT_ALLOWED' });
+    return json(403, { ok: false, error: 'ORIGIN_NOT_ALLOWED' }, origin);
+  }
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders(origin)
+    });
+  }
+
+  if (request.method !== 'POST') {
+    return json(405, { ok: false, error: 'METHOD_NOT_ALLOWED' }, origin);
   }
 
   const authorization = String(request.headers.get('authorization') || '');
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : '';
-  if (!token) return json(401, { ok: false, error: 'AUTH_REQUIRED' });
+  if (!token) return json(401, { ok: false, error: 'AUTH_REQUIRED' }, origin);
 
   let isAdmin = false;
   try {
@@ -187,25 +210,25 @@ export default async (request) => {
   } catch (error) {
     console.error('GitHub admin verification failed', error);
   }
-  if (!isAdmin) return json(403, { ok: false, error: 'ADMIN_REQUIRED' });
+  if (!isAdmin) return json(403, { ok: false, error: 'ADMIN_REQUIRED' }, origin);
 
   let payload;
   try {
     payload = await request.json();
   } catch {
-    return json(400, { ok: false, error: 'INVALID_JSON' });
+    return json(400, { ok: false, error: 'INVALID_JSON' }, origin);
   }
 
   const email = normalizeEmail(payload?.email);
   const referralLink = normalizeReferralLink(payload?.referralLink);
   if (!email || !referralLink) {
-    return json(400, { ok: false, error: 'INVALID_AMBASSADOR_DATA' });
+    return json(400, { ok: false, error: 'INVALID_AMBASSADOR_DATA' }, origin);
   }
 
   const now = Date.now();
   const lastSend = recentSends.get(email) || 0;
   if (now - lastSend < 60000) {
-    return json(429, { ok: false, error: 'RECENTLY_SENT' });
+    return json(429, { ok: false, error: 'RECENTLY_SENT' }, origin);
   }
 
   try {
@@ -216,14 +239,14 @@ export default async (request) => {
       from: FROM_EMAIL,
       cc: CC_EMAIL,
       to: email
-    });
+    }, origin);
   } catch (error) {
     if (error?.code === 'MAIL_NOT_CONFIGURED') {
       console.error('Zoho mail is not configured', error.message);
-      return json(503, { ok: false, error: 'MAIL_NOT_CONFIGURED' });
+      return json(503, { ok: false, error: 'MAIL_NOT_CONFIGURED' }, origin);
     }
     console.error('Zoho ambassador approval email failed', error);
-    return json(502, { ok: false, error: 'MAIL_SEND_FAILED' });
+    return json(502, { ok: false, error: 'MAIL_SEND_FAILED' }, origin);
   }
 };
 
