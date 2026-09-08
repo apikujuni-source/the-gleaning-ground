@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const indexPath = '_site/admin/index.html';
 const ccEmail = 'apikujuni@gmail.com';
 const fromEmail = 'info@gleaningground.com';
+const mailEndpoint = 'https://divineblueprint.gleaningground.com/api/admin/send-ambassador-approval';
 
 let html = await readFile(indexPath, 'utf8');
 
@@ -20,7 +21,7 @@ if (!widgetPattern.test(html)) {
   throw new Error('Could not locate the Ambassador Approval Email widget for Zoho integration.');
 }
 
-const replacement = `      const AMBASSADOR_MAIL_ENDPOINT = '/api/admin/send-ambassador-approval';
+const replacement = `      const AMBASSADOR_MAIL_ENDPOINT = '${mailEndpoint}';
       const AMBASSADOR_MAIL_FROM = '${fromEmail}';
       const AMBASSADOR_MAIL_CC = '${ccEmail}';
       const AMBASSADOR_MAIL_TOKEN_KEY = 'divine_ambassador_mail_github_token';
@@ -148,7 +149,7 @@ const replacement = `      const AMBASSADOR_MAIL_ENDPOINT = '/api/admin/send-amb
 
             if (!response.ok) {
               if (result?.error === 'MAIL_NOT_CONFIGURED') {
-                throw new Error('Zoho Mail is connected in the website code but its SMTP app password has not yet been added to Netlify.');
+                throw new Error('Zoho Mail is connected in the website code but its SMTP app password has not yet been added to the Divine Blueprint Netlify project.');
               }
               if (result?.error === 'ADMIN_REQUIRED') {
                 throw new Error('This Zoho send action is restricted to the authorized Gleaning Ground administrator.');
@@ -197,7 +198,7 @@ for (const required of [
   `AMBASSADOR_MAIL_FROM = '${fromEmail}'`,
   `AMBASSADOR_MAIL_CC = '${ccEmail}'`,
   "authorization:github:success:",
-  "'/api/admin/send-ambassador-approval'"
+  mailEndpoint
 ]) {
   if (!html.includes(required)) throw new Error(`Zoho Ambassador email integration is missing: ${required}`);
 }
