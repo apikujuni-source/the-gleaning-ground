@@ -111,7 +111,7 @@ const replacement = `      const GMAIL_SENDER = '${gmailAddress}';
 html = html.replace(widgetPattern, replacement);
 
 for (const required of [
-  "GMAIL_SENDER = '${gmailAddress}'",
+  `GMAIL_SENDER = '${gmailAddress}'`,
   'Open approval email in Gmail',
   'raw.githubusercontent.com/apikujuni-source/the-gleaning-ground',
   'mail.google.com/mail/'
@@ -120,4 +120,4 @@ for (const required of [
 }
 
 await writeFile(indexPath, html, 'utf8');
-console.log('Configured Ambassador Management approval emails to open in Gmail from ${gmailAddress}.');
+console.log(`Configured Ambassador Management approval emails to open in Gmail from ${gmailAddress}.`);
