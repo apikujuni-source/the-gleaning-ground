@@ -4,13 +4,43 @@ import {
   listCheckoutSessions,
   updateCheckoutMetadata,
   findPaystackRecipient,
-  paystackRequest
+  paystackRequest,
+  findActiveAmbassador,
+  commissionFor,
+  holdUntilEpoch
 } from './_affiliate-core.mjs';
 
 function transferReference(referralId, sessionIds) {
   const digest = createHash('sha256').update(`${referralId}|${sessionIds.sort().join('|')}`).digest('hex').slice(0, 24);
   const ref = String(referralId || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(-12);
   return `tdb_${ref}_${digest}`.slice(0, 50);
+}
+
+async function reconcileMissingCommission(session) {
+  if (session?.payment_status !== 'paid') return session;
+  if (session?.metadata?.affiliate_recorded === 'yes') return session;
+  const ambassador = await findActiveAmbassador(session?.client_reference_id);
+  if (!ambassador) return session;
+  const amountTotal = Number(session?.amount_total || 0);
+  const rate = Number(ambassador.commissionRate || 25);
+  const commission = commissionFor(amountTotal, rate);
+  if (!amountTotal || !commission) return session;
+  const metadata = {
+    affiliate_recorded: 'yes',
+    affiliate_ref: ambassador.referralId,
+    affiliate_email: ambassador.email,
+    commission_rate: rate,
+    commission_original: commission,
+    commission_amount: commission,
+    commission_currency: String(session.currency || '').toUpperCase(),
+    commission_status: 'pending',
+    commission_hold_until: holdUntilEpoch(session.created),
+    commission_debt: 0,
+    commission_paid_amount: 0,
+    commission_reconciled: 'yes'
+  };
+  await updateCheckoutMetadata(session.id, metadata);
+  return { ...session, metadata: { ...(session.metadata || {}), ...Object.fromEntries(Object.entries(metadata).map(([k,v]) => [k, String(v)])) } };
 }
 
 async function reduceDebt(debtSessions, amountToOffset) {
@@ -138,12 +168,26 @@ async function processAmbassador(referralId, sessions) {
 }
 
 export default async () => {
-  if (!env('STRIPE_SECRET_KEY') || !env('PAYSTACK_SECRET_KEY')) {
-    console.log('Affiliate payout run skipped: Stripe and/or Paystack is not configured.');
+  if (!env('STRIPE_SECRET_KEY')) {
+    console.log('Affiliate reconciliation/payout run skipped: Stripe is not configured.');
     return;
   }
 
-  const sessions = await listCheckoutSessions();
+  const rawSessions = await listCheckoutSessions();
+  const sessions = [];
+  for (const session of rawSessions) {
+    try { sessions.push(await reconcileMissingCommission(session)); }
+    catch (error) {
+      console.error(`Affiliate reconciliation failed for ${session?.id || 'unknown session'}`, error);
+      sessions.push(session);
+    }
+  }
+
+  if (!env('PAYSTACK_SECRET_KEY')) {
+    console.log('Affiliate reconciliation complete; automatic Nigeria payout skipped because Paystack is not configured.');
+    return;
+  }
+
   const groups = new Map();
   for (const session of sessions) {
     const metadata = session.metadata || {};
@@ -163,7 +207,7 @@ export default async () => {
       results.push({ referralId, action: 'error' });
     }
   }
-  console.log('Affiliate payout run complete', JSON.stringify(results));
+  console.log('Affiliate reconciliation/payout run complete', JSON.stringify(results));
 };
 
 export const config = { schedule: '15 8 * * *' };
