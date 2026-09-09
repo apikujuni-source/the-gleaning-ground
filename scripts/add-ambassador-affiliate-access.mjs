@@ -131,7 +131,7 @@ html = html.replace('</body>', `${runtime}\n</body>`);
 await writeFile(indexPath, html, 'utf8');
 
 const check = await readFile(indexPath, 'utf8');
-for (const required of [marker, 'Affiliate access links', ENDPOINT]) {
+for (const required of [marker, 'Affiliate access links', endpoint]) {
   if (!check.includes(required)) throw new Error(`Affiliate admin access control missing: ${required}`);
 }
 
