@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import runtimeAmbassadors from './_ambassador-registry.generated.mjs';
+import runtimeAmbassadors from './_lib/ambassador-registry.mjs';
 
 export const ADMIN_GITHUB_LOGIN = 'apikujuni-source';
 export const REPO = 'apikujuni-source/the-gleaning-ground';
