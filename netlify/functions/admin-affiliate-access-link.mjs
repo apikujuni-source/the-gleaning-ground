@@ -27,7 +27,6 @@ export default async (request) => {
     ambassadorName: ambassador.ambassadorName,
     referralId: ambassador.referralId,
     dashboardUrl: `${origin}/api/affiliate/dashboard?token=${encodeURIComponent(accessToken)}`,
-    payoutSetupUrl: `${origin}/api/affiliate/payout-setup?token=${encodeURIComponent(accessToken)}`,
     expiresInDays: 30
   });
 };
