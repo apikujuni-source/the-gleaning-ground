@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 const sourceDir = path.resolve('content/divine-blueprint/approved-ambassadors');
-const outputFile = path.resolve('netlify/functions/_ambassador-registry.generated.mjs');
+const outputFile = path.resolve('netlify/lib/_ambassador-registry.generated.mjs');
 
 const normalizeRef = (value) => {
   const ref = String(value || '').trim().toUpperCase();
