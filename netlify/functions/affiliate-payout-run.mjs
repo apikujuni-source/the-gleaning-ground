@@ -6,21 +6,27 @@ import {
   commissionFor,
   holdUntilEpoch
 } from './_affiliate-core.mjs';
+import {
+  commissionableAmountForSession,
+  commissionBasisSource
+} from '../lib/affiliate-commission.mjs';
 
 async function reconcileMissingCommission(session) {
   if (session?.payment_status !== 'paid') return session;
   if (session?.metadata?.affiliate_recorded === 'yes') return session;
   const ambassador = await findActiveAmbassador(session?.client_reference_id);
   if (!ambassador) return session;
-  const amountTotal = Number(session?.amount_total || 0);
+  const commissionBasis = commissionableAmountForSession(session);
   const rate = Number(ambassador.commissionRate || 25);
-  const commission = commissionFor(amountTotal, rate);
-  if (!amountTotal || !commission) return session;
+  const commission = commissionFor(commissionBasis, rate);
+  if (!commissionBasis || !commission) return session;
   const metadata = {
     affiliate_recorded: 'yes',
     affiliate_ref: ambassador.referralId,
     affiliate_email: ambassador.email,
     commission_rate: rate,
+    commission_basis_amount: commissionBasis,
+    commission_basis_source: commissionBasisSource(session),
     commission_original: commission,
     commission_amount: commission,
     commission_currency: String(session.currency || '').toUpperCase(),
