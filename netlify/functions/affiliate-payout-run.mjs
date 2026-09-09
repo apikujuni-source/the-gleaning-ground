@@ -30,6 +30,30 @@ async function reduceDebt(debtSessions, amountToOffset) {
   }
 }
 
+async function applyOffsets(allocations, debtSessions, offsetTotal) {
+  if (offsetTotal <= 0) return;
+  await reduceDebt(debtSessions, offsetTotal);
+  for (const allocation of allocations) {
+    if (allocation.offset <= 0) continue;
+    const previousOffset = Number(allocation.session.metadata?.commission_offset_amount || 0);
+    if (allocation.payout <= 0) {
+      await updateCheckoutMetadata(allocation.session.id, {
+        commission_status: 'offset',
+        commission_amount: 0,
+        commission_offset_amount: previousOffset + allocation.offset,
+        commission_payout_amount: 0,
+        commission_paid_amount: 0
+      });
+    } else {
+      await updateCheckoutMetadata(allocation.session.id, {
+        commission_status: 'pending',
+        commission_amount: allocation.payout,
+        commission_offset_amount: previousOffset + allocation.offset
+      });
+    }
+  }
+}
+
 async function processAmbassador(referralId, sessions) {
   const now = Math.floor(Date.now() / 1000);
   const pending = sessions
@@ -48,7 +72,6 @@ async function processAmbassador(referralId, sessions) {
   const totalPending = pending.reduce((sum, s) => sum + Number(s.metadata.commission_amount || 0), 0);
   const totalDebt = debtSessions.reduce((sum, s) => sum + Number(s.metadata.commission_debt || 0), 0);
   const offsetTotal = Math.min(totalPending, totalDebt);
-  const payoutTotal = Math.max(0, totalPending - totalDebt);
 
   let offsetRemaining = offsetTotal;
   const allocations = pending.map((session) => {
@@ -58,28 +81,18 @@ async function processAmbassador(referralId, sessions) {
     return { session, commission, offset, payout: commission - offset };
   });
 
-  if (offsetTotal > 0) await reduceDebt(debtSessions, offsetTotal);
+  await applyOffsets(allocations, debtSessions, offsetTotal);
 
-  if (payoutTotal <= 0) {
-    for (const allocation of allocations) {
-      await updateCheckoutMetadata(allocation.session.id, {
-        commission_status: 'offset',
-        commission_offset_amount: allocation.offset,
-        commission_payout_amount: 0,
-        commission_paid_amount: 0
-      });
-    }
-    return { referralId, action: 'offset', amount: offsetTotal };
-  }
+  const payable = allocations.filter((a) => a.payout > 0);
+  const payoutTotal = payable.reduce((sum, a) => sum + a.payout, 0);
+  if (payoutTotal <= 0) return { referralId, action: 'offset', amount: offsetTotal };
 
   const recipient = await findPaystackRecipient(referralId);
   if (!recipient?.recipient_code) {
     return { referralId, action: 'awaiting_payout_setup', amount: payoutTotal };
   }
 
-  const payoutSessions = allocations.filter((a) => a.payout > 0);
-  const reference = transferReference(referralId, payoutSessions.map((a) => a.session.id));
-
+  const reference = transferReference(referralId, payable.map((a) => a.session.id));
   let transfer;
   try {
     const verified = await paystackRequest(`/transfer/verify/${encodeURIComponent(reference)}`);
@@ -106,20 +119,10 @@ async function processAmbassador(referralId, sessions) {
     return { referralId, action: 'otp_required', reference, amount: payoutTotal };
   }
 
-  for (const allocation of allocations) {
-    if (allocation.payout <= 0) {
-      await updateCheckoutMetadata(allocation.session.id, {
-        commission_status: 'offset',
-        commission_offset_amount: allocation.offset,
-        commission_payout_amount: 0,
-        commission_paid_amount: 0
-      });
-      continue;
-    }
-
+  for (const allocation of payable) {
     await updateCheckoutMetadata(allocation.session.id, {
       commission_status: transferStatus === 'success' ? 'paid' : 'payout_pending',
-      commission_offset_amount: allocation.offset,
+      commission_amount: allocation.payout,
       commission_payout_amount: allocation.payout,
       commission_paid_amount: transferStatus === 'success' ? allocation.payout : 0,
       commission_payout_reference: reference
@@ -163,6 +166,4 @@ export default async () => {
   console.log('Affiliate payout run complete', JSON.stringify(results));
 };
 
-export const config = {
-  schedule: '15 8 * * *'
-};
+export const config = { schedule: '15 8 * * *' };
