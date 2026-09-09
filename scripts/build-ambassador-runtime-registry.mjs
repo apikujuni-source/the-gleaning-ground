@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 const sourceDir = path.resolve('content/divine-blueprint/approved-ambassadors');
-const outputFile = path.resolve('netlify/functions/_ambassador-registry.generated.mjs');
+const outputFile = path.resolve('netlify/functions/_lib/ambassador-registry.mjs');
 
 const normalizeRef = (value) => {
   const ref = String(value || '').trim().toUpperCase();
@@ -50,7 +50,7 @@ async function main() {
     }
   }
 
-  const output = `// Generated at build time for server-side functions only. Contains only fields required by the affiliate runtime; phone, location, notes, and application data are excluded.\nexport default ${JSON.stringify(records, null, 2)};\n`;
+  const output = `// Generated at build time for server-side imports only. Contains only fields required by the affiliate runtime; phone, location, notes, and application data are excluded.\nexport default ${JSON.stringify(records, null, 2)};\n`;
   await fs.mkdir(path.dirname(outputFile), { recursive: true });
   await fs.writeFile(outputFile, output, 'utf8');
   console.log(`Built private-safe ambassador runtime registry with ${records.length} record(s).`);
