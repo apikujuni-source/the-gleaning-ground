@@ -1,20 +1,11 @@
-import { createHash } from 'node:crypto';
 import {
   env,
   listCheckoutSessions,
   updateCheckoutMetadata,
-  findPaystackRecipient,
-  paystackRequest,
   findActiveAmbassador,
   commissionFor,
   holdUntilEpoch
 } from './_affiliate-core.mjs';
-
-function transferReference(referralId, sessionIds) {
-  const digest = createHash('sha256').update(`${referralId}|${sessionIds.sort().join('|')}`).digest('hex').slice(0, 24);
-  const ref = String(referralId || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(-12);
-  return `tdb_${ref}_${digest}`.slice(0, 50);
-}
 
 async function reconcileMissingCommission(session) {
   if (session?.payment_status !== 'paid') return session;
@@ -40,7 +31,13 @@ async function reconcileMissingCommission(session) {
     commission_reconciled: 'yes'
   };
   await updateCheckoutMetadata(session.id, metadata);
-  return { ...session, metadata: { ...(session.metadata || {}), ...Object.fromEntries(Object.entries(metadata).map(([k,v]) => [k, String(v)])) } };
+  return {
+    ...session,
+    metadata: {
+      ...(session.metadata || {}),
+      ...Object.fromEntries(Object.entries(metadata).map(([key, value]) => [key, String(value)]))
+    }
+  };
 }
 
 async function reduceDebt(debtSessions, amountToOffset) {
@@ -66,7 +63,7 @@ async function applyOffsets(allocations, debtSessions, offsetTotal) {
   for (const allocation of allocations) {
     if (allocation.offset <= 0) continue;
     const previousOffset = Number(allocation.session.metadata?.commission_offset_amount || 0);
-    if (allocation.payout <= 0) {
+    if (allocation.payable <= 0) {
       await updateCheckoutMetadata(allocation.session.id, {
         commission_status: 'offset',
         commission_amount: 0,
@@ -76,116 +73,88 @@ async function applyOffsets(allocations, debtSessions, offsetTotal) {
       });
     } else {
       await updateCheckoutMetadata(allocation.session.id, {
-        commission_status: 'pending',
-        commission_amount: allocation.payout,
-        commission_offset_amount: previousOffset + allocation.offset
+        commission_status: 'available',
+        commission_amount: allocation.payable,
+        commission_offset_amount: previousOffset + allocation.offset,
+        commission_payout_amount: allocation.payable
       });
     }
   }
 }
 
-async function processAmbassador(referralId, sessions) {
+async function processAmbassadorCurrency(referralId, currency, sessions) {
   const now = Math.floor(Date.now() / 1000);
   const pending = sessions
-    .filter((s) => s.metadata?.commission_status === 'pending')
-    .filter((s) => Number(s.metadata?.commission_hold_until || 0) <= now)
-    .filter((s) => Number(s.metadata?.commission_amount || 0) > 0)
-    .sort((a,b) => Number(a.created || 0) - Number(b.created || 0));
+    .filter((session) => session.metadata?.commission_status === 'pending')
+    .filter((session) => Number(session.metadata?.commission_hold_until || 0) <= now)
+    .filter((session) => Number(session.metadata?.commission_amount || 0) > 0)
+    .sort((a, b) => Number(a.created || 0) - Number(b.created || 0));
 
   const debtSessions = sessions
-    .filter((s) => s.metadata?.commission_status === 'debt')
-    .filter((s) => Number(s.metadata?.commission_debt || 0) > 0)
-    .sort((a,b) => Number(a.created || 0) - Number(b.created || 0));
+    .filter((session) => session.metadata?.commission_status === 'debt')
+    .filter((session) => Number(session.metadata?.commission_debt || 0) > 0)
+    .sort((a, b) => Number(a.created || 0) - Number(b.created || 0));
 
-  if (!pending.length) return { referralId, action: 'none' };
+  if (!pending.length) return { referralId, currency, action: 'none' };
 
-  const totalPending = pending.reduce((sum, s) => sum + Number(s.metadata.commission_amount || 0), 0);
-  const totalDebt = debtSessions.reduce((sum, s) => sum + Number(s.metadata.commission_debt || 0), 0);
+  const totalPending = pending.reduce(
+    (sum, session) => sum + Number(session.metadata?.commission_amount || 0),
+    0
+  );
+  const totalDebt = debtSessions.reduce(
+    (sum, session) => sum + Number(session.metadata?.commission_debt || 0),
+    0
+  );
   const offsetTotal = Math.min(totalPending, totalDebt);
 
   let offsetRemaining = offsetTotal;
   const allocations = pending.map((session) => {
-    const commission = Number(session.metadata.commission_amount || 0);
+    const commission = Number(session.metadata?.commission_amount || 0);
     const offset = Math.min(commission, offsetRemaining);
     offsetRemaining -= offset;
-    return { session, commission, offset, payout: commission - offset };
+    return { session, commission, offset, payable: commission - offset };
   });
 
   await applyOffsets(allocations, debtSessions, offsetTotal);
 
-  const payable = allocations.filter((a) => a.payout > 0);
-  const payoutTotal = payable.reduce((sum, a) => sum + a.payout, 0);
-  if (payoutTotal <= 0) return { referralId, action: 'offset', amount: offsetTotal };
-
-  const recipient = await findPaystackRecipient(referralId);
-  if (!recipient?.recipient_code) {
-    return { referralId, action: 'awaiting_payout_setup', amount: payoutTotal };
-  }
-
-  const reference = transferReference(referralId, payable.map((a) => a.session.id));
-  let transfer;
-  try {
-    const verified = await paystackRequest(`/transfer/verify/${encodeURIComponent(reference)}`);
-    if (verified?.data?.reference === reference) transfer = verified;
-  } catch {}
-
-  if (!transfer) {
-    transfer = await paystackRequest('/transfer', {
-      method: 'POST',
-      body: {
-        source: 'balance',
-        amount: payoutTotal,
-        recipient: recipient.recipient_code,
-        reference,
-        reason: 'The Divine Blueprint Ambassador commission',
-        currency: 'NGN'
-      }
-    });
-  }
-
-  const transferStatus = String(transfer?.data?.status || '').toLowerCase();
-  if (transferStatus === 'otp') {
-    console.error(`Paystack transfer OTP is enabled; automatic payout ${reference} needs manual finalization.`);
-    return { referralId, action: 'otp_required', reference, amount: payoutTotal };
-  }
-
-  for (const allocation of payable) {
+  const directlyAvailable = allocations.filter((allocation) => allocation.offset <= 0 && allocation.payable > 0);
+  for (const allocation of directlyAvailable) {
     await updateCheckoutMetadata(allocation.session.id, {
-      commission_status: transferStatus === 'success' ? 'paid' : 'payout_pending',
-      commission_amount: allocation.payout,
-      commission_payout_amount: allocation.payout,
-      commission_paid_amount: transferStatus === 'success' ? allocation.payout : 0,
-      commission_payout_reference: reference
+      commission_status: 'available',
+      commission_payout_amount: allocation.payable
     });
+  }
+
+  const availableTotal = allocations.reduce((sum, allocation) => sum + allocation.payable, 0);
+  if (availableTotal <= 0) {
+    return { referralId, currency, action: 'offset', amount: offsetTotal };
   }
 
   return {
     referralId,
-    action: transferStatus === 'success' ? 'paid' : 'payout_pending',
-    reference,
-    amount: payoutTotal
+    currency,
+    action: 'available_for_manual_payout',
+    amount: availableTotal,
+    offset: offsetTotal,
+    commissionCount: allocations.filter((allocation) => allocation.payable > 0).length
   };
 }
 
 export default async () => {
   if (!env('STRIPE_SECRET_KEY')) {
-    console.log('Affiliate reconciliation/payout run skipped: Stripe is not configured.');
+    console.log('Affiliate reconciliation run skipped: Stripe is not configured.');
     return;
   }
 
   const rawSessions = await listCheckoutSessions();
   const sessions = [];
   for (const session of rawSessions) {
-    try { sessions.push(await reconcileMissingCommission(session)); }
-    catch (error) {
+    try {
+      sessions.push(await reconcileMissingCommission(session));
+    } catch (error) {
       console.error(`Affiliate reconciliation failed for ${session?.id || 'unknown session'}`, error);
       sessions.push(session);
     }
-  }
-
-  if (!env('PAYSTACK_SECRET_KEY')) {
-    console.log('Affiliate reconciliation complete; automatic Nigeria payout skipped because Paystack is not configured.');
-    return;
   }
 
   const groups = new Map();
@@ -193,21 +162,23 @@ export default async () => {
     const metadata = session.metadata || {};
     const referralId = String(metadata.affiliate_ref || '');
     const currency = String(metadata.commission_currency || session.currency || '').toUpperCase();
-    if (!referralId || metadata.affiliate_recorded !== 'yes' || currency !== 'NGN') continue;
-    if (!groups.has(referralId)) groups.set(referralId, []);
-    groups.get(referralId).push(session);
+    if (!referralId || metadata.affiliate_recorded !== 'yes' || !currency) continue;
+    const key = `${referralId}|${currency}`;
+    if (!groups.has(key)) groups.set(key, { referralId, currency, sessions: [] });
+    groups.get(key).sessions.push(session);
   }
 
   const results = [];
-  for (const [referralId, group] of groups) {
+  for (const group of groups.values()) {
     try {
-      results.push(await processAmbassador(referralId, group));
+      results.push(await processAmbassadorCurrency(group.referralId, group.currency, group.sessions));
     } catch (error) {
-      console.error(`Affiliate payout failed for ${referralId}`, error);
-      results.push({ referralId, action: 'error' });
+      console.error(`Affiliate availability processing failed for ${group.referralId} ${group.currency}`, error);
+      results.push({ referralId: group.referralId, currency: group.currency, action: 'error' });
     }
   }
-  console.log('Affiliate reconciliation/payout run complete', JSON.stringify(results));
+
+  console.log('Affiliate reconciliation/manual-payout availability run complete', JSON.stringify(results));
 };
 
 export const config = { schedule: '15 8 * * *' };
