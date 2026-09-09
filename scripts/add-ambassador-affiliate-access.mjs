@@ -87,7 +87,7 @@ const runtime = `
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.textContent = 'Affiliate access links';
+  button.textContent = 'Ambassador dashboard link';
   button.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:99999;border:0;border-radius:999px;padding:12px 16px;background:#173b62;color:#fff;font:700 14px system-ui;box-shadow:0 8px 24px rgba(0,0,0,.18);cursor:pointer;display:none';
   setVisible(button);
   document.body.appendChild(button);
@@ -109,13 +109,12 @@ const runtime = `
         response = await requestLinks(slug, token);
       }
       const result = await response.json();
-      if (!response.ok) throw new Error(result?.error || 'Could not generate affiliate links.');
+      if (!response.ok) throw new Error(result?.error || 'Could not generate affiliate link.');
       const text =
         'Earnings dashboard:\\n' + result.dashboardUrl +
-        '\\n\\nPayout setup:\\n' + result.payoutSetupUrl +
-        '\\n\\nLinks expire in ' + result.expiresInDays + ' days.';
+        '\\n\\nLink expires in ' + result.expiresInDays + ' days.';
       try { await navigator.clipboard.writeText(text); } catch {}
-      window.prompt('Private ambassador links (copied to clipboard when permitted):', text);
+      window.prompt('Private ambassador dashboard link (copied to clipboard when permitted):', text);
     } catch (error) {
       alert(String(error?.message || error));
     } finally {
@@ -131,8 +130,8 @@ html = html.replace('</body>', `${runtime}\n</body>`);
 await writeFile(indexPath, html, 'utf8');
 
 const check = await readFile(indexPath, 'utf8');
-for (const required of [marker, 'Affiliate access links', endpoint]) {
+for (const required of [marker, 'Ambassador dashboard link', endpoint]) {
   if (!check.includes(required)) throw new Error(`Affiliate admin access control missing: ${required}`);
 }
 
-console.log('Added secure Ambassador Management affiliate access-link control.');
+console.log('Added secure Ambassador Management dashboard-link control.');
