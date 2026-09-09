@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import runtimeAmbassadors from './_ambassador-registry.generated.mjs';
 
 export const ADMIN_GITHUB_LOGIN = 'apikujuni-source';
 export const REPO = 'apikujuni-source/the-gleaning-ground';
@@ -47,75 +48,42 @@ export async function verifyGithubAdmin(token) {
   return String(profile?.login || '').toLowerCase() === ADMIN_GITHUB_LOGIN.toLowerCase();
 }
 
-let ambassadorCache = { expires: 0, records: [] };
-
-export async function getAmbassadors({ force = false } = {}) {
-  if (!force && Date.now() < ambassadorCache.expires && ambassadorCache.records.length) {
-    return ambassadorCache.records;
-  }
-
-  const listUrl = `https://api.github.com/repos/${REPO}/contents/${AMBASSADOR_FOLDER}?ref=main`;
-  const listResponse = await githubRequest(listUrl);
-  if (!listResponse.ok) throw new Error(`Could not load ambassador registry (${listResponse.status}).`);
-  const files = await listResponse.json();
-
-  const jsonFiles = Array.isArray(files)
-    ? files.filter((item) => item?.type === 'file' && String(item?.name || '').endsWith('.json'))
-    : [];
-
-  const records = [];
-  for (const file of jsonFiles) {
-    const rawResponse = await fetch(file.download_url, { headers: { 'cache-control': 'no-cache' } });
-    if (!rawResponse.ok) continue;
-    try {
-      const record = await rawResponse.json();
+function normalizedRuntimeAmbassadors() {
+  return (Array.isArray(runtimeAmbassadors) ? runtimeAmbassadors : [])
+    .map((record) => {
       const referralId = normalizeRef(record?.referralId);
       const email = normalizeEmail(record?.email);
-      if (!referralId || !email) continue;
-      records.push({
-        ...record,
-        referralId,
+      const slug = String(record?.slug || '').trim().toLowerCase();
+      if (!referralId || !email || !/^[a-z0-9][a-z0-9-]{0,119}$/.test(slug)) return null;
+      return {
+        slug,
+        ambassadorName: String(record?.ambassadorName || '').trim().slice(0, 160),
         email,
+        referralId,
+        status: String(record?.status || '').trim(),
         commissionRate: Number.isFinite(Number(record?.commissionRate))
           ? Math.max(0, Math.min(100, Number(record.commissionRate)))
           : 25
-      });
-    } catch {}
-  }
+      };
+    })
+    .filter(Boolean);
+}
 
-  ambassadorCache = { expires: Date.now() + 5 * 60 * 1000, records };
-  return records;
+export async function getAmbassadors() {
+  return normalizedRuntimeAmbassadors();
 }
 
 export async function findActiveAmbassador(ref) {
   const normalized = normalizeRef(ref);
   if (!normalized) return null;
-  const records = await getAmbassadors();
-  return records.find((record) => record.referralId === normalized && String(record.status || '') === 'Active') || null;
+  const records = normalizedRuntimeAmbassadors();
+  return records.find((record) => record.referralId === normalized && record.status === 'Active') || null;
 }
 
 export async function findAmbassadorBySlug(slug) {
   const safe = String(slug || '').trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{0,119}$/.test(safe)) return null;
-  const url = `https://raw.githubusercontent.com/${REPO}/main/${AMBASSADOR_FOLDER}/${encodeURIComponent(safe)}.json`;
-  const response = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
-  if (!response.ok) return null;
-  try {
-    const record = await response.json();
-    const referralId = normalizeRef(record?.referralId);
-    const email = normalizeEmail(record?.email);
-    if (!referralId || !email) return null;
-    return {
-      ...record,
-      referralId,
-      email,
-      commissionRate: Number.isFinite(Number(record?.commissionRate))
-        ? Math.max(0, Math.min(100, Number(record.commissionRate)))
-        : 25
-    };
-  } catch {
-    return null;
-  }
+  return normalizedRuntimeAmbassadors().find((record) => record.slug === safe) || null;
 }
 
 export function signAffiliateToken({ referralId, email, days = 30 }) {

@@ -4,6 +4,8 @@
   "private": true,
   "description": "Gleaning Ground ministry website for Netlify with Decap CMS.",
   "scripts": {
+    "predev": "node scripts/build-ambassador-runtime-registry.mjs",
+    "prebuild": "node scripts/build-ambassador-runtime-registry.mjs && node scripts/enable-private-repo-cms-auth.mjs",
     "prepare-site": "rm -rf src _site && cat .source/chunks/00 .source/chunks/01 .source/chunks/02 .source/chunks/03 .source/chunks/04a .source/chunks/04b | base64 -d | tar -xz --exclude='./package.json' --exclude='package.json' --exclude='./package-lock.json' --exclude='package-lock.json' --exclude='./netlify.toml' --exclude='netlify.toml' --exclude='./scripts' --exclude='scripts' --exclude='./content' --exclude='content' --exclude='./cms' --exclude='cms' && node scripts/import-updated-devotionals.mjs && node scripts/overlay-content.mjs && node scripts/apply-main-home-admin-settings.mjs && node scripts/apply-official-branding.mjs && node scripts/consolidate-main-site-resources.mjs",
     "install-divine-blueprint": "mkdir -p _site/divine-blueprint-site && cat .source/divine-blueprint/chunks/00 .source/divine-blueprint/chunks/01 .source/divine-blueprint/chunks/02 .source/divine-blueprint/chunks/03 .source/divine-blueprint/chunks/04 .source/divine-blueprint/chunks/05 | base64 -d | tar -xz -C _site/divine-blueprint-site && node scripts/apply-divine-blueprint-cover.mjs && node scripts/apply-admin-journal-prompts-to-companion-source.mjs && node scripts/build-consolidated-companion.mjs && node scripts/create-clean-divine-blueprint-routes.mjs && node scripts/apply-canonical-book-cover-everywhere.mjs",
     "dev": "npm run prepare-site && eleventy --serve",
