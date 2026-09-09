@@ -67,13 +67,15 @@ async function adjustRefund(charge) {
 
   const remainingSale = Math.max(0, saleAmount - refundedAmount);
   const adjustedCommission = Math.round(originalCommission * remainingSale / saleAmount);
+  const offsetAmount = Number(session.metadata.commission_offset_amount || 0);
+  const payableAfterOffset = Math.max(0, adjustedCommission - offsetAmount);
   const currentStatus = String(session.metadata.commission_status || 'pending');
   const paidAmount = Number(session.metadata.commission_paid_amount || 0);
 
   if (currentStatus === 'paid' || paidAmount > 0) {
-    const debt = Math.max(0, paidAmount - adjustedCommission);
+    const debt = Math.max(0, paidAmount - payableAfterOffset);
     await updateCheckoutMetadata(session.id, {
-      commission_amount: adjustedCommission,
+      commission_amount: payableAfterOffset,
       commission_debt: debt,
       commission_status: debt > 0 ? 'debt' : 'paid',
       commission_refunded_amount: refundedAmount
@@ -82,8 +84,8 @@ async function adjustRefund(charge) {
   }
 
   await updateCheckoutMetadata(session.id, {
-    commission_amount: adjustedCommission,
-    commission_status: adjustedCommission > 0 ? 'pending' : 'reversed',
+    commission_amount: payableAfterOffset,
+    commission_status: payableAfterOffset > 0 ? 'pending' : 'reversed',
     commission_refunded_amount: refundedAmount
   });
 }
