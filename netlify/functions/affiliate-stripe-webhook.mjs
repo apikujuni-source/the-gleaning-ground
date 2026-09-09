@@ -8,6 +8,11 @@ import {
   updateCheckoutMetadata,
   findSessionByPaymentIntent
 } from './_affiliate-core.mjs';
+import {
+  commissionableAmountForSession,
+  commissionBasisSource,
+  commissionableAmountAfterRefund
+} from '../lib/affiliate-commission.mjs';
 
 function verifyStripeSignature(rawBody, signatureHeader) {
   const secret = env('STRIPE_WEBHOOK_SECRET');
@@ -36,16 +41,18 @@ async function recordCompletedSale(session) {
   const ambassador = await findActiveAmbassador(session?.client_reference_id);
   if (!ambassador) return;
 
-  const amountTotal = Number(session?.amount_total || 0);
+  const commissionBasis = commissionableAmountForSession(session);
   const rate = Number(ambassador.commissionRate || 25);
-  const commission = commissionFor(amountTotal, rate);
-  if (!amountTotal || !commission) return;
+  const commission = commissionFor(commissionBasis, rate);
+  if (!commissionBasis || !commission) return;
 
   await updateCheckoutMetadata(session.id, {
     affiliate_recorded: 'yes',
     affiliate_ref: ambassador.referralId,
     affiliate_email: ambassador.email,
     commission_rate: rate,
+    commission_basis_amount: commissionBasis,
+    commission_basis_source: commissionBasisSource(session),
     commission_original: commission,
     commission_amount: commission,
     commission_currency: String(session.currency || '').toUpperCase(),
@@ -61,12 +68,16 @@ async function adjustRefund(charge) {
   if (!session || session?.metadata?.affiliate_recorded !== 'yes') return;
 
   const originalCommission = Number(session.metadata.commission_original || session.metadata.commission_amount || 0);
-  const saleAmount = Number(session.amount_total || charge?.amount || 0);
+  const originalBasis = Number(session.metadata.commission_basis_amount || commissionableAmountForSession(session));
+  const rate = Number(session.metadata.commission_rate || 0);
   const refundedAmount = Math.max(0, Number(charge?.amount_refunded || 0));
-  if (!originalCommission || !saleAmount) return;
+  if (!originalCommission || !originalBasis) return;
 
-  const remainingSale = Math.max(0, saleAmount - refundedAmount);
-  const adjustedCommission = Math.round(originalCommission * remainingSale / saleAmount);
+  const remainingBasis = commissionableAmountAfterRefund(session, refundedAmount);
+  const refundedBasis = Math.max(0, originalBasis - remainingBasis);
+  const adjustedCommission = rate > 0
+    ? commissionFor(remainingBasis, rate)
+    : Math.round(originalCommission * remainingBasis / originalBasis);
   const offsetAmount = Number(session.metadata.commission_offset_amount || 0);
   const payableAfterOffset = Math.max(0, adjustedCommission - offsetAmount);
   const currentStatus = String(session.metadata.commission_status || 'pending');
@@ -78,7 +89,8 @@ async function adjustRefund(charge) {
       commission_amount: payableAfterOffset,
       commission_debt: debt,
       commission_status: debt > 0 ? 'debt' : 'paid',
-      commission_refunded_amount: refundedAmount
+      commission_refunded_amount: refundedAmount,
+      commission_refunded_basis_amount: refundedBasis
     });
     return;
   }
@@ -86,7 +98,8 @@ async function adjustRefund(charge) {
   await updateCheckoutMetadata(session.id, {
     commission_amount: payableAfterOffset,
     commission_status: payableAfterOffset > 0 ? 'pending' : 'reversed',
-    commission_refunded_amount: refundedAmount
+    commission_refunded_amount: refundedAmount,
+    commission_refunded_basis_amount: refundedBasis
   });
 }
 
