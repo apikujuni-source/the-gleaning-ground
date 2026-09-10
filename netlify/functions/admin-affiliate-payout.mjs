@@ -6,7 +6,7 @@ import {
   findAmbassadorBySlug,
   listCheckoutSessions,
   updateCheckoutMetadata
-} from './_affiliate-core.mjs';
+} from '../lib/affiliate-core.mjs';
 
 const MAX_NOTE = 300;
 const MAX_REFERENCE = 160;

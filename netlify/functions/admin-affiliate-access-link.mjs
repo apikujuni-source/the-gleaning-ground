@@ -3,7 +3,7 @@ import {
   verifyGithubAdmin,
   findAmbassadorBySlug,
   signAffiliateToken
-} from './_affiliate-core.mjs';
+} from '../lib/affiliate-core.mjs';
 
 export default async (request) => {
   if (request.method !== 'POST') return json(405, { ok: false, error: 'METHOD_NOT_ALLOWED' });

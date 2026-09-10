@@ -1,9 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import runtimeAmbassadors from '../lib/_ambassador-registry.generated.mjs';
+import runtimeAmbassadors from './_ambassador-registry.generated.mjs';
 
 export const ADMIN_GITHUB_LOGIN = 'apikujuni-source';
-export const REPO = 'apikujuni-source/the-gleaning-ground';
-export const AMBASSADOR_FOLDER = 'content/divine-blueprint/approved-ambassadors';
 export const HOLD_DAYS = 14;
 
 export function env(name) {
@@ -15,7 +13,8 @@ export function json(status, body) {
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store'
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff'
     }
   });
 }
@@ -76,8 +75,9 @@ export async function getAmbassadors() {
 export async function findActiveAmbassador(ref) {
   const normalized = normalizeRef(ref);
   if (!normalized) return null;
-  const records = normalizedRuntimeAmbassadors();
-  return records.find((record) => record.referralId === normalized && record.status === 'Active') || null;
+  return normalizedRuntimeAmbassadors().find(
+    (record) => record.referralId === normalized && record.status === 'Active'
+  ) || null;
 }
 
 export async function findAmbassadorBySlug(slug) {
@@ -202,50 +202,4 @@ export function commissionFor(amount, rate) {
 export function holdUntilEpoch(createdSeconds) {
   const created = Number(createdSeconds || Math.floor(Date.now() / 1000));
   return created + HOLD_DAYS * 24 * 60 * 60;
-}
-
-export async function paystackRequest(path, { method = 'GET', body } = {}) {
-  const secret = env('PAYSTACK_SECRET_KEY');
-  if (!secret) {
-    const error = new Error('Paystack secret key is not configured.');
-    error.code = 'PAYSTACK_NOT_CONFIGURED';
-    throw error;
-  }
-  const response = await fetch(`https://api.paystack.co${path}`, {
-    method,
-    headers: {
-      authorization: `Bearer ${secret}`,
-      'content-type': 'application/json'
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  let result = {};
-  try { result = await response.json(); } catch {}
-  if (!response.ok || result?.status === false) {
-    const error = new Error(result?.message || `Paystack request failed (${response.status}).`);
-    error.status = response.status;
-    throw error;
-  }
-  return result;
-}
-
-export async function findPaystackRecipient(referralId) {
-  const ref = normalizeRef(referralId);
-  if (!ref) return null;
-  for (let page = 1; page <= 20; page += 1) {
-    const result = await paystackRequest(`/transferrecipient?perPage=50&page=${page}`);
-    const recipients = Array.isArray(result?.data) ? result.data : [];
-    const match = recipients.find((recipient) =>
-      normalizeRef(recipient?.metadata?.referralId) === ref && recipient?.active !== false
-    );
-    if (match) return match;
-    if (recipients.length < 50) break;
-  }
-  return null;
-}
-
-export function payoutReference(sessionId, referralId) {
-  const cleanSession = String(sessionId || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(-20);
-  const cleanRef = String(referralId || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(-16);
-  return `tdb_${cleanRef}_${cleanSession}`.slice(0, 50).padEnd(16, '0');
 }
