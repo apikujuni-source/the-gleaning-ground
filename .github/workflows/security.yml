@@ -17,6 +17,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  history-secret-scan:
+    name: Scan Git history for secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out full repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Scan without printing matched secret values
+        run: node scripts/scan-git-history-secrets.mjs
+
   dependency-audit:
     name: Audit production dependencies
     runs-on: ubuntu-latest
