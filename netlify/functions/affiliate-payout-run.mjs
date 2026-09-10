@@ -5,7 +5,7 @@ import {
   findActiveAmbassador,
   commissionFor,
   holdUntilEpoch
-} from './_affiliate-core.mjs';
+} from '../lib/affiliate-core.mjs';
 import {
   commissionableAmountForSession,
   commissionBasisSource
