@@ -48,6 +48,15 @@
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
     Content-Type = "text/yaml; charset=utf-8"
 
+# The shared admin lives on gleaningground.com, while verified ambassador
+# applications are captured by the Divine Blueprint site. Proxy only this
+# authenticated admin API route to the Divine Blueprint project's function.
+[[redirects]]
+  from = "https://gleaningground.com/api/admin/ambassador-applications"
+  to = "https://divineblueprint.gleaningground.com/.netlify/functions/admin-ambassador-applications"
+  status = 200
+  force = true
+
 # Send legacy Divine Blueprint pages on the main domain to the standalone site.
 [[redirects]]
   from = "https://gleaningground.com/divine-blueprint/"
