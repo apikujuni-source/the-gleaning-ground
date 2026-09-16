@@ -85,14 +85,22 @@ const runtime = `
   page.id = 'ambassador-application-inbox';
   page.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#f4f6f8;display:none;overflow:auto;font-family:system-ui,-apple-system,sans-serif;color:#172536';
   page.innerHTML = '<div style="position:sticky;top:0;z-index:2;background:#173b62;color:#fff;padding:16px 22px;box-shadow:0 2px 12px rgba(0,0,0,.12)"><div style="max-width:1180px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between"><div><div style="font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:.08em">Admin</div><h1 style="font-size:22px;margin:2px 0 0">Ambassador Applications</h1></div><div style="display:flex;gap:8px"><button id="amb-app-refresh" type="button" style="padding:9px 13px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer">Refresh</button><button id="amb-app-close" type="button" style="padding:9px 13px;border-radius:8px;border:0;background:#fff;color:#173b62;font-weight:750;cursor:pointer">Back to Admin</button></div></div></div><main style="max-width:1180px;margin:0 auto;padding:24px 20px 48px"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px"><button data-filter="pending" type="button" class="amb-app-filter" style="padding:8px 12px;border:0;border-radius:999px;background:#173b62;color:#fff;font-weight:700;cursor:pointer">Pending</button><button data-filter="all" type="button" class="amb-app-filter" style="padding:8px 12px;border:1px solid #c7d0d9;border-radius:999px;background:#fff;color:#173b62;font-weight:700;cursor:pointer">All</button><span id="amb-app-count" style="color:#6a7785;font-size:14px"></span></div><div id="amb-app-notice" style="display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px"></div><div id="amb-app-list"></div></main>';
-  document.body.appendChild(page);
 
   const launch = document.createElement('button');
   launch.id = 'ambassador-application-launch';
   launch.type = 'button';
   launch.textContent = 'Ambassador Applications';
   launch.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:99997;border:0;border-radius:999px;padding:12px 17px;background:#173b62;color:#fff;font:750 14px system-ui;box-shadow:0 8px 24px rgba(0,0,0,.18);cursor:pointer';
-  document.body.appendChild(launch);
+
+  // Decap replaces the admin document body while it finishes mounting. Keep
+  // this independently managed inbox attached after that replacement and
+  // after later admin route transitions without recreating its event state.
+  const mount = () => {
+    if (!document.body) return;
+    if (!page.isConnected) document.body.appendChild(page);
+    if (!launch.isConnected) document.body.appendChild(launch);
+  };
+  mount();
 
   let applications = [];
   let filter = 'pending';
@@ -170,6 +178,10 @@ const runtime = `
       } else setNotice(String(error.message || error), false);
     }
   });
+
+  const mountObserver = new MutationObserver(mount);
+  mountObserver.observe(document.documentElement, { childList: true, subtree: true });
+  window.addEventListener('pageshow', mount);
 })();
 </script>`;
 
@@ -180,5 +192,5 @@ if (!html.includes('Open Ambassador Applications →')) {
 }
 await writeFile(indexPath, html, 'utf8');
 const check = await readFile(indexPath, 'utf8');
-for (const required of [marker, 'Ambassador Applications', 'Approve & send message', queueEndpoint, approvalEndpoint]) if (!check.includes(required)) throw new Error(`Ambassador application inbox missing: ${required}`);
+for (const required of [marker, 'Ambassador Applications', 'Approve & send message', queueEndpoint, approvalEndpoint, 'new MutationObserver(mount)', 'window.addEventListener(\'pageshow\', mount)']) if (!check.includes(required)) throw new Error(`Ambassador application inbox missing: ${required}`);
 console.log('Installed Ambassador Applications admin inbox with one-click approval and approval-email delivery.');
