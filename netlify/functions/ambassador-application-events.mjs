@@ -11,6 +11,8 @@ function clean(value, max = 1000) {
 function applicationFrom(data = {}) {
   const email = clean(data.email, 254).toLowerCase();
   if (!email || clean(data['application-source'], 120) !== FORM_SOURCE) return null;
+
+  const applicantName = clean(data['applicant-name'] || data.name, 160);
   const fingerprint = JSON.stringify({
     email,
     phone: clean(data.phone, 80),
@@ -21,7 +23,7 @@ function applicationFrom(data = {}) {
   return {
     id,
     submittedAt: new Date().toISOString(),
-    name: clean(data.name, 160),
+    name: applicantName,
     email,
     phone: clean(data.phone, 80),
     location: clean(data.location, 180),
@@ -31,7 +33,7 @@ function applicationFrom(data = {}) {
     bookStatus: clean(data['book-status'], 160),
     why: clean(data.why, 3000),
     programUnderstanding: String(data['program-understanding'] || '').toLowerCase() === 'on',
-    status: 'pending'
+    status: applicantName ? 'pending' : 'incomplete_name_capture'
   };
 }
 
