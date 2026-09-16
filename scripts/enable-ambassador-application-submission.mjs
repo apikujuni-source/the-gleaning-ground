@@ -54,14 +54,34 @@ const runtime = `<script ${runtimeMarker}>
   const status = form.querySelector('[data-ambassador-submit-status]');
   let submitting = false;
 
+  const getNameInput = () => form.querySelector('[data-ambassador-name-input], input[name="applicant-name"], input[name="name"][type="text"]');
+  const getNameMirror = () => form.querySelector('[data-ambassador-name-mirror]');
+
   form.addEventListener('submit', async (event) => {
-    if (submitting) {
-      event.preventDefault();
+    event.preventDefault();
+    if (submitting) return;
+
+    const nameInput = getNameInput();
+    const fullName = String(nameInput?.value || '').trim();
+    if (!fullName) {
+      if (nameInput) {
+        nameInput.setCustomValidity('Please enter your full name.');
+        nameInput.reportValidity();
+        nameInput.focus();
+      }
+      if (status) status.textContent = 'Please enter your full name before submitting.';
       return;
     }
-    if (!form.checkValidity()) return;
+    if (nameInput) nameInput.setCustomValidity('');
 
-    event.preventDefault();
+    const nameMirror = getNameMirror();
+    if (nameMirror) nameMirror.value = fullName;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     submitting = true;
     if (button) {
       button.disabled = true;
@@ -75,6 +95,13 @@ const runtime = `<script ${runtimeMarker}>
       for (const [key, value] of new FormData(form).entries()) {
         if (typeof value === 'string') encoded.append(key, value);
       }
+
+      // Send the applicant's full name under both a dedicated field and the
+      // legacy field. The dedicated field avoids any ambiguity with provider
+      // metadata named "name"; the mirror keeps existing notifications and
+      // integrations backward-compatible.
+      encoded.set('applicant-name', fullName);
+      encoded.set('name', fullName);
 
       const response = await fetch('/', {
         method: 'POST',
@@ -112,6 +139,7 @@ const requiredChecks = [
   [/data-netlify=["']true["']/i, 'Netlify form detection attribute'],
   [/netlify-honeypot=["']bot-field["']/i, 'Netlify honeypot'],
   [new RegExp(`name=["']form-name["'][^>]*value=["']${formName}["']`, 'i'), 'hidden form-name field'],
+  [/<input\b[^>]*name=["'](?:applicant-name|name)["'][^>]*type=["']text["'][^>]*required|<input\b[^>]*type=["']text["'][^>]*name=["'](?:applicant-name|name)["'][^>]*required/i, 'required applicant name field'],
   [/name=["']email["'][^>]*type=["']email["'][^>]*required/i, 'required email field'],
   [/type=["']submit["'][^>]*data-ambassador-submit/i, 'functional submit button'],
   [/data-ambassador-submit-status/i, 'submission status message']
@@ -120,11 +148,11 @@ const requiredChecks = [
 for (const [pattern, label] of requiredChecks) {
   if (!pattern.test(finalForm)) throw new Error(`Ambassador application is missing ${label}.`);
 }
-if (!finalHtml.includes(runtimeMarker) || !finalHtml.includes("fetch('/',")) {
-  throw new Error('Ambassador Netlify submission runtime was not installed.');
+if (!finalHtml.includes(runtimeMarker) || !finalHtml.includes("encoded.set('applicant-name', fullName)") || !finalHtml.includes("encoded.set('name', fullName)")) {
+  throw new Error('Ambassador Netlify submission runtime was not installed with explicit name mirroring.');
 }
 if (!fs.readFileSync(thanksPath, 'utf8').includes('Thank You for Applying')) {
   throw new Error('Ambassador success page is missing expected confirmation copy.');
 }
 
-console.log('Ambassador application submission enabled with Netlify Forms, AJAX feedback, spam protection, and success redirect.');
+console.log('Ambassador application submission enabled with explicit dual-field name capture, Netlify Forms, AJAX feedback, spam protection, and success redirect.');
