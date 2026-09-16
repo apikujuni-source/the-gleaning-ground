@@ -486,9 +486,9 @@
     },
     {
       "label": "Form label — phone",
-      "mode": "html",
-      "find": "Phone or WhatsApp <span>(optional)</span>",
-      "value": "Phone or WhatsApp <span>(optional)</span>",
+      "mode": "text",
+      "find": "Phone or WhatsApp (required)",
+      "value": "Phone or WhatsApp (required)",
       "all": false,
       "required": true
     },
