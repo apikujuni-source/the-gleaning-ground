@@ -129,7 +129,7 @@ const ambassadorMain = `<main id="main">
         <small class="form-note">Please use an email address you check regularly. This is how we will contact selected ambassadors.</small>
       </label>
       <div class="form-row">
-        <label>Phone or WhatsApp <span>(optional)</span><input name="phone" type="tel" autocomplete="tel"></label>
+        <label>Phone or WhatsApp (required)<input name="phone" type="tel" autocomplete="tel" required></label>
         <label>City and country<input name="location" type="text" required></label>
       </div>
       <div class="form-row">
@@ -202,7 +202,7 @@ thanksHtml = replaceMain(thanksHtml, thanksMain);
 fs.writeFileSync(thanksPath, thanksHtml);
 
 const check = fs.readFileSync(ambassadorPath, 'utf8');
-for (const required of ['Ambassador Requirements', 'Program Benefits', '15%', 'applications are reviewed', 'Toolkit sent manually', 'Email address', 'you@example.com', 'This is how we will contact selected ambassadors']) {
+for (const required of ['Ambassador Requirements', 'Program Benefits', '15%', 'applications are reviewed', 'Toolkit sent manually', 'Email address', 'you@example.com', 'This is how we will contact selected ambassadors', 'Phone or WhatsApp (required)']) {
   if (!check.toLowerCase().includes(required.toLowerCase())) {
     throw new Error(`Simplified ambassador page is missing required copy: ${required}`);
   }
@@ -213,4 +213,9 @@ if (emailInputs.length !== 1 || !/type=["']email["']/i.test(emailInputs[0]) || !
   throw new Error('Ambassador application must contain exactly one required email input.');
 }
 
-console.log('Simplified Divine Blueprint Ambassador flow installed with a prominent required email contact field.');
+const phoneInputs = check.match(/<input\b[^>]*name=["']phone["'][^>]*>/gi) || [];
+if (phoneInputs.length !== 1 || !/type=["']tel["']/i.test(phoneInputs[0]) || !/\brequired\b/i.test(phoneInputs[0])) {
+  throw new Error('Ambassador application must contain exactly one required Phone or WhatsApp input.');
+}
+
+console.log('Simplified Divine Blueprint Ambassador flow installed with prominent required email and Phone or WhatsApp contact fields.');
