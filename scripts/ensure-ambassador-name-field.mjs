@@ -4,6 +4,7 @@ import path from 'node:path';
 const siteDir = path.resolve('_site/divine-blueprint-site');
 const ambassadorPath = path.join(siteDir, 'ambassadors', 'index.html');
 const formName = 'divine-blueprint-ambassador-application';
+const cmsPageDataPattern = /<script\s+id=["']cms-page-data["'][^>]*>([\s\S]*?)<\/script>/i;
 
 if (!fs.existsSync(ambassadorPath)) {
   throw new Error(`Ambassador page not found: ${ambassadorPath}`);
@@ -60,6 +61,48 @@ if (!/data-ambassador-name-mirror/i.test(form)) {
 }
 
 html = html.replace(formPattern, form);
+
+// The Ambassador page is created from the homepage shell after the general
+// CMS page-content pass has already run. Without narrowing the inherited page
+// data, the homepage newsletter XPath targets the Ambassador form at runtime
+// and replaces the Full name label (including its input). Keep only shared
+// header/footer settings on this page and give it page-specific metadata.
+const cmsPageDataMatch = html.match(cmsPageDataPattern);
+if (cmsPageDataMatch) {
+  let cmsPageData;
+  try {
+    cmsPageData = JSON.parse(cmsPageDataMatch[1]);
+  } catch (error) {
+    throw new Error(`Could not parse inherited Ambassador CMS page data: ${error.message}`);
+  }
+
+  const sharedSections = (cmsPageData.sections || []).filter((section) => {
+    const fields = [
+      ...(section.textFields || []),
+      ...(section.linkFields || []),
+      ...(section.imageFields || []),
+      ...(section.attributeFields || [])
+    ];
+    return fields.length > 0 && fields.every((field) =>
+      /^\/html\/body\/(?:header|footer)\//.test(String(field.xpath || ''))
+    );
+  });
+
+  const ambassadorPageData = {
+    ...cmsPageData,
+    adminTitle: 'Divine Blueprint — Ambassador Program Page',
+    target: 'divine',
+    pagePath: '/ambassadors',
+    sections: sharedSections,
+    seo: {
+      title: 'Ambassador Program | The Divine Blueprint',
+      description: 'Apply to become a Divine Blueprint Ambassador and help share the book responsibly.'
+    }
+  };
+  const safeJson = JSON.stringify(ambassadorPageData).replace(/</g, '\\u003c');
+  html = html.replace(cmsPageDataPattern, (block) => block.replace(cmsPageDataMatch[1], safeJson));
+}
+
 fs.writeFileSync(ambassadorPath, html, 'utf8');
 
 const finalHtml = fs.readFileSync(ambassadorPath, 'utf8');
@@ -82,6 +125,23 @@ if (finalLegacyVisible.length !== 0) {
 }
 if (!/Full name/i.test(finalForm)) {
   throw new Error('Ambassador application is missing the Full name label.');
+}
+
+const finalPageDataMatch = finalHtml.match(cmsPageDataPattern);
+if (finalPageDataMatch) {
+  const finalPageData = JSON.parse(finalPageDataMatch[1]);
+  const inheritedMainTargets = (finalPageData.sections || []).flatMap((section) => [
+    ...(section.textFields || []),
+    ...(section.linkFields || []),
+    ...(section.imageFields || []),
+    ...(section.attributeFields || [])
+  ]).filter((field) => /^\/html\/body\/main\//.test(String(field.xpath || '')));
+  if (inheritedMainTargets.length) {
+    throw new Error('Ambassador page still contains inherited homepage main-content targets.');
+  }
+  if (finalPageData.pagePath !== '/ambassadors') {
+    throw new Error('Ambassador CMS page data has the wrong page path.');
+  }
 }
 
 console.log('Ensured required applicant-name capture plus backward-compatible name mirroring on the Divine Blueprint ambassador application.');
