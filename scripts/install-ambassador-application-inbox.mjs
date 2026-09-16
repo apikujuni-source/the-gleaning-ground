@@ -137,7 +137,14 @@ const runtime = `
     catch (error) { list.innerHTML = '<div style="background:#fff;border-radius:14px;padding:24px;color:#8a2f2f">' + esc(error.message || error) + '</div>'; }
   };
 
-  launch.addEventListener('click', async () => { page.style.display = 'block'; document.body.style.overflow = 'hidden'; await load(); });
+  const openInbox = async () => { page.style.display = 'block'; document.body.style.overflow = 'hidden'; await load(); };
+  // Decap handles document clicks while it is reconciling the admin shell.
+  // Capture this control before that handler can detach or replace it.
+  document.addEventListener('click', event => {
+    if (!event.target.closest?.('#ambassador-application-launch')) return;
+    event.preventDefault();
+    void openInbox();
+  }, true);
   page.querySelector('#amb-app-close').addEventListener('click', () => { page.style.display = 'none'; document.body.style.overflow = ''; });
   page.querySelector('#amb-app-refresh').addEventListener('click', load);
   page.querySelectorAll('.amb-app-filter').forEach(btn => btn.addEventListener('click', () => { filter = btn.dataset.filter; page.querySelectorAll('.amb-app-filter').forEach(item => { item.style.background = item === btn ? '#173b62' : '#fff'; item.style.color = item === btn ? '#fff' : '#173b62'; }); render(); }));
@@ -192,5 +199,5 @@ if (!html.includes('Open Ambassador Applications →')) {
 }
 await writeFile(indexPath, html, 'utf8');
 const check = await readFile(indexPath, 'utf8');
-for (const required of [marker, 'Ambassador Applications', 'Approve & send message', queueEndpoint, approvalEndpoint, 'new MutationObserver(mount)', 'window.addEventListener(\'pageshow\', mount)']) if (!check.includes(required)) throw new Error(`Ambassador application inbox missing: ${required}`);
+for (const required of [marker, 'Ambassador Applications', 'Approve & send message', queueEndpoint, approvalEndpoint, 'new MutationObserver(mount)', 'window.addEventListener(\'pageshow\', mount)', "document.addEventListener('click', event => {"]) if (!check.includes(required)) throw new Error(`Ambassador application inbox missing: ${required}`);
 console.log('Installed Ambassador Applications admin inbox with one-click approval and approval-email delivery.');
