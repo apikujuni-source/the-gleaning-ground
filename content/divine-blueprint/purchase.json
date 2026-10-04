@@ -1,38 +1,66 @@
 {
+  "amazonPaperbackUrl": "https://www.amazon.com/s?k=9789786343204&i=stripbooks",
   "mode": "preorder",
-  "isbn": "9789786343204",
-  "paperbackRegularPriceUs": "$14.99",
-  "paperbackPriceUs": "$10.99",
+  "companionUrl": "https://divineblueprint.gleaningground.com/companion",
   "paperbackSavingsUs": "Save $4.00",
-  "digitalRegularPriceInternational": "$9.99",
+  "selarUrl": "https://selar.com/thedivineblueprint",
+  "nigeriaDelivery": {
+    "lagos": {
+      "fee": 3500,
+      "label": "Lagos",
+      "stripeUrl": "https://buy.stripe.com/00w6oG93BfFGfuc3bkcfK0j"
+    },
+    "oyo": {
+      "fee": 3000,
+      "label": "Oyo",
+      "stripeUrl": "https://buy.stripe.com/7sY9ASbbJ1OQa9SfY6cfK0k"
+    },
+    "southwest": {
+      "fee": 4000,
+      "label": "Other Southwest",
+      "stripeUrl": "https://buy.stripe.com/eVq6oG6Vtbpq3Lu4focfK0l"
+    },
+    "centralSouth": {
+      "fee": 5000,
+      "label": "FCT / North Central / South East / South South",
+      "stripeUrl": "https://buy.stripe.com/6oUfZg93B9hi0zi7rAcfK0m"
+    },
+    "north": {
+      "fee": 6000,
+      "label": "North West / North East",
+      "stripeUrl": "https://buy.stripe.com/14A9AS6Vt0KM2Hq6nwcfK0n"
+    }
+  },
   "digitalPreorderPriceInternational": "$7.99",
-  "digitalSavingsInternational": "Save $2.00",
-  "kindleRegularPrice": "$9.99",
+  "whatsappAlternate": "2347037180583",
+  "digitalRegularPriceInternational": "$9.99",
   "kindleLaunchPrice": "$7.99",
-  "kindleSavings": "Save $2.00",
-  "digitalRegularPriceNigeria": "₦10,000",
   "digitalPreorderPriceNigeria": "₦8,000",
+  "paperbackSavingsNigeria": "Save ₦2,500",
+  "digitalRegularPriceNigeria": "₦10000",
+  "kindleSavings": "Save $2.00",
+  "nigeriaPickup": {
+    "lagos": {
+      "fee": 0,
+      "label": "Pickup in Lagos",
+      "stripeUrl": "https://buy.stripe.com/aFa14mgw38de0zieU2cfK0o"
+    },
+    "ibadan": {
+      "fee": 0,
+      "label": "Pickup in Ibadan",
+      "stripeUrl": "https://buy.stripe.com/eVqdR8gw32SU1Dm27gcfK0p"
+    }
+  },
+  "digitalSavingsInternational": "Save $2.00",
+  "stripeNigeriaPaymentUrl": "https://buy.stripe.com/bJecN45RpgJKa9S5jscfK0i",
+  "whatsappPrimary": "2349122632551",
   "digitalSavingsNigeria": "Save ₦2,000",
   "paperbackRegularPriceNigeria": "₦7,500",
-  "paperbackPriceNigeria": "₦5,500",
-  "paperbackSavingsNigeria": "Save ₦2,000",
-  "amazonPaperbackUrl": "https://www.amazon.com/s?k=9789786343204&i=stripbooks",
-  "amazonKindleUrl": "https://www.amazon.com/s?k=The+Divine+Blueprint+Ayo-Paul+Ikujuni&i=digital-text",
-  "selarUrl": "https://selar.com/thedivineblueprint",
-  "stripeNigeriaPaymentUrl": "https://buy.stripe.com/bJecN45RpgJKa9S5jscfK0i",
-  "nigeriaDelivery": {
-    "lagos": {"fee": 3500, "label": "Lagos", "stripeUrl": "https://buy.stripe.com/00w6oG93BfFGfuc3bkcfK0j"},
-    "oyo": {"fee": 3000, "label": "Oyo", "stripeUrl": "https://buy.stripe.com/7sY9ASbbJ1OQa9SfY6cfK0k"},
-    "southwest": {"fee": 4000, "label": "Other Southwest", "stripeUrl": "https://buy.stripe.com/eVq6oG6Vtbpq3Lu4focfK0l"},
-    "centralSouth": {"fee": 5000, "label": "FCT / North Central / South East / South South", "stripeUrl": "https://buy.stripe.com/6oUfZg93B9hi0zi7rAcfK0m"},
-    "north": {"fee": 6000, "label": "North West / North East", "stripeUrl": "https://buy.stripe.com/14A9AS6Vt0KM2Hq6nwcfK0n"}
-  },
-  "nigeriaPickup": {
-    "lagos": {"fee": 0, "label": "Pickup in Lagos", "stripeUrl": "https://buy.stripe.com/aFa14mgw38de0zieU2cfK0o"},
-    "ibadan": {"fee": 0, "label": "Pickup in Ibadan", "stripeUrl": "https://buy.stripe.com/eVqdR8gw32SU1Dm27gcfK0p"}
-  },
-  "whatsappPrimary": "2349122632551",
-  "whatsappAlternate": "2347037180583",
+  "paperbackPriceUs": "$10.99",
+  "isbn": "9789786343204",
+  "kindleRegularPrice": "$9.99",
+  "paperbackPriceNigeria": "₦5,000",
   "email": "info@gleaningground.com",
-  "companionUrl": "https://divineblueprint.gleaningground.com/companion"
+  "amazonKindleUrl": "https://www.amazon.com/s?k=The+Divine+Blueprint+Ayo-Paul+Ikujuni&i=digital-text",
+  "paperbackRegularPriceUs": "$14.99"
 }
