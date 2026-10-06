@@ -35,7 +35,7 @@ jobs:
           ls -lh journal/output
 
       - name: Upload Companion Journal files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: divine-blueprint-companion-journal
           path: journal/output/*
