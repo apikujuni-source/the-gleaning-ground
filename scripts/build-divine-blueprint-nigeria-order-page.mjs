@@ -78,7 +78,7 @@ ${nav}
         <div><span class="order-eyebrow">Paperback</span><h2>The Divine Blueprint</h2><p>by Ayo-Paul Ikujuni</p></div>
       </div>
       <div class="order-price">
-        <div class="order-price-main"><strong>${currentPrice}</strong>${isPreorder ? `<del>${regularPrice}</del>` : ""}</div>
+        <div class="order-price-main"><strong>${currentPrice}</strong>${currentPrice !== regularPrice ? `<del>${regularPrice}</del>` : ""}</div>
         ${isPreorder && savings ? `<span class="order-save">${savings}</span>` : ""}
       </div>
       <ul class="order-includes">

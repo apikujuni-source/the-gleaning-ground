@@ -21,9 +21,9 @@ if (!html.includes('<div class="order-price-main"><strong>')) {
 
 html = html.replace(
   pricePattern,
-  `<div class="order-price-main" data-preorder-price-display="true">
+  `<div class="order-price-main" data-order-price-display="true">
     <div class="order-price-current">
-      <span class="order-price-label">Preorder price</span>
+      <span class="order-price-label">Current price</span>
       <strong>$1</strong>
     </div>
     <div class="order-price-regular">

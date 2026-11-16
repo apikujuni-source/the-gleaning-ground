@@ -58,6 +58,7 @@ const modal = `
         <span class="book-purchase-region">Nigeria</span>
         <h3>Paperback</h3>
         <div class="book-purchase-price">${config.paperbackPriceNigeria}</div>
+        ${config.mode !== "preorder" && config.paperbackRegularPriceNigeria !== config.paperbackPriceNigeria ? `<small>Regular price <del>${config.paperbackRegularPriceNigeria}</del></small>` : ""}
         <p>Order directly for local payment and delivery coordination.</p>
         <a class="book-purchase-action book-purchase-action-whatsapp" href="${primaryWhatsappUrl}" target="_blank" rel="noopener noreferrer">Order on WhatsApp ↗</a>
         <a class="book-purchase-secondary" href="${alternateWhatsappUrl}" target="_blank" rel="noopener noreferrer">Use alternate WhatsApp number</a>
