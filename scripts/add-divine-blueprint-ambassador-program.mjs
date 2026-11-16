@@ -356,7 +356,10 @@ function pageHtml(main, currentRoute = '') {
   if (currentRoute !== '/ambassadors') {
     pageHeader = pageHeader.replace(/\saria-current=["']page["']/gi, '');
   }
-  return `${prefix}${pageHeader}${main}${tail}`;
+  const pagePrefix = currentRoute === '/ambassadors'
+    ? prefix.replace(/<title>[^<]*<\/title>/i, '<title>Ambassador Program | The Divine Blueprint</title>')
+    : prefix;
+  return `${pagePrefix}${pageHeader}${main}${tail}`;
 }
 
 fs.mkdirSync(ambassadorDir, { recursive: true });

@@ -81,8 +81,6 @@ function applyPreorder(html) {
   updated = updated
     .replace("Order the printed book through Amazon. Journal access is included.", "Preorder the printed book through Amazon at the reduced preorder price. Journal access is included.")
     .replace("Buy Paperback on Amazon ↗", "Preorder Paperback on Amazon ↗")
-    .replace("Read instantly on Kindle and register for your digital Companion Journal.", "Preorder the Kindle edition at the launch price and register for your digital Companion Journal.")
-    .replace("Buy Kindle eBook ↗", "Preorder Kindle eBook ↗")
     .replace(`<small>Planned regular price: ${config.kindleRegularPrice}.</small>`, "")
     .replace("Order directly for local payment and delivery coordination.", "Preorder directly for local payment and delivery coordination at the reduced preorder price.")
     .replace("Order on WhatsApp ↗", "Preorder on WhatsApp ↗")

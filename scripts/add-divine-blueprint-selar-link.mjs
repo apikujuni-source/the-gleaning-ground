@@ -17,7 +17,7 @@ if (!/^https:\/\//i.test(kindleUrl)) {
   throw new Error(`Invalid or missing Kindle URL in ${configPath}: ${kindleUrl}`);
 }
 
-const kindleLabel = mode === "preorder" ? "Preorder Kindle eBook ↗" : "Buy Kindle eBook ↗";
+const kindleLabel = "Buy Kindle eBook ↗";
 const nigeriaOrderLabel = mode === "preorder" ? "Preorder Paperback →" : "Order Paperback →";
 const kindleDescription = mode === "preorder"
   ? "Preorder the Kindle edition at the launch price and register for your digital Companion Journal."

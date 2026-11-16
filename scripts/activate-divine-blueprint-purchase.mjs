@@ -51,6 +51,7 @@ const modal = `
         <p>Read instantly on Kindle and register for your digital Companion Journal.</p>
         <a class="book-purchase-action book-purchase-action-gold" href="${config.amazonKindleUrl}" target="_blank" rel="noopener noreferrer">Buy Kindle eBook ↗</a>
         <small>Planned regular price: ${config.kindleRegularPrice}.</small>
+        <a href="mailto:${config.email}?subject=U.S.%20paperback%20availability">Ask about the U.S. paperback</a>
       </article>
 
       <article class="book-purchase-card">
@@ -173,6 +174,7 @@ let activatedTriggers = 0;
 
 for (const page of pages) {
   let html = await readFile(page, "utf8");
+  html = html.replace(/<div class="modal" role="dialog" aria-modal="true" aria-label="Book availability">\s*<div class="modal-card">[\s\S]*?<\/div>\s*<\/div>/g, "");
   const activated = activateTriggers(html);
   html = activated.html;
   activatedTriggers += activated.count;
