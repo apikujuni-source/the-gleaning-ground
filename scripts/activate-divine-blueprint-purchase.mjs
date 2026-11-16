@@ -48,9 +48,9 @@ const modal = `
         <span class="book-purchase-region">United States &amp; international</span>
         <h3>Kindle eBook</h3>
         <div class="book-purchase-price">${config.kindleLaunchPrice} <small>launch price</small></div>
+        ${config.mode !== "preorder" && config.kindleRegularPrice !== config.kindleLaunchPrice ? `<small>Regular price <del>${config.kindleRegularPrice}</del></small>` : ""}
         <p>Read instantly on Kindle and register for your digital Companion Journal.</p>
         <a class="book-purchase-action book-purchase-action-gold" href="${config.amazonKindleUrl}" target="_blank" rel="noopener noreferrer">Buy Kindle eBook ↗</a>
-        <small>Planned regular price: ${config.kindleRegularPrice}.</small>
         <a href="mailto:${config.email}?subject=U.S.%20paperback%20availability">Ask about the U.S. paperback</a>
       </article>
 
