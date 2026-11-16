@@ -15,8 +15,8 @@ html = html.replace(
 );
 
 const pricePattern = /<div class="order-price-main"><strong>([^<]+)<\/strong><del>([^<]+)<\/del><\/div>/i;
-if (!pricePattern.test(html)) {
-  throw new Error('Nigeria preorder current/regular price block was not found.');
+if (!html.includes('<div class="order-price-main"><strong>')) {
+  throw new Error('Nigeria order price block was not found.');
 }
 
 html = html.replace(

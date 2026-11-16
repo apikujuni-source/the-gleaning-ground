@@ -91,7 +91,7 @@ await writeFile(pagePath, html, 'utf8');
 
 let thanks = await readFile(thanksPath, 'utf8');
 thanks = thanks
-  .replace(/<title>Order Details Received \| The Divine Blueprint<\/title>/i, '<title>Preorder Confirmed | The Divine Blueprint</title>')
+  .replace(/<title>Order Details Received \| The Divine Blueprint<\/title>/i, '<title>Order Confirmed | The Divine Blueprint</title>')
   .replace('Your Divine Blueprint Nigeria paperback order details have been received.', 'Your Divine Blueprint Nigeria paperback book payment has been completed.')
   .replace('Order Details Received', 'Payment Successful')
   .replace('Your Nigeria paperback order details have been received. We will use the contact information you provided to send the secure payment and delivery instructions.', 'Your Nigeria paperback book payment has been completed securely through Stripe.')

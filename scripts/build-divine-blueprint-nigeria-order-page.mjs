@@ -16,7 +16,7 @@ const regularPrice = String(config.paperbackRegularPriceNigeria || "₦12,000");
 const savings = String(config.paperbackSavingsNigeria || "");
 const numericPrice = Number(currentPrice.replace(/[^0-9.]/g, "")) || 10000;
 const whatsapp = String(config.whatsappPrimary || "").replace(/\D/g, "");
-const whatsappUrl = whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent("Hello, I need help with my Nigeria preorder for The Divine Blueprint paperback.")}` : "#";
+const whatsappUrl = whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent("Hello, I need help with my Nigeria order for The Divine Blueprint paperback.")}` : "#";
 
 const pageTitle = isPreorder ? "Preorder The Divine Blueprint in Nigeria" : "Order The Divine Blueprint in Nigeria";
 const actionLabel = isPreorder ? "Reserve My Preorder" : "Submit My Order";
